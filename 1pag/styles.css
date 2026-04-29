@@ -7,6 +7,13 @@
 * {
     box-sizing: border-box;
 }
+.textos {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    border-radius: 12px;
+    border: 4px solid #073763;
+}
 
 html, body {
     margin: 0;
@@ -17,6 +24,8 @@ body {
     min-height: 100vh;
     background: linear-gradient(180deg, #f9f6e6 0%, #ffffff 60%);
     color: #073763;
+    ;
+    
 }
 
 
@@ -38,8 +47,8 @@ body {
 }
 
 .logo {
-    width: 64px;
-    height: 64px;
+    width: 71px;
+    height: 55px;
     display: grid;
     place-items: center;
     background: #073763;
@@ -71,5 +80,17 @@ body {
     text-decoration: none;
     color: #073763;
     font-weight: 600;
+}
+
+@media (max-width: 1200px) {
+    body {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        grid-template-columns: 1fr;
+    }
 }
 
