@@ -100,7 +100,33 @@ body {
 .nav-and-login {
     display: flex;
     gap: 1rem;
-    align-items: center;
+
+}
+
+.school-logo-button {
+    background-color: #ffda00;
+    color: #073763;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.school-logo-button:hover {
+    background: #073763;
+    color: #ffda00;
+    transform: translateY(-1px);
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
+}
+
+.school-logo-button:focus {
+    outline: 2px solid #ffda00;
+    outline-offset: 2px;
 }
 
 .site-header a {
