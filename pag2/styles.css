@@ -20,6 +20,9 @@ html, body {
     padding: 0;
 }
 
+
+
+
 body {
     min-height: 100vh;
     background: linear-gradient(180deg, #f9f6e6 0%, #ffffff 60%);
@@ -76,23 +79,30 @@ body {
     flex-wrap: wrap;
 }
 
-
 .site-header a {
     text-decoration: none;
     color: #073763;
     font-weight: 600;
-    padding-top: 60px;
-    
-}
-h1{
-    text-align: center;
-    color: #073763;
-    margin-top: 2rem;
 }
 
 @media (max-width: 1200px) {
     body {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+    .brand {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .site-header nav {
+        justify-content: center;
     }
 }
 
