@@ -100,7 +100,7 @@ body {
 .nav-and-login {
     display: flex;
     gap: 1rem;
-
+    align-items: center;
 }
 
 .school-logo-button {
@@ -112,7 +112,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-decoration: none;
     display: inline-block;
 }
@@ -121,7 +121,7 @@ body {
     background: #073763;
     color: #ffda00;
     transform: translateY(-1px);
-    box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .school-logo-button:focus {

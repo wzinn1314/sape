@@ -1,0 +1,112 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1E90FF 0%, #FF0000 50%, #FFFF00 100%);
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: #1E90FF;
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.tipo-pessoa {
+    margin-bottom: 20px;
+}
+
+.tipo-pessoa label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.tipo-pessoa input[type="radio"] {
+    margin-right: 10px;
+}
+
+.tipo-pessoa label:not(.tipo-pessoa label:first-child) {
+    margin-left: 20px;
+}
+
+label {
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #1E90FF;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #FF0000;
+    outline: none;
+}
+
+.termos {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.termos input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.termos label {
+    font-weight: normal;
+    line-height: 1.4;
+}
+
+.termos a {
+    color: #1E90FF;
+    text-decoration: none;
+}
+
+.termos a:hover {
+    text-decoration: underline;
+}
+
+button {
+    padding: 12px;
+    background-color: #FFFF00;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #FFD700;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
