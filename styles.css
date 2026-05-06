@@ -77,16 +77,31 @@ body {
 }
 
 .logo {
-    width: 79px;
-    height: 55px;
+    width: 180px;
+    height: 180px;
     display: grid;
     place-items: center;
-    background: #073763;
     color: #ffffff;
     font-weight: 800;
     border-radius: 12px;
-    font-size: 1.35rem;
-    border: 2px solid #ffda00;
+    font-size: 1.8rem;
+    
+}
+
+.logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
 }
 
 .school-name {
