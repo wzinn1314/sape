@@ -9,10 +9,10 @@
 .register-card {
     width: min(560px, 100%);
     background-color: #ffffff;
-    border: 4px solid #073763;
+    border: 2px solid #073763;
     border-radius: 24px;
     padding: 2.5rem;
-    box-shadow: 0 24px 60px rgba(7, 55, 99, 0.12);
+    box-shadow: 0 8px 24px rgba(7, 55, 99, 0.1);
 }
 
 .register-header .small-title {
@@ -66,7 +66,7 @@ input {
 
 input:focus {
     outline: 2px solid #ffda00;
-    border-color: #073763;
+    border-color: #ffda00;
     background-color: #ffffff;
 }
 
@@ -106,8 +106,8 @@ input:focus {
     align-items: center;
     width: 100%;
     padding: 1rem;
-    background-color: #073763;
-    color: #ffda00;
+    background-color: #ffda00;
+    color: #073763;
     border-radius: 14px;
     font-size: 1rem;
     font-weight: 700;
@@ -116,8 +116,8 @@ input:focus {
 }
 
 .button-link:hover {
-    background-color: #13407c;
-    transform: translateY(-1px);
+    background-color: #f0c900;
+    transform: translateY(-2px);
 }
 
 .button-link.disabled {

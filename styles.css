@@ -10,43 +10,52 @@
 .textos {
     max-width: 800px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 2rem 1rem;
     border-radius: 12px;
-    border: 4px solid #073763;
+    border-left: 5px solid #ffda00;
+    background-color: #f9f6e6;
+    box-shadow: 0 2px 8px rgba(7, 55, 99, 0.08);
 }
-.login{
-    color: #fff;
+.login {
+    color: #ffffff;
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 15px;
-   
+    background-color: #ffda00;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.login:hover {
+    background-color: #f0c900;
+    transform: translateY(-2px);
 }
 
 html, body {
     margin: 0;
     padding: 0;
 }
-button{
-    background-color: #073763;
-    color: #ffda00;
+button {
+    background-color: #ffda00;
+    color: #073763;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: #13407c;
+    background-color: #f0c900;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 218, 0, 0.3);
 }
 
 body {
     min-height: 100vh;
-    background: linear-gradient(180deg, #f9f6e6 0%, #ffffff 60%);
+    background-color: #ffffff;
     color: #073763;
-    ;
-    
 }
 
 
@@ -57,8 +66,8 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1.5rem 2rem;
-    background-color: #ffda00;
-    border-bottom: 4px solid #073763;
+    background-color: #ffffff;
+    border-bottom: 3px solid #073763;
 }
 
 .brand {
@@ -73,10 +82,11 @@ body {
     display: grid;
     place-items: center;
     background: #073763;
-    color: #ffda00;
+    color: #ffffff;
     font-weight: 800;
     border-radius: 12px;
     font-size: 1.35rem;
+    border: 2px solid #ffda00;
 }
 
 .school-name {
@@ -88,7 +98,7 @@ body {
 .school-tag {
     margin: 0.25rem 0 0;
     font-size: 0.95rem;
-    color: #13407c;
+    color: #073763;
 }
 
 .site-header nav {

@@ -1,0 +1,115 @@
+:root {
+    color: #073763;
+    background-color: #ffffff;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.textos {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    border-left: 5px solid #ffda00;
+    background-color: #f9f6e6;
+    box-shadow: 0 2px 8px rgba(7, 55, 99, 0.08);
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #ffffff;
+    color: #073763;
+}
+
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background-color: #ffffff;
+    border-bottom: 3px solid #073763;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 79px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    background: #073763;
+    color: #ffffff;
+    font-weight: 800;
+    border-radius: 12px;
+    font-size: 1.35rem;
+    border: 2px solid #ffda00;
+}
+
+.school-name {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.school-tag {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+    color: #073763;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.site-header a {
+    text-decoration: none;
+    color: #073763;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.site-header a:hover {
+    color: #ffda00;
+}
+
+@media (max-width: 1200px) {
+    body {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .brand {
+        flex-direction: column;
+    }
+
+    .site-header nav {
+        justify-content: center;
+    }
+
+    .textos {
+        padding: 1.5rem 1rem;
+    }
+}

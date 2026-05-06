@@ -25,10 +25,8 @@ html, body {
 
 body {
     min-height: 100vh;
-    background: linear-gradient(180deg, #f9f6e6 0%, #ffffff 60%);
+    background-color: #ffffff;
     color: #073763;
-    ;
-    
 }
 
 
@@ -39,8 +37,8 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1.5rem 2rem;
-    background-color: #ffda00;
-    border-bottom: 4px solid #073763;
+    background-color: #ffffff;
+    border-bottom: 3px solid #073763;
 }
 
 .brand {
@@ -55,10 +53,11 @@ body {
     display: grid;
     place-items: center;
     background: #073763;
-    color: #ffda00;
+    color: #ffffff;
     font-weight: 800;
     border-radius: 12px;
     font-size: 1.35rem;
+    border: 2px solid #ffda00;
 }
 
 .school-name {
@@ -70,7 +69,7 @@ body {
 .school-tag {
     margin: 0.25rem 0 0;
     font-size: 0.95rem;
-    color: #13407c;
+    color: #073763;
 }
 
 .site-header nav {
