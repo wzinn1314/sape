@@ -15,6 +15,64 @@
     box-shadow: 0 8px 24px rgba(7, 55, 99, 0.1);
 }
 
+/* Header responsivo */
+.site-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background-color: #ffffff;
+    border-bottom: 3px solid #073763;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 180px;
+    height: 180px;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-weight: 800;
+    border-radius: 12px;
+    font-size: 1.8rem;
+}
+
+.logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.nav-and-login {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.school-logo-button {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 15px;
+    background-color: #ffda00;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.school-logo-button:hover {
+    background-color: #f0c900;
+    transform: translateY(-2px);
+}
+
 .register-header .small-title {
     margin: 0;
     font-size: 0.85rem;
@@ -142,10 +200,16 @@ input:focus {
     }
 }
 
-
+/* Responsividade completa */
 @media (max-width: 1200px) {
-    body {
-        grid-template-columns: repeat(2, 1fr);
+    .logo {
+        width: 100px;
+        height: 100px;
+        font-size: 1.5rem;
+    }
+
+    .site-header {
+        padding: 1.25rem 1.5rem;
     }
 }
 
@@ -154,19 +218,107 @@ input:focus {
         flex-direction: column;
         text-align: center;
         padding: 1rem;
+        gap: 1rem;
     }
+
     .brand {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
-    .site-header nav {
-        justify-content: center;
+
+    .logo {
+        width: 80px;
+        height: 80px;
+        font-size: 1.2rem;
+    }
+
+    .register-page {
+        padding: 1rem 0.5rem 2rem;
+        min-height: calc(100vh - 100px);
+    }
+
+    .register-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .register-header h1 {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .checkbox-group {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .checkbox-group input {
+        margin-top: 0.1rem;
     }
 }
 
-@media (max-width: 600px) {
-    body {
-        grid-template-columns: 1fr;
+@media (max-width: 480px) {
+    .site-header {
+        padding: 0.75rem;
+    }
+
+    .logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1rem;
+    }
+
+    .school-name {
+        font-size: 1rem;
+    }
+
+    .register-page {
+        padding: 0.5rem 0.25rem 1rem;
+    }
+
+    .register-card {
+        padding: 1.25rem;
+        margin: 0 0.5rem;
+    }
+
+    .register-header h1 {
+        font-size: 1.75rem;
+        margin: 0.5rem 0;
+    }
+
+    .register-header p {
+        font-size: 0.9rem;
+    }
+
+    input {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .button-link {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .note {
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 1201px) {
+    .logo {
+        width: 140px;
+        height: 140px;
+        font-size: 2rem;
+    }
+
+    .site-header {
+        padding: 2rem 3rem;
+    }
+
+    .register-card {
+        max-width: 600px;
+        padding: 3rem;
     }
 }
 
