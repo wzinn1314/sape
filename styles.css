@@ -8,13 +8,13 @@
     box-sizing: border-box;
 }
 .textos {
-    max-width: 800px;
+    max-width: 900px;
     margin: 2rem auto;
-    padding: 2rem 1rem;
+    padding: 2rem 1.5rem;
     border-radius: 12px;
     border-left: 5px solid #ffda00;
     background-color: #f9f6e6;
-    box-shadow: 0 2px 8px rgba(7, 55, 99, 0.08);
+    box-shadow: 0 2px 12px rgba(7, 55, 99, 0.1);
 }
 .login {
     color: #ffffff;
@@ -98,15 +98,14 @@ body {
 }
 
 .logo {
-    width: 180px;
-    height: 180px;
+    width: 220px;
+    height: 220px;
     display: grid;
     place-items: center;
     color: #ffffff;
     font-weight: 800;
-    border-radius: 12px;
-    font-size: 1.8rem;
-    
+    border-radius: 16px;
+    font-size: 2.2rem;
 }
 
 .logo img {
@@ -182,8 +181,22 @@ body {
 }
 
 @media (max-width: 1200px) {
-    body {
-        grid-template-columns: repeat(2, 1fr);
+    .logo {
+        width: 180px;
+        height: 180px;
+        font-size: 2rem;
+    }
+
+    .site-header {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .school-name {
+        font-size: 1.15rem;
+    }
+
+    .school-tag {
+        font-size: 0.95rem;
     }
 }
 
@@ -203,19 +216,53 @@ body {
         flex-direction: column;
         text-align: center;
         padding: 1rem;
+        gap: 1rem;
     }
     .brand {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        width: 100%;
+    }
+    .logo {
+        width: 160px;
+        height: 160px;
+        font-size: 1.8rem;
     }
     .site-header nav {
         justify-content: center;
+        width: 100%;
+    }
+    .nav-and-login {
+        width: 100%;
+        justify-content: center;
+    }
+    .textos {
+        padding: 1.5rem 1rem;
     }
 }
 
 @media (max-width: 600px) {
-    body {
-        grid-template-columns: 1fr;
+    .site-header {
+        padding: 0.85rem 0.85rem;
+    }
+    .logo {
+        width: 120px;
+        height: 120px;
+        font-size: 1.4rem;
+    }
+    .school-name {
+        font-size: 1rem;
+    }
+    .school-tag {
+        font-size: 0.9rem;
+    }
+    .textos {
+        padding: 1rem 0.85rem;
+    }
+    .site-header nav,
+    .nav-and-login {
+        flex-direction: column;
+        gap: 0.75rem;
     }
 }
 
