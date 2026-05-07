@@ -37,16 +37,61 @@ function validarFormulario() {
 
     if (formularioValido) {
         buttonLink.classList.remove('disabled');
-        buttonLink.setAttribute('href', '../login/index.html');
         buttonLink.setAttribute('aria-disabled', 'false');
         buttonLink.removeAttribute('tabindex');
     } else {
         buttonLink.classList.add('disabled');
-        buttonLink.removeAttribute('href');
         buttonLink.setAttribute('aria-disabled', 'true');
         buttonLink.setAttribute('tabindex', '-1');
     }
 }
+
+// Adicionar event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    [nome, email, cpf, senha, confirmarSenha, checkbox].forEach(field => {
+        field.addEventListener('input', validarFormulario);
+        field.addEventListener('change', validarFormulario);
+    });
+
+    buttonLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        if (buttonLink.classList.contains('disabled')) {
+            return;
+        }
+
+        // Coletar dados
+        const userData = {
+            name: nome.value.trim(),
+            email: email.value.trim(),
+            cpf: cpf.value.replace(/\D/g, ''), // Remove formatação
+            password: senha.value
+        };
+
+        try {
+            // Enviar para o backend
+            const response = await fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Cadastro realizado com sucesso!');
+                window.location.href = '../login/index.html';
+            } else {
+                alert('Erro no cadastro: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao conectar com o servidor. Tente novamente.');
+        }
+    });
+});
 
 [nome, email, cpf, senha, confirmarSenha, checkbox].forEach(element => {
     element.addEventListener('input', validarFormulario);
