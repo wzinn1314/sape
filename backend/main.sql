@@ -1,0 +1,9 @@
+CREATE DATABASE sapedb;
+USE sapedb;
+CREATE TABLE user (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(240) NOT NULL,
+    email VARCHAR(240) NOT NULL,
+    password VARCHAR(240) NOT NULL,
+    
+}
