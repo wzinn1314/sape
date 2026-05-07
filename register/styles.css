@@ -34,8 +34,8 @@
 }
 
 .logo {
-    width: 180px;
-    height: 180px;
+    width: 60px;
+    height: 60px;
     display: grid;
     place-items: center;
     color: #ffffff;
@@ -113,7 +113,7 @@ label {
 }
 
 input {
-    width: 100%;
+    width: 90%;
     padding: 1rem 1rem;
     border: 1px solid #d9dbe1;
     border-radius: 14px;
@@ -162,7 +162,7 @@ input:focus {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 90%;
     padding: 1rem;
     background-color: #ffda00;
     color: #073763;
@@ -200,7 +200,7 @@ input:focus {
     }
 }
 
-/* Responsividade completa */
+
 @media (max-width: 1200px) {
     .logo {
         width: 100px;
@@ -277,8 +277,28 @@ input:focus {
     }
 
     .register-card {
+        width: 100%;
+        max-width: 100%;
         padding: 1.25rem;
-        margin: 0 0.5rem;
+        margin: 0;
+    }
+
+    form {
+        width: 100%;
+        gap: 0.95rem;
+    }
+
+    .form-group {
+        gap: 0.35rem;
+    }
+
+    .checkbox-group {
+        width: 100%;
+    }
+
+    .button-link {
+        white-space: normal;
+        word-break: break-word;
     }
 
     .register-header h1 {
