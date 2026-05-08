@@ -49,7 +49,11 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
 
 
 app.get('/users', (req, res) => {
+<<<<<<< HEAD
   db.all('SELECT id, name, email, cpf FROM user', ... [], (err, rows) => {
+=======
+  db.all('SELECT id, name, email, cpf, password FROM user', [], (err, rows) => {
+>>>>>>> 146ac3d (banco de dados feito e funcionando, para colocar para rodar so da cd backend e depois npm run dev)
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
