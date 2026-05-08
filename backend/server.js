@@ -1,3 +1,10 @@
+/* backend/server.js
+   Pequeno servidor Express para desenvolvimento local.
+   - Usa SQLite para persistência simples (arquivo `sapedb.sqlite`).
+   - Endpoints: GET /users, POST /register, POST /login
+   Observação: em produção, ajustar configurações de segurança, CORS e uso de variáveis de ambiente.
+*/
+
 require('dotenv').config();
 
 const sqlite3 = require('sqlite3').verbose();
@@ -9,13 +16,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
+// Conexão e inicialização do banco SQLite
 const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
   if (err) {
     console.error('Erro ao conectar no DB:', err.message);
   } else {
     console.log('Conectado ao banco de dados SQLite!');
 
+    // Cria tabela `user` se não existir e garante colunas esperadas
     db.serialize(() => {
       db.run(`CREATE TABLE IF NOT EXISTS user (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +33,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         cpf TEXT NOT NULL
       )`);
 
+      // Verifica colunas e adiciona colunas faltantes (migração simples)
       db.all('PRAGMA table_info(user)', [], (err, columns) => {
         if (!err && columns) {
           const requiredColumns = [
@@ -47,7 +56,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
   }
 });
 
-
+// Lista usuários (apenas para desenvolvimento/debug)
 app.get('/users', (req, res) => {
   db.all('SELECT id, name, email, cpf, password FROM user', [], (err, rows) => {
     if (err) {
@@ -58,6 +67,7 @@ app.get('/users', (req, res) => {
   });
 });
 
+// Cadastro de usuário
 app.post('/register', async (req, res) => {
   const { name, email, cpf, password } = req.body;
 
@@ -66,10 +76,9 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    
+    // Armazena senha com hash (bcrypt)
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    
     db.run('INSERT INTO user (name, email, password, cpf) VALUES (?, ?, ?, ?)', [name, email, hashedPassword, cpf], function(err) {
       if (err) {
         if (err.message.includes('UNIQUE constraint failed')) {
@@ -86,7 +95,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
+// Login: valida credenciais
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -109,6 +118,7 @@ app.post('/login', (req, res) => {
   });
 });
 
+// Inicializa servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

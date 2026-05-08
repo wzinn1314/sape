@@ -1,3 +1,11 @@
+/* pag3/styles.css - estilos da página "Diagnóstico e Apoio"
+   Estrutura:
+   - Reset / variáveis
+   - Cabeçalho (site-header, brand, logo)
+   - Navegação e interações
+   - Regras responsivas
+*/
+
 :root {
     color: #073763;
     background-color: #ffffff;
@@ -12,7 +20,6 @@
     max-width: 900px;
     margin: 2rem auto;
     padding: 2rem 1.5rem;
-    border-radius: 12px;
     border-left: 5px solid #ffda00;
     background-color: #f9f6e6;
     box-shadow: 0 2px 12px rgba(7, 55, 99, 0.1);
@@ -35,7 +42,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 2rem;
+    padding: 1rem 2rem;
     background-color: #ffffff;
     border-bottom: 3px solid #073763;
 }
@@ -47,8 +54,8 @@ body {
 }
 
 .logo {
-    width: 160px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     display: grid;
     place-items: center;
     background: #073763;
@@ -57,6 +64,7 @@ body {
     border-radius: 16px;
     font-size: 1.85rem;
     border: 3px solid #ffda00;
+    flex-shrink: 0;
 }
 
 .school-name {
@@ -98,6 +106,19 @@ body {
     .site-header {
         padding: 1.25rem 1.5rem;
     }
+}
+
+/* Override local: garante que a logo não expanda e empurre o cabeçalho */
+.site-header .logo {
+    width: auto !important;
+    max-width: 120px !important;
+    height: auto !important;
+    max-height: 120px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
 }
 
 @media (max-width: 768px) {

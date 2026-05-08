@@ -1,10 +1,21 @@
-﻿:root {
+﻿/* styles.css - estilos globais do site
+   Seções principais:
+   1) Variáveis e tipografia (:root)
+   2) Reset e box model
+   3) Componentes (cards, header, nav, logo)
+   4) Regras responsivas
+   Comentários em PT-BR para ajudar manutenção.
+*/
+
+:root {
+    /* Variáveis básicas de cor e tipografia */
     color: #073763;
     background-color: #f7f3e9;
     font-family: 'Inter', system-ui, sans-serif;
 }
 
 * {
+    /* Box-sizing consistente para todos os elementos */
     box-sizing: border-box;
 }
 .textos {
@@ -65,7 +76,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 2rem;
+    padding: 1rem 2rem;
     background-color: #ffffff;
     border-bottom: 3px solid #073763;
 }
@@ -98,25 +109,23 @@ body {
 }
 
 .logo {
-    width: 220px;
-    height: 220px;
-    display: grid;
-    place-items: center;
+    /* Container da logo (imagem ou texto) */
+    /* Mantém tamanho inicial e centraliza o conteúdo */
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;   /* centraliza verticalmente */
+    justify-content: center; /* centraliza horizontalmente */
     color: #ffffff;
     font-weight: 800;
     border-radius: 16px;
-    font-size: 2.2rem;
+    font-size: 1rem;
+    flex-shrink: 0;
+    overflow: hidden; /* evita que imagens vazeam do container */
 }
 
 .logo img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-}
-
-.logo img {
+    /* Imagem dentro da logo: não ultrapassar o container */
     max-width: 100%;
     max-height: 100%;
     width: auto;
@@ -126,20 +135,132 @@ body {
 
 .school-name {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .school-tag {
-    margin: 0.25rem 0 0;
-    font-size: 0.95rem;
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
     color: #073763;
+    line-height: 1.2;
 }
 
 .site-header nav {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+.skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 0.75rem;
+    background: #ffda00;
+    color: #073763;
+    z-index: 1000;
+    border-radius: 6px;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+.site-nav .nav-list {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+.site-nav a {
+    text-decoration: none;
+    color: #073763;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.site-nav a:hover,
+.site-nav a:focus {
+    background: #ffda00;
+    color: #073763;
+}
+.nav-toggle {
+    display: none;
+    background: transparent;
+    border: 2px solid #073763;
+    border-radius: 8px;
+    padding: 0.4rem;
+    cursor: pointer;
+}
+.nav-toggle .hamburger {
+    width: 20px;
+    height: 2px;
+    background: #073763;
+    display: block;
+    position: relative;
+}
+.nav-toggle .hamburger::before,
+.nav-toggle .hamburger::after {
+    content: "";
+    width: 20px;
+    height: 2px;
+    background: #073763;
+    position: absolute;
+    left: 0;
+}
+.nav-toggle .hamburger::before { top: -6px; }
+.nav-toggle .hamburger::after { top: 6px; }
+
+.site-nav { --menu-width: 320px; }
+
+@media (max-width: 768px) {
+    .nav-toggle { display: inline-block; }
+    .site-nav {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        background: #ffffff;
+        border-top: 1px solid #eee;
+        box-shadow: 0 6px 18px rgba(7,55,99,0.08);
+        display: none;
+        z-index: 90;
+    }
+    .site-nav.open { display: block; }
+    .site-nav .nav-list { flex-direction: column; padding: 1rem; gap: 0.5rem; }
+    .site-header { position: relative; }
 }
 
 .nav-and-login {
@@ -264,5 +385,18 @@ body {
         flex-direction: column;
         gap: 0.75rem;
     }
+}
+
+/* Garanta que a logo não expanda e empurre o cabeçalho */
+.site-header .logo {
+    width: auto !important;
+    max-width: 120px !important;
+    height: auto !important;
+    max-height: 120px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
 }
 

@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<!-- register/index.html
+     Página de cadastro (formulário).
+     Estrutura:
+     - head: metatags, estilos (local + global) e import do `header.js`.
+     - body: o cabeçalho é injetado dinamicamente; o formulário está dentro de <main id="conteudo">.
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assent/foto.png">
+    <!-- styles.css local para esta página e ../styles.css para estilos globais -->
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../header.js" defer></script>
     <title>Cadastro - SAPE</title>
 </head>
 <body>
-    <header class="site-header">
-        <div class="brand">
-            <div class="logo"><img src="../assent/logo.png" alt="Logo da Escola"></div>
-            <div>
-                <p class="school-name">Sistema de Suporte à Atenção Psicopedagógica Estudantil</p>
-            </div>
-        </div>
-        <div class="nav-and-login">
-            <a href="../index.html" class="school-logo-button">Voltar</a>
-        </div>
-    </header>
+    <!-- Cabeçalho padrão: injetado via header.js -->
 
-    <main class="register-page">
+    <main id="conteudo" class="register-page">
         <section class="register-card">
             <div class="register-header">
                 <p class="small-title">Novo cadastro</p>
@@ -70,6 +69,7 @@
         </section>
     </main>
 
+    <!-- Script que valida e envia o formulário de cadastro -->
     <script src="register.js"></script>
 </body>
 </html>

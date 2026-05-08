@@ -1,25 +1,24 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-BR">
+<!-- index.html
+    Página principal do site SAPE.
+    Estrutura:
+    - <head>: metatags, estilos e carregamento do injetor de cabeçalho (`header.js`).
+    - <body>: o cabeçalho é injetado dinamicamente por `header.js`; o conteúdo principal fica em <main id="conteudo">.
+    Comentários e marcações em PT-BR para facilitar manutenção.
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assent/foto.png">
     <link rel="stylesheet" href="styles.css">
     <title>SAPE</title>
+    <script src="header.js" defer></script>
 </head>
 <body>
-    <header class="site-header">
-        <div class="brand">
-            <div class="logo"><img src="assent/logo.png" alt="Logo da Escola"></div>
-            <div>
-                <p class="school-name">Sistema de Suporte à Atenção Psicopedagógica Estudantil</p>
-            </div>
-        </div>
-        <div class="nav-and-login">
-            <a href="login/index.html" class="school-logo-button">Login</a>
-            <a href="register/index.html" class="school-logo-button">Cadastre-se</a>
-        </div>
-    </header>
+    <!-- Cabeçalho padrão: injetado via header.js -->
+    <main id="conteudo">
+    <!-- Blocos de conteúdo informativo (classe .textos compartilha estilos globais) -->
     <div class ="textos">
         <h1>O que é ser um neurodivergente?</h1>
         <p>Neurodivergente é um termo usado para descrever pessoas cujo desenvolvimento neurológico ou funcionamento cognitivo difere do que é considerado típico ou "neurotípico". Isso inclui condições como autismo, TDAH, dislexia, entre outras. O conceito de neurodivergência reconhece que essas diferenças não são necessariamente patologias, mas sim variações naturais da diversidade humana. O objetivo é promover a inclusão e o respeito às diferenças neurológicas, valorizando as habilidades e perspectivas únicas que as pessoas neurodivergentes podem oferecer.</p>
@@ -36,7 +35,7 @@
             <h2>Dislexia</h2>
             <p>A dislexia é uma dificuldade de aprendizagem que afeta a capacidade de ler, escrever e soletrar. Pessoas com dislexia podem ter dificuldades em reconhecer palavras, decodificar sons e compreender textos escritos. No entanto, muitas pessoas com dislexia possuem habilidades visuais e espaciais excepcionais, além de serem criativas e inovadoras.</p>
         </div>
+        </main>
 
-   
-</body>
-</html>
+    </body>
+    </html>
