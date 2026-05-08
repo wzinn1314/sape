@@ -6,6 +6,10 @@
     padding: 2rem;
 }
 
+img{
+    width: 120px;
+}
+
 .login-card {
     width: 100%;
     max-width: 430px;
