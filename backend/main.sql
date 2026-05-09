@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS user (
     email VARCHAR(240) NOT NULL,
     password VARCHAR(240) NOT NULL
 );
+wazinnnnnnnnnnnnn
