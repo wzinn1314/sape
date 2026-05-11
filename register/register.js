@@ -1,3 +1,13 @@
+/* register.js
+   Validação do formulário de cadastro e envio ao backend.
+
+   Funcionalidade:
+   - Valida campos em tempo real (nome, email, CPF, senha e aceite de termos).
+   - Habilita/desabilita o botão de envio (`#registrar-btn`).
+   - Envia requisição POST para `/register` do backend.
+*/
+
+// Elementos do formulário (script é carregado no final do body)
 const nome = document.getElementById('nome');
 const email = document.getElementById('email');
 const cpf = document.getElementById('cpf');
@@ -6,6 +16,7 @@ const confirmarSenha = document.getElementById('confirmar-senha');
 const checkbox = document.getElementById('aceito-termos');
 const buttonLink = document.getElementById('registrar-btn');
 
+// Validação de CPF (formato e dígitos verificadores)
 function validarCPF(cpfValue) {
     const digits = cpfValue.replace(/\D/g, '');
     if (digits.length !== 11 || /^([0-9])\1{10}$/.test(digits)) {
@@ -25,6 +36,7 @@ function validarCPF(cpfValue) {
     return digits === `${base}${digito1}${digito2}`;
 }
 
+// Verifica se o formulário está válido e atualiza o estado do botão
 function validarFormulario() {
     const nomeValido = nome.value.trim() !== '';
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
@@ -46,13 +58,18 @@ function validarFormulario() {
     }
 }
 
-// Adicionar event listeners
+// Liga os event listeners quando o DOM estiver pronto e faz a submissão
 document.addEventListener('DOMContentLoaded', () => {
+    // Atualiza validação ao digitar e ao mudar campos
     [nome, email, cpf, senha, confirmarSenha, checkbox].forEach(field => {
         field.addEventListener('input', validarFormulario);
         field.addEventListener('change', validarFormulario);
     });
 
+    // Validação inicial para ajustar estado do botão ao carregar a página
+    validarFormulario();
+
+    // Envio do formulário (via fetch para o backend)
     buttonLink.addEventListener('click', async (e) => {
         e.preventDefault();
 
@@ -60,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Coletar dados
         const userData = {
             name: nome.value.trim(),
             email: email.value.trim(),
@@ -69,12 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            // Enviar para o backend
             const response = await fetch('http://localhost:3000/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
 
@@ -92,16 +105,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-[nome, email, cpf, senha, confirmarSenha, checkbox].forEach(element => {
-    element.addEventListener('input', validarFormulario);
-    element.addEventListener('change', validarFormulario);
-});
-
-buttonLink.addEventListener('click', function(event) {
-    if (buttonLink.classList.contains('disabled')) {
-        event.preventDefault();
-    }
-});
-
-validarFormulario(); 

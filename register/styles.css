@@ -1,4 +1,10 @@
 .register-page {
+    /* register/styles.css
+       1) Estrutura da página de cadastro (layout e cartão)
+       2) Cabeçalho (site-header, brand, logo)
+       3) Formulários e regras responsivas
+       Comentários em PT-BR para facilitar manutenção.
+    */
     min-height: calc(100vh - 120px);
     display: flex;
     align-items: center;
@@ -22,7 +28,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 2rem;
+    padding: 1rem 2rem;
     background-color: #ffffff;
     border-bottom: 3px solid #073763;
 }
@@ -34,14 +40,17 @@
 }
 
 .logo {
-    width: 160px;
-    height: 160px;
+    /* Container da logo (imagem ou texto). Centraliza e mantém proporção */
+    width: 80px;
+    height: 80px;
     display: grid;
-    place-items: center;
+    place-items: center; /* funciona com grid: alinha horizontal/vertical */
     color: #ffffff;
     font-weight: 800;
     border-radius: 18px;
     font-size: 2.4rem;
+    flex-shrink: 0;
+    overflow: hidden; /* previne vazamento da imagem */
 }
 
 .logo img {
@@ -99,6 +108,19 @@ form {
     display: grid;
     gap: 1rem;
     margin-top: 1.75rem;
+}
+
+/* Garanta que a logo não expanda e empurre o cabeçalho */
+.site-header .logo {
+    width: auto !important;
+    max-width: 120px !important;
+    height: auto !important;
+    max-height: 120px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
 }
 
 .form-group {
@@ -259,7 +281,7 @@ input:focus {
 
 @media (max-width: 480px) {
     .site-header {
-        padding: 0.75rem;
+        padding: 1.75rem;
     }
 
     .logo {
