@@ -1,41 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<!-- login/index.html — Entrada no sistema (e-mail e senha). Cabeçalho via header.js. -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <link rel="icon" href="../assets/foto.png" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../styles.css" />
+  <script src="../header.js" defer></script>
+  <title>Login - SAPE</title>
 </head>
 <body>
-    <header class="site-header">
-        <div class="brand">
-            <div class="logo">SAPE</div>
-            <div>
-                <p class="school-name">Sistema de Suporte à Atenção Psicopedagógica Estudantil</p>
-                <p class="school-tag">Escola Estadual ETE Urbano Gomes de Sá</p>
-            </div>
-        </div>
-        <nav>
-           
-            <a href="../index.html">Inicio</a>
-             <a href="../pag2/index.html"><u>Neurodiversidade</u></a>
-             <a href="../pag3/index.html">Diagnóstico e Apoio</a>
-        </nav>
-    </header>
-   <h1>Neurodiversidade</h1>
-        <div class="textos">
-            <h2>O que é a  Neurodiversidade?</h2>
-            <p>A neurodiversidade é um conceito que reconhece e celebra a variação natural do cérebro humano. Assim como a biodiversidade enriquece nossos ecossistemas, a neurodiversidade enriquece nossa sociedade com uma pluralidade de pensamentos, talentos e perspectivas.
-        </div>
-        <div class="textos">
-            <h2>TDAH</2>
-            <p>É fundamental superarmos a visão patologizante que historicamente acompanhou condições como o Transtorno do Espectro Autista (TEA), o Transtorno do Déficit de Atenção com Hiperatividade (TDAH), a dislexia, entre outras. Em vez de focar em "déficits", devemos reconhecer as características únicas e as potencialidades inerentes a cada indivíduo neurodivergente.</p>
-        </div>
-            <div class="textos">
-            <h2>Dislexia</h2>
-            <p>A dislexia é uma dificuldade de aprendizagem que afeta a capacidade de ler, escrever e soletrar. Pessoas com dislexia podem ter dificuldades em reconhecer palavras, decodificar sons e compreender textos escritos. No entanto, muitas pessoas com dislexia possuem habilidades visuais e espaciais excepcionais, além de serem criativas e inovadoras.</p>
-        </div>
+  <main id="conteudo" class="login-page">
+    <section class="login-card" aria-labelledby="login-title">
+      <header class="login-header">
+        <p class="small-title">Acesso</p>
+        <h1 id="login-title">Entrar</h1>
+        <p>Use o e-mail e a senha cadastrados para acessar o sistema.</p>
+      </header>
 
-   
+      <form id="loginForm" action="#" method="post" novalidate>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <button type="submit">Entrar</button>
+      </form>
+
+      <p id="message" class="login-message" role="status" aria-live="polite"></p>
+      <p class="login-footer">
+        Não tem conta?
+        <a href="../register/index.html">Cadastre-se</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="login.js"></script>
 </body>
 </html>
