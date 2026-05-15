@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <header class="site-header" role="banner">
       <div class="brand">
         <a href="${prefix}index.html" class="brand-link" aria-label="Ir para o início">
-          <div class="logo"><img src="${prefix}assent/logo.png" alt="Logo da Escola"></div>
+          <div class="logo"><img src="${prefix}assets/logo.png" alt="Logo da Escola"></div>
         </a>
         <div class="brand-text">
           <p class="school-name">Sistema de Suporte à Atenção Psicopedagógica Estudantil</p>
