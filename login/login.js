@@ -7,6 +7,9 @@ form.addEventListener('submit', async (event) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  message.textContent = 'Verificando dados...';
+  message.style.color = 'green';
+
   try {
     const response = await fetch('http://localhost:3000/login', {
       method: 'POST',
@@ -18,16 +21,19 @@ form.addEventListener('submit', async (event) => {
 
     const data = await response.json();
 
-    if (data.success) {
+    if (response.ok && data.success) {
       localStorage.setItem('user', JSON.stringify(data.user));
-      window.location.href = 'dashboard.html';
+
+     
+      window.location.href = '../pag3/index.html';
     } else {
-      message.textContent = data.message;
-      message.style.color = 'green';
+      message.textContent = data.message || 'Login inválido';
+      message.style.color = 'red';
     }
 
   } catch (error) {
     message.textContent = 'Erro ao conectar com o servidor';
     message.style.color = 'red';
+    console.error(error);
   }
 });
