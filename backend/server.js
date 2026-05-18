@@ -49,7 +49,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
 
 
 app.get('/users', (req, res) => {
-  db.all('SELECT id, name, email, cpf, password FROM user', [], (err, rows) => {
+  db.all('SELECT id, name, email, cpf FROM user', ... [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
