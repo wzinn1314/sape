@@ -1,5 +1,6 @@
 .register-page {
     min-height: calc(100vh - 120px);
+    background-image: url('../assets/tela.png');
     display: flex;
     align-items: center;
     justify-content: center;
