@@ -37,16 +37,17 @@ function validarFormulario() {
 
     if (formularioValido) {
         buttonLink.classList.remove('disabled');
+        buttonLink.disabled = false;
         buttonLink.setAttribute('aria-disabled', 'false');
         buttonLink.removeAttribute('tabindex');
     } else {
         buttonLink.classList.add('disabled');
+        buttonLink.disabled = true;
         buttonLink.setAttribute('aria-disabled', 'true');
         buttonLink.setAttribute('tabindex', '-1');
     }
 }
 
-// Adicionar event listeners
 document.addEventListener('DOMContentLoaded', () => {
     [nome, email, cpf, senha, confirmarSenha, checkbox].forEach(field => {
         field.addEventListener('input', validarFormulario);
