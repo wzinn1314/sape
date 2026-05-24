@@ -5,7 +5,7 @@ const loading = document.getElementById('loading');
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const email = document.getElementById('email').value;
+  const cpf = document.getElementById('cpf').value;
   const password = document.getElementById('password').value;
 
   // mostra spinner
@@ -18,7 +18,7 @@ form.addEventListener('submit', async (event) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ cpf, password })
     });
 
     const data = await response.json();
