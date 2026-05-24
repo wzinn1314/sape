@@ -45,7 +45,7 @@ body {
   padding: 14px 18px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   background: #ffffffd9;
   border: 2px solid #d8e8ff;
   border-radius: 22px;
@@ -65,6 +65,7 @@ body {
 }
 
 .nav-buttons a {
+  align-items:center;
   text-decoration: none;
   padding: 13px 24px;
   border-radius: 14px;
@@ -188,6 +189,59 @@ main {
   line-height: 1.7;
   margin-bottom: 14px;
   color: #17466f;
+}
+
+
+@media (max-width: 1440px) {
+  .hero {
+    padding: 16px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .logo {
+    width: 80px;
+  }
+
+  .nav-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-buttons a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 14px;
+  }
+
+  .hero-content {
+    margin-top: 55px;
+    padding: 38px 24px;
+    border-radius: 26px;
+    box-shadow: 8px 8px 0 #ffdd3b;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions a {
+    width: 100%;
+  }
+
+  main {
+    padding: 50px 16px;
+  }
+
+  .about,
+  .info {
+    padding: 32px 24px;
+    border-radius: 22px;
+  }
 }
 
 @media (max-width: 768px) {

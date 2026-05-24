@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informações dos Alunos - SAPE</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">💙</div>
+      <div>
+        <h1>SAPE</h1>
+        <span>Painel SAPE</span>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="#">🏠 Dashboard</a>
+      <a class="active" href="#">🎓 Alunos</a>
+      <a href="#">👤 Perfil do Aluno</a>
+      <a href="#">⭐ Características</a>
+      <a href="#">📄 Adaptações de Provas</a>
+      <a href="#">📊 Histórico Escolar</a>
+      <a href="#">📘 Plano de Apoio</a>
+      <a href="#">💬 Observações</a>
+      <a href="#">👥 Responsáveis</a>
+      <a href="#">⚙️ Configurações</a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar">A</div>
+      <div>
+        <strong>Prof. Amanda</strong>
+        <span>Professora</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <div>
+        <h2>📚 Alunos Neurodivergentes</h2>
+        <p>Informações para apoio pedagógico e elaboração de provas</p>
+      </div>
+    </header>
+
+    <!-- FILTROS E BUSCA -->
+    <div class="filters-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar aluno por nome ou matrícula...">
+      </div>
+      <div class="filter-group">
+        <select id="gradeFilter">
+          <option value="">Todas as turmas</option>
+          <option value="7">1º Ano</option>
+          <option value="8">2º Ano</option>
+          <option value="9">3º Ano</option>
+        </select>
+        <select id="typeFilter">
+          <option value="">Todos os tipos</option>
+          <option value="tdah">TDAH</option>
+          <option value="dislexia">Dislexia</option>
+          <option value="discalculia">Discalculia</option>
+          <option value="misto">Diagnósticos múltiplos</option>
+        </select>
+      </div>
+    </div>
+
+    
+    <div class="students-grid">
+      <!-- ALUNO 2 -->
+      <div class="student-card" data-grade="7" data-type="tdah">
+        <div class="card-header">
+          <div class="badge-type tdah">TDAH</div>
+          <button class="info-btn" onclick="openModal('aluno2')">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        
+        <div class="student-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+
+        <h3>Maria Santos</h3>
+        <p class="matricula">Matrícula: 2024002</p>
+        <p class="turma">7º Ano - Turma B</p>
+
+        <div class="quick-info">
+          <div class="info-item">
+            <span class="label">Dificuldades:</span>
+            <span class="value">Concentração, Organização</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pontos fortes:</span>
+            <span class="value">Criatividade, Comunicação</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Adaptações:</span>
+            <span class="value">Pausas durante aula</span>
+          </div>
+        </div>
+
+        <button class="btn-details" onclick="openModal('aluno2')">Ver Detalhes Completos</button>
+      </div>
+
+      <!-- ALUNO 3 -->
+      <div class="student-card" data-grade="6" data-type="dislexia">
+        <div class="card-header">
+          <div class="badge-type dislexia">Dislexia</div>
+          <button class="info-btn" onclick="openModal('aluno3')">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        
+        <div class="student-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+
+        <h3>Pedro Oliveira</h3>
+        <p class="matricula">Matrícula: 2024003</p>
+        <p class="turma">6º Ano - Turma A</p>
+
+        <div class="quick-info">
+          <div class="info-item">
+            <span class="label">Dificuldades:</span>
+            <span class="value">Leitura, Escrita</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pontos fortes:</span>
+            <span class="value">Raciocínio visual, Esportes</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Adaptações:</span>
+            <span class="value">Fonte Arial 16pt, Mais tempo</span>
+          </div>
+        </div>
+
+        <button class="btn-details" onclick="openModal('aluno3')">Ver Detalhes Completos</button>
+      </div>
+
+      <!-- ALUNO 4 -->
+      <div class="student-card" data-grade="8" data-type="misto">
+        <div class="card-header">
+          <div class="badge-type misto">Diagnósticos Múltiplos</div>
+          <button class="info-btn" onclick="openModal('aluno4')">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        
+        <div class="student-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+
+        <h3>Ana Costa</h3>
+        <p class="matricula">Matrícula: 2024004</p>
+        <p class="turma">8º Ano - Turma C</p>
+
+        <div class="quick-info">
+          <div class="info-item">
+            <span class="label">Dificuldades:</span>
+            <span class="value">Autismo + TDAH</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pontos fortes:</span>
+            <span class="value">Artes, Música</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Adaptações:</span>
+            <span class="value">Tempo extra, sala especial</span>
+          </div>
+        </div>
+
+        <button class="btn-details" onclick="openModal('aluno4')">Ver Detalhes Completos</button>
+      </div>
+
+      <!-- ALUNO 5 -->
+      <div class="student-card" data-grade="9" data-type="discalculia">
+        <div class="card-header">
+          <div class="badge-type discalculia">Discalculia</div>
+          <button class="info-btn" onclick="openModal('aluno5')">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        
+        <div class="student-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+
+        <h3>Carlos Mendes</h3>
+        <p class="matricula">Matrícula: 2024005</p>
+        <p class="turma">9º Ano - Turma D</p>
+
+        <div class="quick-info">
+          <div class="info-item">
+            <span class="label">Dificuldades:</span>
+            <span class="value">Cálculos, Conceitos numéricos</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pontos fortes:</span>
+            <span class="value">Português, Literatura</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Adaptações:</span>
+            <span class="value">Calculadora, Redutor numérico</span>
+          </div>
+        </div>
+
+        <button class="btn-details" onclick="openModal('aluno5')">Ver Detalhes Completos</button>
+      </div>
+
+      <!-- ALUNO 6 -->
+      <div class="student-card" data-grade="7" data-type="tdah">
+        <div class="card-header">
+          <div class="badge-type tdah">TDAH</div>
+          <button class="info-btn" onclick="openModal('aluno6')">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        
+        <div class="student-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+
+        <h3>Sophia Alves</h3>
+        <p class="matricula">Matrícula: 2024006</p>
+        <p class="turma">7º Ano - Turma A</p>
+
+        <div class="quick-info">
+          <div class="info-item">
+            <span class="label">Dificuldades:</span>
+            <span class="value">Atenção, Seguir instruções</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pontos fortes:</span>
+            <span class="value">Sociabilidade, Iniciativa</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Adaptações:</span>
+            <span class="value">Instruções claras e visuais</span>
+          </div>
+        </div>
+
+        <button class="btn-details" onclick="openModal('aluno6')">Ver Detalhes Completos</button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL DE DETALHES DO ALUNO 1 -->
+  <div id="modalAluno1" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno1')">✕</button>
+      
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Lucas Silva</h2>
+          <p>Matrícula: 2024001 | 6º Ano - Turma A</p>
+        </div>
+        <div class="badge-large autismo">Autismo Leve</div>
+      </div>
+
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnóstico e Avaliação</h3>
+          <div class="info-box">
+            <p><strong>Diagnóstico:</strong> Transtorno do Espectro do Autismo (TEA)</p>
+            <p><strong>Nível:</strong> Leve a Moderado</p>
+            <p><strong>Data do Diagnóstico:</strong> 15/03/2023</p>
+            <p><strong>Avaliação Escolar:</strong> Realizado em 2024</p>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>💪 Pontos Fortes e Habilidades</h3>
+          <div class="info-box">
+            <ul class="skills-list">
+              <li>✓ Excelente memória (especialmente com números e fatos)</li>
+              <li>✓ Alto desempenho em Matemática</li>
+              <li>✓ Organizado e responsável</li>
+              <li>✓ Interesse focado em temas de interesse (programação)</li>
+              <li>✓ Honesto e direto na comunicação</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>⚠️ Dificuldades e Desafios</h3>
+          <div class="info-box">
+            <ul class="challenges-list">
+              <li>✗ Sensibilidade sensorial (barulho alto, luzes)</li>
+              <li>✗ Dificuldade com interações sociais espontâneas</li>
+              <li>✗ Resistência a mudanças na rotina</li>
+              <li>✗ Interpretação literal de instruções</li>
+              <li>✗ Ansiedade em ambientes muito movimentados</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>🎯 Estratégias de Ensino Recomendadas</h3>
+          <div class="info-box">
+            <div class="strategy-item">
+              <strong>Comunicação:</strong>
+              <p>Use linguagem clara e explícita. Evite figuras de linguagem e expressões idiomáticas.</p>
+            </div>
+            <div class="strategy-item">
+              <strong>Ambiente:</strong>
+              <p>Minimize distrações sensoriais. Considere local preferencial para testes.</p>
+            </div>
+            <div class="strategy-item">
+              <strong>Tempo:</strong>
+              <p>Permita tempo adicional para processar informações e responder.</p>
+            </div>
+            <div class="strategy-item">
+              <strong>Estrutura:</strong>
+              <p>Antecipe mudanças na rotina. Use organizadores visuais e cronogramas.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>📝 Adaptações para Provas</h3>
+          <div class="adaptations-box">
+            <div class="adaptation-item verde">
+              <strong>✓ Recomendadas:</strong>
+              <ul>
+                <li>Prova em sala separada (reduz estímulos)</li>
+                <li>Tempo adicional de 50% (se necessário)</li>
+                <li>Questões bem estruturadas e claras</li>
+                <li>Permitir uso de exemplos visuais</li>
+                <li>Intervalo/pausa durante a prova</li>
+              </ul>
+            </div>
+            <div class="adaptation-item vermelho">
+              <strong>✗ Não Recomendadas:</strong>
+              <ul>
+                <li>Testes orais em grupo</li>
+                <li>Muitas mudanças de formato na mesma prova</li>
+                <li>Distrações auditivas</li>
+                <li>Interpretações ambíguas</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>📞 Observações da Família</h3>
+          <div class="info-box">
+            <p>"Lucas é muito inteligente mas se sente ansioso com mudanças. Quando tem rotina clara, seu desempenho melhora muito. Prefere trabalhar em grupos pequenos ou sozinho."</p>
+            <p><small>- Responsáveis</small></p>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <h3>📊 Histórico de Desempenho</h3>
+          <div class="info-box">
+            <p><strong>Português:</strong> Bom (7.5/10) - Dificuldade com interpretação de texto</p>
+            <p><strong>Matemática:</strong> Excelente (9.2/10) - Ponto forte</p>
+            <p><strong>Ciências:</strong> Bom (7.8/10)</p>
+            <p><strong>Comportamento:</strong> Ótimo (segue regras, responsável)</p>
+          </div>
+        </section>
+
+        <section class="modal-section full-width">
+          <h3>💬 Notas Adicionais para o Professor</h3>
+          <div class="info-box">
+            <div class="note-item">
+              <p>• Lucas se beneficia de instruções passo-a-passo e feedback específico</p>
+              <p>• Reconheça seus pontos fortes e especialmente suas habilidades em Matemática</p>
+              <p>• Seja paciente com questões sociais; ele está aprendendo</p>
+              <p>• Comunique claramente as expectativas e mudanças na rotina</p>
+              <p>• Evite tom de crítica; ele pode se sentir ansioso</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-success">📧 Enviar para Casa</button>
+        <button class="btn btn-info">🖨️ Imprimir</button>
+        <button class="btn btn-secondary" onclick="closeModal('aluno1')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAIS PARA OUTROS ALUNOS (estrutura simplificada) -->
+  <div id="modalAluno2" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno2')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Maria Santos</h2>
+          <p>Matrícula: 2024002 | 7º Ano - Turma B</p>
+        </div>
+        <div class="badge-large tdah">TDAH</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnóstico e Avaliação</h3>
+          <div class="info-box">
+            <p><strong>Diagnóstico:</strong> Transtorno de Déficit de Atenção e Hiperatividade</p>
+            <p><strong>Nível:</strong> Moderado (Combinado)</p>
+            <p><strong>Medicação:</strong> Sim (conforme recomendação)</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>🎯 Estratégias Principais</h3>
+          <div class="info-box">
+            <p>• Manter ambiente com poucas distrações</p>
+            <p>• Dividir tarefas em passos menores</p>
+            <p>• Usar temporizadores visuais</p>
+            <p>• Permitir movimento durante aula</p>
+            <p>• Feedback imediato e positivo</p>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-success">📧 Enviar para Casa</button>
+        <button class="btn btn-secondary" onclick="closeModal('aluno2')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAluno3" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno3')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Pedro Oliveira</h2>
+          <p>Matrícula: 2024003 | 6º Ano - Turma A</p>
+        </div>
+        <div class="badge-large dislexia">Dislexia</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnóstico</h3>
+          <div class="info-box">
+            <p><strong>Diagnóstico:</strong> Dislexia do Desenvolvimento</p>
+            <p><strong>Afetado:</strong> Leitura e Soletração</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>📝 Adaptações para Provas</h3>
+          <div class="info-box">
+            <ul class="adaptation-list">
+              <li>✓ Fonte Arial, tamanho 16pt</li>
+              <li>✓ Espaçamento entre linhas: 1.5</li>
+              <li>✓ Tempo adicional: 50%</li>
+              <li>✓ Ledor disponível se necessário</li>
+              <li>✓ Sem penalização pela ortografia em tarefas não focadas nisso</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('aluno3')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAluno4" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno4')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Ana Costa</h2>
+          <p>Matrícula: 2024004 | 8º Ano - Turma C</p>
+        </div>
+        <div class="badge-large misto">Diagnósticos Múltiplos</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnósticos</h3>
+          <div class="info-box">
+            <p><strong>Primário:</strong> Autismo Leve + TDAH Combinado</p>
+            <p><strong>Observação:</strong> Diagnóstico duplo requer abordagem integrada</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>⭐ Força</h3>
+          <div class="info-box">
+            <p>Excelente em atividades criativas e artísticas. Desempenho melhor quando pode expressar-se através de artes/música.</p>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('aluno4')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAluno5" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno5')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Carlos Mendes</h2>
+          <p>Matrícula: 2024005 | 9º Ano - Turma D</p>
+        </div>
+        <div class="badge-large discalculia">Discalculia</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnóstico</h3>
+          <div class="info-box">
+            <p><strong>Diagnóstico:</strong> Discalculia - Dificuldade Específica de Aprendizagem em Matemática</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>🎯 Recomendações</h3>
+          <div class="info-box">
+            <p>• Permitir calculadora em provas de Matemática</p>
+            <p>• Foco em conceitos, não em cálculos</p>
+            <p>• Usar material manipulável</p>
+            <p>• Reduzir quantidade de problemas</p>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('aluno5')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAluno6" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('aluno6')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>Sophia Alves</h2>
+          <p>Matrícula: 2024006 | 7º Ano - Turma A</p>
+        </div>
+        <div class="badge-large tdah">TDAH</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Diagnóstico</h3>
+          <div class="info-box">
+            <p><strong>Diagnóstico:</strong> TDAH Desatencional</p>
+            <p><strong>Característica:</strong> Mais dificuldade com atenção do que hiperatividade</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>🎯 Estratégias</h3>
+          <div class="info-box">
+            <p>• Ambiente com mínimas distrações</p>
+            <p>• Instruções escritas e visuais</p>
+            <p>• Lembretes frequentes das tarefas</p>
+            <p>• Reforço positivo</p>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('aluno6')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
