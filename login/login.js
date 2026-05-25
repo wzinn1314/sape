@@ -5,10 +5,9 @@ const loading = document.getElementById('loading');
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const cpf = document.getElementById('cpf').value;
+  const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
 
-  // mostra spinner
   loading.style.display = 'block';
   message.textContent = '';
 
@@ -18,21 +17,19 @@ form.addEventListener('submit', async (event) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ cpf, password })
+      body: JSON.stringify({ email, password })
     });
 
     const data = await response.json();
 
-    if (response.ok) {
-      loading.style.display = 'none';
+    loading.style.display = 'none';
 
+    if (response.ok) {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       window.location.href = '../deshboard/index.html';
     } else {
-      loading.style.display = 'none';
-
-      message.textContent = data.message || 'Login inválido';
+      message.textContent = data.error || data.message || 'Login inválido';
       message.style.color = 'red';
     }
 

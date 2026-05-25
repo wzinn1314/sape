@@ -1,36 +1,46 @@
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
+const form = document.getElementById('loginForm');
+const message = document.getElementById('message');
+const loading = document.getElementById('loading');
 
-  db.get(
-    'SELECT id, name, email, cpf, password FROM user WHERE email = ?',
-    [email],
-    async (err, user) => {
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: 'Usuário não encontrado'
-        });
-      }
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
 
-      const senhaValida = await bcrypt.compare(password, user.password);
+  loading.style.display = 'block';
+  message.textContent = '';
 
-      if (!senhaValida) {
-        return res.status(401).json({
-          success: false,
-          message: 'Senha incorreta'
-        });
-      }
+  try {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-      res.json({
-        success: true,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          cpf: user.cpf
-        }
-      });
+    const data = await response.json();
+
+    loading.style.display = 'none';
+
+    console.log('Resposta do backend:', data);
+
+    if (data.success === true) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      window.location.href = '../deshboard/index.html';
+    } else {
+      message.textContent = data.message || 'Login inválido';
+      message.style.color = 'red';
     }
-  );
+
+  } catch (error) {
+    loading.style.display = 'none';
+
+    message.textContent = 'Erro ao conectar com o servidor';
+    message.style.color = 'red';
+
+    console.error(error);
+  }
 });

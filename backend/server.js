@@ -50,62 +50,6 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
 });
 
 
-function requestPortalCidadaoAuth(cpf, password) {
-  return new Promise((resolve, reject) => {
-    const portalUrl = process.env.PORTAL_CIDADAO_URL;
-    if (!portalUrl) {
-      return reject(new Error('PORTAL_CIDADAO_URL não configurado'));
-    }
-
-    const url = new URL(portalUrl);
-    const payload = JSON.stringify({ cpf, password });
-
-    const options = {
-      hostname: url.hostname,
-      port: url.port || (url.protocol === 'https:' ? 443 : 80),
-      path: `${url.pathname}${url.search}`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      }
-    };
-
-    const request = (url.protocol === 'https:' ? https : require('http')).request(options, (response) => {
-      let body = '';
-      response.on('data', (chunk) => body += chunk);
-      response.on('end', () => {
-        try {
-          const json = JSON.parse(body || '{}');
-          resolve({ statusCode: response.statusCode, body: json });
-        } catch (error) {
-          reject(new Error('Resposta inválida do Portal Cidadão'));
-        }
-      });
-    });
-
-    request.on('error', reject);
-    request.write(payload);
-    request.end();
-  });
-}
-
-function parsePortalCidadaoResult(result) {
-  const data = result.body || {};
-  const valueToLower = (text) => typeof text === 'string' ? text.toLowerCase() : '';
-  const role = valueToLower(data.role || data.userType || data.profession || '');
-  const roles = Array.isArray(data.roles) ? data.roles : [];
-  const isTeacher = role.includes('professor') || role.includes('docente') || roles.some((r) => valueToLower(r).includes('professor') || valueToLower(r).includes('docente'));
-
-  return {
-    success: result.statusCode === 200,
-    isTeacher,
-    name: data.name || data.fullName || data.nome || '',
-    email: data.email || '',
-    message: data.message || data.error || ''
-  };
-}
-
 app.get('/users', (req, res) => {
   db.all('SELECT id, name, email, cpf, role FROM user', ... [], (err, rows) => {
     if (err) {
@@ -146,54 +90,36 @@ app.post('/register', async (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-  const { cpf, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!cpf || !password) {
-    return res.status(400).json({ error: 'CPF e senha são obrigatórios' });
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios' });
   }
 
-  try {
-    const portalResult = await requestPortalCidadaoAuth(cpf, password);
-    const parsed = parsePortalCidadaoResult(portalResult);
-
-    if (!parsed.success) {
-      return res.status(401).json({ error: parsed.message || 'Não foi possível autenticar no Portal Cidadão' });
+  db.get('SELECT * FROM user WHERE email = ?', [email], async (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
     }
 
-    if (!parsed.isTeacher) {
-      return res.status(403).json({ error: 'Acesso permitido apenas para professores' });
+    if (!row) {
+      return res.status(401).json({ error: 'Email ou senha inválidos' });
     }
 
-    db.get('SELECT * FROM user WHERE cpf = ?', [cpf], async (err, row) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
+    try {
+      const passwordMatches = await bcrypt.compare(password, row.password);
+
+      if (!passwordMatches) {
+        return res.status(401).json({ error: 'Email ou senha inválidos' });
       }
 
-      const name = parsed.name || 'Professor';
-      const email = parsed.email ? parsed.email : `teacher-${cpf}@sape.local`;
-      const role = 'teacher';
-
-      if (row) {
-        db.run('UPDATE user SET name = ?, email = ?, role = ? WHERE cpf = ?', [name, email, role, cpf], (updateErr) => {
-          if (updateErr) {
-            return res.status(500).json({ error: updateErr.message });
-          }
-
-          res.json({ message: 'Login bem-sucedido', user: { id: row.id, name, email, cpf, role } });
-        });
-      } else {
-        db.run('INSERT INTO user (name, email, cpf, password, role) VALUES (?, ?, ?, ?, ?)', [name, email, cpf, '', role], function(insertErr) {
-          if (insertErr) {
-            return res.status(500).json({ error: insertErr.message });
-          }
-
-          res.json({ message: 'Login bem-sucedido', user: { id: this.lastID, name, email, cpf, role } });
-        });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message || 'Erro interno ao se comunicar com o Portal Cidadão' });
-  }
+      res.json({
+        message: 'Login bem-sucedido',
+        user: { id: row.id, name: row.name, email: row.email, cpf: row.cpf, role: row.role }
+      });
+    } catch (compareError) {
+      res.status(500).json({ error: 'Erro ao verificar a senha' });
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3000;
