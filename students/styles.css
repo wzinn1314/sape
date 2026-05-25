@@ -37,10 +37,14 @@ body {
   font-size: 35px;
 }
 
-.logo h1 {
-  color: #1b66d2;
-  font-size: 28px;
-  font-weight: 800;
+.logo{
+ width: 100px;
+  height: 100px;
+  margin: 0 auto 15px;
+  display: absolute;
+  justify-content: center;
+  align-items: center;
+  
 }
 
 .logo span {

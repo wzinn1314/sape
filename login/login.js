@@ -28,7 +28,7 @@ form.addEventListener('submit', async (event) => {
 
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      window.location.href = '../pag3/index.html';
+      window.location.href = '../deshboard/index.html';
     } else {
       loading.style.display = 'none';
 

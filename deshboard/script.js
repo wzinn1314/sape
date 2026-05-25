@@ -1,0 +1,148 @@
+// ========== DATA ATUAL ==========
+function updateDate() {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const today = new Date();
+  const dateString = today.toLocaleDateString('pt-BR', options);
+  document.getElementById('currentDate').textContent = dateString;
+}
+
+
+function loadProfessorData() {
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      
+   
+      const professorName = user.name || 'Prof. Amanda';
+      document.getElementById('professorGreeting').textContent = `Prof. ${user.name || 'Amanda'}`;
+      document.getElementById('professorName').textContent = professorName;
+      
+     
+      const firstLetter = (user.name || 'A').charAt(0).toUpperCase();
+      document.getElementById('avatarProfile').textContent = firstLetter;
+    } catch (error) {
+      console.error('Erro ao carregar dados do professor:', error);
+    }
+  }
+}
+
+
+function checkAuth() {
+  const user = localStorage.getItem('user');
+  if (!user) {
+    window.location.href = '../../login/index.html';
+  }
+}
+
+
+function animateCards() {
+  const cards = document.querySelectorAll('.card, .box');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      card.style.transition = 'all 0.5s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 50);
+  });
+}
+
+
+function logout() {
+  localStorage.removeItem('user');
+  window.location.href = '../../login/index.html';
+}
+
+
+window.addEventListener('load', function() {
+  checkAuth();
+  loadProfessorData();
+  updateDate();
+  animateCards();
+});
+
+
+setInterval(updateDate, 60000);
+
+const menuLinks = document.querySelectorAll('.menu a');
+menuLinks.forEach(link => {
+  link.addEventListener('click', function(e) {
+  
+    if (this.href === '#') {
+      e.preventDefault();
+    }
+  });
+});
+
+const quickButtons = document.querySelectorAll('.quick-link-btn');
+quickButtons.forEach((btn, index) => {
+  btn.addEventListener('click', function() {
+    const buttons = ['Gerar Relatório', 'Novo Aluno', 'Nova Observação', 'Contatar Família'];
+    const action = buttons[index];
+    
+    switch (index) {
+      case 0:
+       
+        console.log('Gerando relatório...');
+        alert('Funcionalidade em desenvolvimento - Gerar Relatório');
+        break;
+      case 1:
+        
+        console.log('Novo aluno...');
+        alert('Funcionalidade em desenvolvimento - Novo Aluno');
+        break;
+      case 2:
+      
+        console.log('Nova observação...');
+        alert('Funcionalidade em desenvolvimento - Nova Observação');
+        break;
+      case 3:
+        console.log('Contatar família...');
+        alert('Funcionalidade em desenvolvimento - Contatar Família');
+        break;
+    }
+  });
+});
+
+
+const avisoItems = document.querySelectorAll('.aviso-item');
+avisoItems.forEach(item => {
+  item.addEventListener('mouseenter', function() {
+    this.style.transform = 'translateX(8px)';
+  });
+  item.addEventListener('mouseleave', function() {
+    this.style.transform = 'translateX(0)';
+  });
+});
+
+
+function animateProgressBars() {
+  const bars = document.querySelectorAll('.analytics-progress');
+  bars.forEach(bar => {
+    const width = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => {
+      bar.style.transition = 'width 1s ease';
+      bar.style.width = width;
+    }, 100);
+  });
+}
+
+
+window.addEventListener('load', animateProgressBars);
+
+document.querySelectorAll('.card-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    if (this.href !== '#') {
+      // Se for um link real, deixar passar normalmente
+      return;
+    }
+    e.preventDefault();
+  });
+});
+
+
+console.log('Dashboard SAPE carregada com sucesso!');
+console.log('Hora da página:', new Date().toLocaleTimeString('pt-BR'));
