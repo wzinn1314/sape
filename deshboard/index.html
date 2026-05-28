@@ -11,14 +11,10 @@
 
   <aside class="sidebar">
     <div class="logo">
+      <img src="../../assets/logo.png" alt="Logo SAPE">
       <div>
-        <img src="../../assets/logo.png" alt="Logo SAPE">
         <span>SAPE</span>
-        <div>
-        <strong id="professorName"></strong>
-        
-      </div>
-        
+        <p>Suporte e Acolhimento</p>
       </div>
     </div>
 
@@ -37,23 +33,32 @@
 
     <div class="profile">
       <div class="avatar" id="avatarProfile">A</div>
-      <div>
-        <strong id="professorName"></strong>
-        <span>Professor(a)</span>
+      <div class="profile-info">
+        <strong id="professorName">Usuário</strong>
+        <span id="userType">Professor(a)</span>
       </div>
+      <button class="logout-btn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
     </div>
   </aside>
 
   <main class="main">
     <header class="top-header">
       <div class="header-content">
-        <div>
-          <h2>Olá, <span id="professorGreeting">Prof. Amanda</span>! 👋</h2>
-          <p>Bem-vindo(a) ao Painel SAPE</p>
+        <div class="header-greeting">
+          <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>! 👋</h1>
+          <p id="headerSubtitle">Painel de controle e gerenciamento de alunos</p>
         </div>
-        <div class="header-date">
-          <i class="fas fa-bell"></i>
-          <span id="currentDate">24 de maio de 2024</span>
+        <div class="header-right">
+          <div class="header-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="currentDate">24 de maio de 2024</span>
+          </div>
+          <div class="header-bell">
+            <i class="fas fa-bell"></i>
+            <span class="bell-badge">2</span>
+          </div>
         </div>
       </div>
     </header>
