@@ -12,17 +12,35 @@ function loadProfessorData() {
   if (userStr) {
     try {
       const user = JSON.parse(userStr);
+      const userName = user.name || 'Usuário';
+      const userRole = user.role || 'Professor(a)';
       
-   
-      const professorName = user.name || 'Prof. Amanda';
-      document.getElementById('professorGreeting').textContent = `Prof. ${user.name || 'Amanda'}`;
-      document.getElementById('professorName').textContent = professorName;
+      // Atualiza saudação no header
+      document.getElementById('professorGreeting').textContent = userName;
       
-     
-      const firstLetter = (user.name || 'A').charAt(0).toUpperCase();
+      // Atualiza nome no perfil da sidebar
+      document.getElementById('professorName').textContent = userName;
+      
+      // Atualiza tipo de usuário
+      if (document.getElementById('userType')) {
+        document.getElementById('userType').textContent = userRole;
+      }
+      
+      // Atualiza avatar com primeira letra do nome
+      const firstLetter = userName.charAt(0).toUpperCase();
       document.getElementById('avatarProfile').textContent = firstLetter;
+      
+      // Atualiza subtítulo baseado no tipo de usuário
+      const subtitleEl = document.getElementById('headerSubtitle');
+      if (subtitleEl) {
+        if (userRole.toLowerCase().includes('aluno') || userRole.toLowerCase().includes('Aluno')) {
+          subtitleEl.textContent = 'Acompanhe seu desempenho e evolução';
+        } else {
+          subtitleEl.textContent = 'Painel de controle e gerenciamento de alunos';
+        }
+      }
     } catch (error) {
-      console.error('Erro ao carregar dados do professor:', error);
+      console.error('Erro ao carregar dados do usuário:', error);
     }
   }
 }

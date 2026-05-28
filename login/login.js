@@ -26,8 +26,13 @@ form.addEventListener('submit', async (event) => {
 
     if (response.ok) {
       localStorage.setItem('user', JSON.stringify(data.user));
-
-      window.location.href = '../deshboard/index.html';
+      const role = (data.user && data.user.role) ? data.user.role.toString().toLowerCase() : '';
+      // Redireciona conforme o papel
+      if (role.includes('aluno') || role.includes('student')) {
+        window.location.href = '../students/index.html';
+      } else {
+        window.location.href = '../deshboard/index.html';
+      }
     } else {
       message.textContent = data.error || data.message || 'Login inválido';
       message.style.color = 'red';
