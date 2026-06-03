@@ -1,3 +1,4 @@
 .env
 sapedb.sqlite
 query
+node_modules
