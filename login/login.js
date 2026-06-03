@@ -29,7 +29,7 @@ form.addEventListener('submit', async (event) => {
       const role = (data.user && data.user.role) ? data.user.role.toString().toLowerCase() : '';
       // Redireciona conforme o papel
       if (role.includes('aluno') || role.includes('student')) {
-        window.location.href = '../students/index.html';
+        window.location.href = '../deshboard/index.html';
       } else {
         window.location.href = '../deshboard/index.html';
       }
