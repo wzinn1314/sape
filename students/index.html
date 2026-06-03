@@ -6,20 +6,22 @@
   <title>Informações dos Alunos - SAPE</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
 
   <aside class="sidebar">
     <div class="logo">
+      <img src="../assets/logo.png" alt="Logo SAPE">
       <div>
-        <img src="../assets/logo.png" alt="Logo SAPE">
-        <span>Painel SAPE</span>
+        <span>SAPE</span>
+        <p>Suporte e Acolhimento</p>
       </div>
     </div>
 
     <nav class="menu">
-      <a class="active"href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
-      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
+      <a href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a class="active" href="index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
       <a href="#"><i class="fas fa-user"></i> Perfil do Aluno</a>
       <a href="#"><i class="fas fa-star"></i> Características</a>
       <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
@@ -31,10 +33,10 @@
     </nav>
 
     <div class="profile">
-      <div class="avatar">A</div>
+      <div class="avatar" id="avatarProfile">A</div>
       <div>
-        <strong>Prof. Amanda</strong>
-        <span>Professora</span>
+        <strong id="professorName">Prof. Amanda</strong>
+        <span id="userType">Professora</span>
       </div>
     </div>
   </aside>
@@ -70,183 +72,10 @@
     </div>
 
     
-    <div class="students-grid">
-      <!-- ALUNO 2 -->
-      <div class="student-card" data-grade="7" data-type="tdah">
-        <div class="card-header">
-          <div class="badge-type tdah">TDAH</div>
-          <button class="info-btn" onclick="openModal('aluno2')">
-            <i class="fas fa-info-circle"></i>
-          </button>
-        </div>
-        
-        <div class="student-avatar">
-          <i class="fas fa-user-circle"></i>
-        </div>
-
-        <h3>Maria Santos</h3>
-        <p class="matricula">Matrícula: 2024002</p>
-        <p class="turma">1º Ano - Turma TDS "B"</p>
-
-        <div class="quick-info">
-          <div class="info-item">
-            <span class="label">Dificuldades:</span>
-            <span class="value">Concentração, Organização</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pontos fortes:</span>
-            <span class="value">Criatividade, Comunicação</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Adaptações:</span>
-            <span class="value">Pausas durante aula</span>
-          </div>
-        </div>
-
-        <button class="btn-details" onclick="openModal('aluno2')">Ver Detalhes Completos</button>
+    <div class="students-grid" id="studentsGrid">
+      <div class="empty-state" id="emptyState">
+        Nenhum aluno cadastrado ainda. Cadastre um novo aluno para aparecer aqui.
       </div>
-
-      <!-- ALUNO 3 -->
-      <div class="student-card" data-grade="6" data-type="dislexia">
-        <div class="card-header">
-          <div class="badge-type dislexia">Dislexia</div>
-          <button class="info-btn" onclick="openModal('aluno3')">
-            <i class="fas fa-info-circle"></i>
-          </button>
-        </div>
-        
-        <div class="student-avatar">
-          <i class="fas fa-user-circle"></i>
-        </div>
-
-        <h3>Pedro Oliveira</h3>
-        <p class="matricula">Matrícula: 2024003</p>
-        <p class="turma">6º Ano - Turma A</p>
-
-        <div class="quick-info">
-          <div class="info-item">
-            <span class="label">Dificuldades:</span>
-            <span class="value">Leitura, Escrita</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pontos fortes:</span>
-            <span class="value">Raciocínio visual, Esportes</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Adaptações:</span>
-            <span class="value">Fonte Arial 16pt, Mais tempo</span>
-          </div>
-        </div>
-
-        <button class="btn-details" onclick="openModal('aluno3')">Ver Detalhes Completos</button>
-      </div>
-
-      <!-- ALUNO 4 -->
-      <div class="student-card" data-grade="8" data-type="misto">
-        <div class="card-header">
-          <div class="badge-type misto">Diagnósticos Múltiplos</div>
-          <button class="info-btn" onclick="openModal('aluno4')">
-            <i class="fas fa-info-circle"></i>
-          </button>
-        </div>
-        
-        <div class="student-avatar">
-          <i class="fas fa-user-circle"></i>
-        </div>
-
-        <h3>Ana Costa</h3>
-        <p class="matricula">Matrícula: 2024004</p>
-        <p class="turma">8º Ano - Turma C</p>
-
-        <div class="quick-info">
-          <div class="info-item">
-            <span class="label">Dificuldades:</span>
-            <span class="value">Autismo + TDAH</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pontos fortes:</span>
-            <span class="value">Artes, Música</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Adaptações:</span>
-            <span class="value">Tempo extra, sala especial</span>
-          </div>
-        </div>
-
-        <button class="btn-details" onclick="openModal('aluno4')">Ver Detalhes Completos</button>
-      </div>
-
-      <!-- ALUNO 5 -->
-      <div class="student-card" data-grade="9" data-type="discalculia">
-        <div class="card-header">
-          <div class="badge-type discalculia">Discalculia</div>
-          <button class="info-btn" onclick="openModal('aluno5')">
-            <i class="fas fa-info-circle"></i>
-          </button>
-        </div>
-        
-        <div class="student-avatar">
-          <i class="fas fa-user-circle"></i>
-        </div>
-
-        <h3>Carlos Mendes</h3>
-        <p class="matricula">Matrícula: 2024005</p>
-        <p class="turma">9º Ano - Turma D</p>
-
-        <div class="quick-info">
-          <div class="info-item">
-            <span class="label">Dificuldades:</span>
-            <span class="value">Cálculos, Conceitos numéricos</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pontos fortes:</span>
-            <span class="value">Português, Literatura</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Adaptações:</span>
-            <span class="value">Calculadora, Redutor numérico</span>
-          </div>
-        </div>
-
-        <button class="btn-details" onclick="openModal('aluno5')">Ver Detalhes Completos</button>
-      </div>
-
-      <!-- ALUNO 6 -->
-      <div class="student-card" data-grade="7" data-type="tdah">
-        <div class="card-header">
-          <div class="badge-type tdah">TDAH</div>
-          <button class="info-btn" onclick="openModal('aluno6')">
-            <i class="fas fa-info-circle"></i>
-          </button>
-        </div>
-        
-        <div class="student-avatar">
-          <i class="fas fa-user-circle"></i>
-        </div>
-
-        <h3>Sophia Alves</h3>
-        <p class="matricula">Matrícula: 2024006</p>
-        <p class="turma">7º Ano - Turma A</p>
-
-        <div class="quick-info">
-          <div class="info-item">
-            <span class="label">Dificuldades:</span>
-            <span class="value">Atenção, Seguir instruções</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pontos fortes:</span>
-            <span class="value">Sociabilidade, Iniciativa</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Adaptações:</span>
-            <span class="value">Instruções claras e visuais</span>
-          </div>
-        </div>
-
-        <button class="btn-details" onclick="openModal('aluno6')">Ver Detalhes Completos</button>
-      </div>
-
-    </div>
 
   </main>
 

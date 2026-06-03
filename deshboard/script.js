@@ -94,35 +94,7 @@ menuLinks.forEach(link => {
   });
 });
 
-const quickButtons = document.querySelectorAll('.quick-link-btn');
-quickButtons.forEach((btn, index) => {
-  btn.addEventListener('click', function() {
-    const buttons = ['Gerar Relatório', 'Novo Aluno', 'Nova Observação', 'Contatar Família'];
-    const action = buttons[index];
-    
-    switch (index) {
-      case 0:
-       
-        console.log('Gerando relatório...');
-        alert('Funcionalidade em desenvolvimento - Gerar Relatório');
-        break;
-      case 1:
-        
-        console.log('Novo aluno...');
-        alert('Funcionalidade em desenvolvimento - Novo Aluno');
-        break;
-      case 2:
-      
-        console.log('Nova observação...');
-        alert('Funcionalidade em desenvolvimento - Nova Observação');
-        break;
-      case 3:
-        console.log('Contatar família...');
-        alert('Funcionalidade em desenvolvimento - Contatar Família');
-        break;
-    }
-  });
-});
+
 
 
 const avisoItems = document.querySelectorAll('.aviso-item');

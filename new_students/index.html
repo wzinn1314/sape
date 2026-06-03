@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/foto.png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+    <title>Cadastro de Novo Aluno - SAPE</title>
+</head>
+<body>
+    <main class="page-shell">
+        <section class="registration-panel">
+            <header class="panel-header">
+                <div>
+                    <span class="eyebrow">Cadastrar Novo Aluno</span>
+                    <h1>Dados do aluno e inclusão escolar</h1>
+                </div>
+            </header>
+
+            <form id="studentForm" class="registration-form">
+                <div class="section-card grid-two-columns">
+                    <div class="section-heading">
+                        <strong>Informações Pessoais</strong>
+                    </div>
+                    <div class="photo-card">
+                        <div class="photo-preview">
+                            <span>Upload</span>
+                        </div>
+                        <label class="upload-button">
+                            <input type="file" accept="image/*" hidden>
+                            Adicionar Foto
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-grid form-grid-2">
+                    <label class="field">
+                        <span>Nome Completo</span>
+                        <input id="studentName" type="text" placeholder="Nome do aluno" />
+                    </label>
+                    <label class="field">
+                        <span>Data de Nascimento</span>
+                        <input id="birthDate" type="date" />
+                    </label>
+                    <label class="field">
+                        <span>Matrícula</span>
+                        <input id="matricula" type="text" placeholder="Código ou número" />
+                    </label>
+                    <label class="field">
+                        <span>CPF</span>
+                        <input id="cpf" type="text" placeholder="000.000.000-00" />
+                    </label>
+                </div>
+
+                <div class="section-card grid-three-columns">
+                    <div class="section-heading">
+                        <strong>Informações Escolares</strong>
+                    </div>
+                    <label class="field">
+                        <span>Turma</span>
+                        <select id="turma">
+                            <option>3º Ano</option>
+                            <option>2º Ano</option>
+                            <option>1º Ano</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>Curso</span>
+                        <select id="curso">
+                            <option>LOG</option>
+                            <option>TDS "A"</option>
+                            <option>TDS "B"</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>Ano Letivo</span>
+                        <input id="anoLetivo" type="text" value="2024" />
+                    </label>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-heading">
+                        <strong>Informações de Inclusão</strong>
+                    </div>
+                    <div class="form-grid form-grid-3">
+                        <label class="field">
+                            <span>Diagnóstico Formal</span>
+                            <select id="diagnostico">
+                                <option>TEA - Nível 1</option>
+                                <option>TDAH</option>
+                                <option>Dislexia</option>
+                            </select>
+                        </label>
+                        <label class="field toggle-field">
+                            <span>Possui PEI?</span>
+                            <input id="pei" type="checkbox" />
+                        </label>
+                        <label class="field">
+                            <span>Nível de Suporte</span>
+                            <select id="suporte">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-grid form-grid-2">
+                        <label class="field">
+                            <span>Hiperfocos e Interesses</span>
+                            <input id="hiperfocos" type="text" placeholder="Astronomia, Trem, Matemática" />
+                        </label>
+                        <label class="field">
+                            <span>Gatilhos Emocionais</span>
+                            <input id="gatilhos" type="text" placeholder="Luz forte, barulho alto, mudança de rotina" />
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>Estratégias de Calma</span>
+                        <textarea id="estrategias" rows="3" placeholder="Ex: Espaço tranquilo, fones, descanso breve"></textarea>
+                    </label>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-heading">
+                        <strong>Contatos dos Responsáveis</strong>
+                    </div>
+                    <div class="form-grid form-grid-2">
+                        <label class="field">
+                            <span>Nome Completo</span>
+                            <input id="responsavelNome" type="text" placeholder="Nome do responsável" />
+                        </label>
+                        <label class="field">
+                            <span>Parentesco</span>
+                            <select id="parentesco">
+                                <option>Responsável</option>
+                                <option>Mãe</option>
+                                <option>Pai</option>
+                                <option>Avó</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Telefone</span>
+                            <input id="telefone" type="tel" placeholder="(00) 00000-0000" />
+                        </label>
+                        <label class="field">
+                            <span>Email</span>
+                            <input id="email" type="email" placeholder="responsavel@email.com" />
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="checkbox-field">
+                        <input type="checkbox" id="confirm" />
+                        <label for="confirm">Declaro que as informações são verdadeiras.</label>
+                    </div>
+                    <div class="buttons-row">
+                        <button type="submit" class="btn-primary">Salvar Cadastro</button>
+                        <a href="../deshboard/index.html"><button type="button" class="btn-secondary">Cancelar</button></a>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
