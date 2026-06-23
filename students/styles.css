@@ -63,26 +63,43 @@ body {
 .menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 30px;
+  gap: 4px;
+  margin-bottom: 180px;
 }
 
 .menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   text-decoration: none;
-  color: #555;
-  padding: 12px 14px;
+  color: #666;
+  padding: 11px 14px;
   border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 13px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.menu a:hover,
-.menu a.active {
-  background: linear-gradient(135deg, #1b66d2, #0b4fa8);
-  color: white;
+.menu a i {
+  font-size: 16px;
+  width: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.menu a:hover {
+  background: #f0f3f7;
+  color: #1b66d2;
   transform: translateX(4px);
 }
+
+.menu a.active {
+  background: linear-gradient(135deg, #1b66d2 0%, #0b4fa8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(27, 102, 210, 0.25);
+}
+
 
 .profile {
   position: absolute;
@@ -697,190 +714,130 @@ body {
 }
 
 
-@media (max-width: 1200px) {
-  .students-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+@media (max-width: 1400px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .modal-grid {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+    padding: 25px;
+  }
+
+  .stats-cards {
     grid-template-columns: 1fr;
   }
 
-  .adaptations-box {
-    grid-template-columns: 1fr;
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 768px) {
-  body {
-    display: block;
-  }
-
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid #e5e7f0;
-    padding: 20px;
+    width: 200px;
+    padding: 20px 10px;
   }
 
   .main {
-    margin-left: 0;
-    width: 100%;
+    margin-left: 200px;
+    width: calc(100% - 200px);
     padding: 20px;
   }
 
-  .profile {
-    position: static;
-    margin-top: 20px;
+  .top-header {
+    padding: 20px;
+  }
+
+  .logo span {
+    font-size: 15px;
   }
 
   .menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
+    margin-bottom: 150px;
   }
 
-  .students-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  .menu a {
+    padding: 10px 12px;
+    font-size: 12px;
   }
 
-  .filters-section {
-    flex-direction: column;
+  .menu a i {
+    font-size: 15px;
   }
 
-  .search-box {
-    min-width: 100%;
-  }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .filter-group select {
-    flex: 1;
-  }
-
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-    max-height: 95vh;
-  }
-
-  .modal-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .badge-large {
-    margin-left: 0;
+  .quick-links {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .main {
-    padding: 15px;
-  }
-
-  .top-header h2 {
-    font-size: 22px;
-  }
-
-  .students-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .student-card {
-    padding: 18px;
-  }
-
-  .filters-section {
+  body {
     flex-direction: column;
   }
-
-  .search-box input {
-    font-size: 12px;
-  }
-
-  .filter-group select {
-    font-size: 12px;
-  }
-
-  .modal-content {
-    padding: 18px;
-  }
-
-  .modal-actions {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
 
   .sidebar {
-    position: relative;
     width: 100%;
     height: auto;
     border-right: none;
     border-bottom: 1px solid #e5e7f0;
+    position: relative;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
   }
 
   .menu {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 0;
   }
 
   .profile {
-    position: static;
-    margin-top: 25px;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin-top: 20px;
   }
 
-  .main {
-    margin-left: 0;
-    width: 100%;
-    padding: 25px;
+  .top-header h1 {
+    font-size: 22px;
   }
 
-  .top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-
-@media (max-width: 600px) {
-  .main {
-    padding: 18px;
-  }
-
-  .cards,
-  .student-list,
-  .summary {
+  .stats-cards {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .menu {
-    grid-template-columns: 1fr;
+  .card {
+    padding: 16px;
   }
 
-  .card,
-  .box {
-    padding: 20px;
-  }
-
-  .top h2 {
-    font-size: 24px;
-  }
-
-  .card h3 {
-    font-size: 32px;
-  }
-
-  .student {
-    flex-direction: column;
-    align-items: flex-start;
+  .card-number {
+    font-size: 28px;
   }
 }
