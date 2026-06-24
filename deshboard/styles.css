@@ -49,10 +49,11 @@ a {
 }
 
 .logo img {
-  width: 46px;
-  height: 46px;
+  /*A resolução da logo é de 316x375*/
+  width: 50px;
+  height: 55px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(27, 102, 210, 0.15);
+  /*box-shadow: 0 2px 8px rgba(27, 102, 210, 0.15);*/
 }
 
 .logo span {
