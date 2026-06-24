@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - SAPE</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="../../assets/foto.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../../assets/foto.png" alt="Logo SAPE">
+      <div>
+        <span>SAPE</span>
+        <p>Suporte e Acolhimento</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a class="active"href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
+      <a href="#"><i class="fas fa-user"></i> Perfil do Aluno</a>
+      <a href="#"><i class="fas fa-star"></i> Características</a>
+      <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
+      <a href="#"><i class="fas fa-chart-bar"></i> Histórico Escolar</a>
+      <a href="#"><i class="fas fa-book"></i> Plano de Apoio</a>
+      <a href="#"><i class="fas fa-comments"></i> Observações</a>
+      <a href="#"><i class="fas fa-users"></i> Responsáveis</a>
+      <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div class="profile-info">
+        <strong id="professorName">Usuário</strong>
+        <span id="userType">Professor(a)</span>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <div class="header-content">
+        <div class="header-greeting">
+          <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>! 👋</h1>
+          <p id="headerSubtitle">Painel de controle e gerenciamento de alunos</p>
+        </div>
+        <div class="header-right">
+          <div class="header-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="currentDate">24 de maio de 2024</span>
+          </div>
+          <div class="header-bell">
+            <i class="fas fa-bell"></i>
+            <span class="bell-badge">2</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CARDS DE ESTATÍSTICAS -->
+    <section class="stats-cards">
+      <div class="card card-purple">
+        <div class="card-content">
+          <p class="card-label">Total de Alunos</p>
+          <h3 class="card-number">48</h3>
+          <small>Cadastrados</small>
+        </div>
+        <a href="../index.html" class="card-link">Ver todos →</a>
+      </div>
+
+      <div class="card card-blue">
+        <div class="card-content">
+          <p class="card-label">Alunos de Atendimento</p>
+          <h3 class="card-number">18</h3>
+          <small>Com necessidades especiais</small>
+        </div>
+        <a href="../index.html" class="card-link">Ver todos →</a>
+      </div>
+
+      <div class="card card-yellow">
+        <div class="card-content">
+          <p class="card-label">Questionários Pendentes</p>
+          <h3 class="card-number">7</h3>
+          <small>Aguardando preenchimento</small>
+        </div>
+        <a href="#" class="card-link">Ver todos →</a>
+      </div>
+
+      <div class="card card-green">
+        <div class="card-content">
+          <p class="card-label">Avisos de Apoio</p>
+          <h3 class="card-number">5</h3>
+          <small>Notificações ativas</small>
+        </div>
+        <a href="#" class="card-link">Ver todos →</a>
+      </div>
+    </section>
+
+    <!-- SEÇÃO PRINCIPAL -->
+    <section class="dashboard-grid">
+      
+      <!-- COLUNA ESQUERDA -->
+      <div class="left-column">
+
+      
+        <div class="box">
+          <div class="box-header">
+            <a href="#" class="link-small">Ver todos</a>
+          </div>
+
+          <div class="aviso-item aviso-red">
+            <div class="aviso-content">
+              <strong>Entrega de Relatórios</strong>
+              <p>Prazo final: 30 de maio de 2024</p>
+            </div>
+          </div>
+
+          <div class="aviso-item aviso-yellow">
+            <div class="aviso-content">
+              <strong>Reunião com Responsáveis</strong>
+              <p>Data: 25/05 às 14h - Sala de Reuniões</p>
+            </div>
+          </div>
+
+          <div class="aviso-item aviso-blue">
+            <div class="aviso-content">
+              <strong>Atualizar Planos de Apoio</strong>
+              <p>Verifique planos com mais de 30 dias</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-header">
+            <h3> Últimos Registros</h3>
+            <a href="#" class="link-small">Ver todos</a>
+          </div>
+
+          <div class="record-list">
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Lucas Silva</div>
+                <div class="record-meta">6º Ano A • Observação registrada</div>
+              </div>
+              <div class="record-date">Hoje às 10h</div>
+            </div>
+
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Maria Santos</div>
+                <div class="record-meta">7º Ano B • Adaptação atualizada</div>
+              </div>
+              <div class="record-date">Ontem às 14h</div>
+            </div>
+
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Pedro Oliveira</div>
+                <div class="record-meta">6º Ano A • Prova aplicada</div>
+              </div>
+              <div class="record-date">23/05 às 09h</div>
+            </div>
+
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Ana Costa</div>
+                <div class="record-meta">8º Ano C • Plano revisado</div>
+              </div>
+              <div class="record-date">22/05 às 16h</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA -->
+      <div class="right-column">
+
+        <!-- GRÁFICO RÁPIDO -->
+        <div class="box">
+          <div class="box-header">
+            <h3>Análise Rápida</h3>
+            <span class="badge-secondary">Este mês</span>
+          </div>
+
+          <div class="analytics">
+            <div class="analytics-item">
+              <div class="analytics-label">Observações Registradas</div>
+              <div class="analytics-value">36</div>
+              <div class="analytics-bar">
+                <div class="analytics-progress" style="width: 85%"></div>
+              </div>
+            </div>
+
+            <div class="analytics-item">
+              <div class="analytics-label">Reuniões com Responsáveis</div>
+              <div class="analytics-value">12</div>
+              <div class="analytics-bar">
+                <div class="analytics-progress" style="width: 60%"></div>
+              </div>
+            </div>
+
+            <div class="analytics-item">
+              <div class="analytics-label">Planos de Aula Adaptados</div>
+              <div class="analytics-value">15</div>
+              <div class="analytics-bar">
+                <div class="analytics-progress" style="width: 70%"></div>
+              </div>
+            </div>
+
+            <div class="analytics-item">
+              <div class="analytics-label">Metas em Andamento</div>
+              <div class="analytics-value">22</div>
+              <div class="analytics-bar">
+                <div class="analytics-progress" style="width: 90%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALUNOS EM FOCO -->
+        <div class="box">
+          <div class="box-header">
+            <h3> Alunos em Foco</h3>
+            <a href="#" class="link-small">Ver todos</a>
+          </div>
+
+          <div class="students-focus">
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">LC</div>
+              <div class="student-focus-content">
+                <strong>Lucas Silva</strong>
+                <span>6º Ano A • Autismo</span>
+              </div>
+              <div class="student-focus-status yellow"> Atenção</div>
+            </div>
+
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">MS</div>
+              <div class="student-focus-content">
+                <strong>Maria Santos</strong>
+                <span>7º Ano B • TDAH</span>
+              </div>
+              <div class="student-focus-status red"> Crítico</div>
+            </div>
+
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">PO</div>
+              <div class="student-focus-content">
+                <strong>Pedro Oliveira</strong>
+                <span>6º Ano A • Dislexia</span>
+              </div>
+              <div class="student-focus-status green">✓ Normal</div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="box">
+          <div class="box-header">
+            <h3> Atalhos Rápidos</h3>
+          </div>
+
+          <div class="quick-links">
+            <button class="quick-link-btn">
+              <i class="fas fa-file-pdf"></i>
+              <span>Gerar Relatório</span>
+            </button>
+            <a class="quick-link-btn" href="../new_students/index.html">
+              <i class="fas fa-plus-circle"></i>
+              <span>Novo Aluno</span>
+            </a>
+            <button class="quick-link-btn">
+              <i class="fas fa-clipboard-list"></i>
+              <span>Nova Observação</span>
+            </button>
+            <button class="quick-link-btn">
+              <i class="fas fa-envelope"></i>
+              <span>Contatar Família</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

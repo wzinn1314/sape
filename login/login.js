@@ -5,10 +5,9 @@ const loading = document.getElementById('loading');
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
 
-  // mostra spinner
   loading.style.display = 'block';
   message.textContent = '';
 
@@ -23,16 +22,19 @@ form.addEventListener('submit', async (event) => {
 
     const data = await response.json();
 
+    loading.style.display = 'none';
+
     if (response.ok) {
-      loading.style.display = 'none';
-
       localStorage.setItem('user', JSON.stringify(data.user));
-
-      window.location.href = '../pag3/index.html';
+      const role = (data.user && data.user.role) ? data.user.role.toString().toLowerCase() : '';
+      // Redireciona conforme o papel
+      if (role.includes('aluno') || role.includes('student')) {
+        window.location.href = '../deshboard/index.html';
+      } else {
+        window.location.href = '../deshboard/index.html';
+      }
     } else {
-      loading.style.display = 'none';
-
-      message.textContent = data.message || 'Login inválido';
+      message.textContent = data.error || data.message || 'Login inválido';
       message.style.color = 'red';
     }
 

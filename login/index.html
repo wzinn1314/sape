@@ -1,46 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
-  <link rel="icon" href="../assets/foto.png" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Os Autistas</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-  <main class="login-container">
-    <section class="login-card">
+  <div class="background">
+
+    <div class="puzzle puzzle-red"></div>
+    <div class="puzzle puzzle-blue"></div>
+    <div class="puzzle puzzle-yellow"></div>
+    <div class="puzzle puzzle-green"></div>
+
+    <div class="login-card">
+
       <div class="logo">
-        <img src="../assets/logo.png" alt="Logo da Escola">
+        <img src="../assets/foto.png" alt="Logo Os Autistas">
       </div>
 
-      <h2>Login</h2>
+      <h1>
+        <span class="blue">L</span>
+        <span class="red">o</span>
+        <span class="yellow">g</span>
+        <span class="green">i</span>
+        <span class="blue">n</span>
+      </h1>
+
+      <p class="subtitle">
+        Inclusão, respeito e compreensão<br>
+        fazem a diferença.
+      </p>
+
       <form id="loginForm">
+
         <label for="email">E-mail</label>
-        <input 
-          type="email" 
-          id="email" 
-          placeholder="Digite seu e-mail" 
-          required
-        />
+        <div class="input-box">
+          <i class="fa-solid fa-id-card"></i>
+          <input 
+            type="email" 
+            id="email" 
+            placeholder="Digite seu e-mail" 
+            required
+          >
+        </div>
 
         <label for="password">Senha</label>
-        <input 
-          type="password" 
-          id="password" 
-          placeholder="Digite sua senha" 
-          required
-        />
+        <div class="input-box">
+          <i class="fa-solid fa-lock"></i>
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="Digite sua senha" 
+            required
+          >
+          <i class="fa-regular fa-eye"></i>
+        </div>
+
+        <p id="loading" style="display: none;">
+          Verificando dados...
+        </p>
+
+        <p id="message"></p>
 
         <button type="submit">Entrar</button>
+
       </form>
 
-      <div id="loading" class="spinner" style="display: none;"></div>
-      <p id="message"></p>
+    </div>
 
-    </section>
-  </main>
+    <div class="waves">
+      <div class="wave blue-wave"></div>
+      <div class="wave red-wave"></div>
+      <div class="wave yellow-wave"></div>
+      <div class="wave green-wave"></div>
+    </div>
+
+  </div>
 
   <script src="login.js"></script>
 </body>
