@@ -1,0 +1,896 @@
+@import url("../assets/theme.css");
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:var(--font-family);
+}
+
+body{
+    background:#f5f8fd;
+    color:var(--base-text);
+}
+
+.main{
+    max-width:1500px;
+    margin:auto;
+    padding:35px;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.top-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:35px;
+
+}
+
+.header-left{
+
+    display:flex;
+    align-items:center;
+    gap:20px;
+
+}
+
+.header-icon{
+
+    width:90px;
+    height:90px;
+
+    border-radius:24px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:linear-gradient(
+        135deg,
+        #e9f1ff,
+        #dce9ff
+    );
+
+    color:#2563eb;
+
+    font-size:38px;
+
+    box-shadow:0 15px 40px rgba(37,99,235,.12);
+
+}
+
+.header-left h1{
+
+    font-size:52px;
+
+    color:#183153;
+
+    font-weight:800;
+
+    margin-bottom:8px;
+
+}
+
+.header-left p{
+
+    font-size:22px;
+
+    color:#667085;
+
+    line-height:1.6;
+
+}
+
+/* =====================================================
+   BOTÃO
+===================================================== */
+
+.btn-new{
+
+    height:62px;
+
+    padding:0 34px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    transition:.30s;
+
+    box-shadow:0 15px 35px rgba(37,99,235,.25);
+
+}
+
+.btn-new:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 20px 45px rgba(37,99,235,.35);
+
+}
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:25px;
+
+    margin-bottom:35px;
+
+}
+
+.stat-card{
+
+    background:white;
+
+    border-radius:26px;
+
+    padding:28px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:22px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    border:1px solid #e8eef9;
+
+    transition:.30s;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.05);
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 25px 50px rgba(0,0,0,.08);
+
+}
+
+.icon-box{
+
+    width:76px;
+    height:76px;
+
+    border-radius:22px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:34px;
+
+    color:white;
+
+}
+
+.blue .icon-box{
+
+    background:#2563eb;
+
+}
+
+.green .icon-box{
+
+    background:#10b981;
+
+}
+
+.purple .icon-box{
+
+    background:#7c3aed;
+
+}
+
+.orange .icon-box{
+
+    background:#f59e0b;
+
+}
+
+.stat-card h2{
+
+    font-size:46px;
+
+    color:#183153;
+
+    font-weight:800;
+
+}
+
+.stat-card span{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#344054;
+
+}
+
+.stat-card small{
+
+    display:block;
+
+    margin-top:5px;
+
+    color:#98a2b3;
+
+    font-size:15px;
+
+}
+
+.card-decoration{
+
+    position:absolute;
+
+    right:25px;
+
+    top:25px;
+
+    font-size:28px;
+
+    opacity:.18;
+
+}
+
+/* =====================================================
+   RESPONSIVO
+===================================================== */
+
+@media(max-width:1300px){
+
+    .stats-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:900px){
+
+    .top-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .btn-new{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .main{
+
+        padding:20px;
+
+    }
+
+    .header-left{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .header-icon{
+
+        width:70px;
+        height:70px;
+        font-size:30px;
+
+    }
+
+    .header-left h1{
+
+        font-size:36px;
+
+    }
+
+    .header-left p{
+
+        font-size:17px;
+
+    }
+
+    .stats-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .main{
+
+        padding:15px;
+
+    }
+
+    .header-left h1{
+
+        font-size:30px;
+
+    }
+
+    .header-left p{
+
+        font-size:15px;
+
+    }
+
+    .btn-new{
+
+        font-size:16px;
+
+        height:55px;
+
+    }
+
+}
+
+/*======================================================
+  TABELA
+======================================================*/
+
+.report-table-container{
+    width:100%;
+    overflow-x:auto;
+    border-radius:18px;
+    border:1px solid var(--base-border);
+    background:var(--base-surface);
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.report-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+.report-table thead{
+    background:linear-gradient(90deg,#eef5ff,#f8fbff);
+}
+
+.report-table th{
+    padding:18px 20px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    color:var(--secondary);
+    text-align:left;
+    white-space:nowrap;
+}
+
+.report-table td{
+    padding:18px 20px;
+    border-top:1px solid var(--base-border);
+    font-size:14px;
+    vertical-align:middle;
+}
+
+.report-table tbody tr{
+    transition:.25s;
+}
+
+.report-table tbody tr:hover{
+    background:#f7fbff;
+}
+
+/*======================================================
+  COLUNA RELATÓRIO
+======================================================*/
+
+.report-title{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.report-icon{
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#edf5ff;
+    color:#2563eb;
+    font-size:18px;
+    flex-shrink:0;
+}
+
+.report-info{
+    display:flex;
+    flex-direction:column;
+}
+
+.report-info strong{
+    font-size:15px;
+    color:var(--secondary-dark);
+    margin-bottom:3px;
+}
+
+.report-info span{
+    font-size:12px;
+    color:var(--base-text-light);
+}
+
+/*======================================================
+  ALUNO
+======================================================*/
+
+.student-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.student-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#60a5fa);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:14px;
+}
+
+.student-name{
+    display:flex;
+    flex-direction:column;
+}
+
+.student-name strong{
+    font-size:14px;
+}
+
+.student-name span{
+    font-size:12px;
+    color:var(--base-text-light);
+}
+
+/*======================================================
+  PROFESSOR
+======================================================*/
+
+.teacher{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.teacher i{
+    color:#2563eb;
+    font-size:16px;
+}
+
+.teacher span{
+    font-weight:600;
+}
+
+/*======================================================
+  DATA
+======================================================*/
+
+.report-date{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.report-date strong{
+    font-size:14px;
+}
+
+.report-date small{
+    color:var(--base-text-light);
+}
+
+/*======================================================
+  STATUS
+======================================================*/
+
+.report-status{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 16px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.status-finalizado{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.status-pendente{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.status-rascunho{
+    background:#e5e7eb;
+    color:#4b5563;
+}
+
+/*======================================================
+  BOTÕES
+======================================================*/
+
+.report-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.btn-report{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.25s;
+}
+
+.btn-report i{
+    font-size:15px;
+}
+
+.btn-view{
+    background:#eef5ff;
+    color:#2563eb;
+}
+
+.btn-view:hover{
+    background:#2563eb;
+    color:#fff;
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(37,99,235,.25);
+}
+
+.btn-download{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.btn-download:hover{
+    background:#16a34a;
+    color:#fff;
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(22,163,74,.25);
+}
+
+.btn-delete{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.btn-delete:hover{
+    background:#dc2626;
+    color:#fff;
+    transform:translateY(-3px);
+}
+
+
+/*======================================================
+  EMPTY
+======================================================*/
+
+.report-empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:80px 30px;
+    text-align:center;
+}
+
+.report-empty i{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:#eef5ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:38px;
+    margin-bottom:25px;
+}
+
+.report-empty h3{
+    font-size:24px;
+    color:var(--secondary-dark);
+    margin-bottom:10px;
+}
+
+.report-empty p{
+    color:var(--base-text-light);
+    max-width:450px;
+    line-height:1.7;
+}
+
+/*======================================================
+  ANIMAÇÕES
+======================================================*/
+
+@keyframes fadeUp{
+
+    from{
+        opacity:0;
+        transform:translateY(25px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.report-card,
+.report-table-container,
+.report-summary{
+    animation:fadeUp .5s ease;
+}
+
+/*======================================================
+  TABLET
+======================================================*/
+
+@media(max-width:1100px){
+
+    .report-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .search-report{
+        width:100%;
+        min-width:100%;
+    }
+
+    .report-filter{
+        width:100%;
+    }
+
+    .report-filter select{
+        flex:1;
+        min-width:0;
+    }
+
+}
+
+/*======================================================
+  TABLET PEQUENO
+======================================================*/
+
+@media(max-width:900px){
+
+    .report-summary{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .report-table-container{
+        overflow-x:auto;
+    }
+
+}
+
+/*======================================================
+  CELULAR
+======================================================*/
+
+@media(max-width:768px){
+
+    .report-summary{
+        grid-template-columns:1fr;
+    }
+
+    .report-filter{
+        flex-direction:column;
+    }
+
+    .report-filter select{
+        width:100%;
+    }
+
+    .search-report input{
+        height:48px;
+    }
+
+    .report-table{
+        min-width:700px;
+    }
+
+}
+
+/*======================================================
+  CELULAR PEQUENO
+======================================================*/
+
+@media(max-width:560px){
+
+    .report-container{
+        gap:18px;
+    }
+
+    .report-actions{
+        gap:15px;
+    }
+
+    .report-card{
+        padding:18px;
+    }
+
+    .report-summary-card{
+        padding:20px;
+    }
+
+    .report-summary-card h2{
+        font-size:26px;
+    }
+
+    .report-table th,
+    .report-table td{
+        padding:14px;
+        font-size:13px;
+    }
+
+    .student-avatar{
+        width:34px;
+        height:34px;
+        font-size:12px;
+    }
+
+    .report-icon{
+        width:40px;
+        height:40px;
+        font-size:16px;
+    }
+
+    .btn-report{
+        width:38px;
+        height:38px;
+    }
+
+}
+
+/*======================================================
+  SCROLLBAR
+======================================================*/
+
+.report-table-container::-webkit-scrollbar{
+    height:8px;
+}
+
+.report-table-container::-webkit-scrollbar-thumb{
+    background:#c7d7ef;
+    border-radius:20px;
+}
+
+.report-table-container::-webkit-scrollbar-track{
+    background:#eef5ff;
+}
+
+/*======================================================
+  HOVER BONITO
+======================================================*/
+
+.report-summary-card,
+.report-card,
+.report-table-container{
+
+    transition:.30s;
+
+}
+
+.report-summary-card:hover,
+.report-card:hover,
+.report-table-container:hover{
+
+    box-shadow:0 18px 40px rgba(0,0,0,.08);
+
+}
+
+/*======================================================
+  BADGES
+======================================================*/
+
+.badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    padding:7px 12px;
+
+    border-radius:30px;
+
+    background:#eef5ff;
+
+    color:#2563eb;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.badge i{
+
+    font-size:11px;
+
+}

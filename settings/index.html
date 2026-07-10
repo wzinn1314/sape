@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPE - Configurações</title>
+    <link rel ="icon" href = "../assets/foto.png">
+     <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+    <div class="app-wrapper">
+
+       
+        <aside class="sidebar">
+            <nav class="menu">
+                <div class="menu-header">SAPE</div>
+                <a href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="../students/"><i class="fas fa-graduation-cap"></i> Alunos</a>
+                <a href="#"><i class="fas fa-user"></i> Perfil do Aluno</a>
+                <a href="#"><i class="fas fa-star"></i> Características</a>
+                <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
+                <a href="#"><i class="fas fa-chart-bar"></i> Histórico Escolar</a>
+                <a href="#"><i class="fas fa-book"></i> Plano de Apoio</a>
+                <a href="#"><i class="fas fa-comments"></i> Observações</a>
+                <a href="#"><i class="fas fa-users"></i> Responsáveis</a>
+                <a class="active" href="index.html"><i class="fas fa-cog"></i> Configurações</a>
+            </nav>
+        </aside>
+
+        
+        <main class="main-content">
+            
+            <header class="settings-header">
+                <h1 class="main-title">Configurações</h1>
+                <p class="subtitle">Gerencie as configurações do sistema</p>
+            </header>
+
+            <div class="settings-container">
+                
+                
+                <div class="cards-grid">
+                    
+                    
+                    <section class="settings-card profile-info">
+                        <h2 class="card-title">Informações do Perfil</h2>
+                        <div class="card-content">
+                            
+                            <div class="photo-section">
+                                <img src="https://via.placeholder.com/100" alt="Foto de Perfil" class="profile-photo">
+                                <button class="btn-text">Alterar Foto</button>
+                            </div>
+
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label for="nome">Nome Completo</label>
+                                    <input type="text" id="nome" placeholder="Ana Silva">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">E-mail</label>
+                                    <input type="email" id="email" placeholder="ana.silva@sape.edu.br">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefone">Telefone</label>
+                                    <input type="tel" id="telefone" placeholder="(11) 98765-4321">
+                                </div>
+                                <button type="submit" class="btn-primary">Salvar Alterações</button>
+                            </form>
+
+                        </div>
+                    </section>
+
+                    <!-- CARD DIREITO: PREFERÊNCIAS -->
+                    <section class="settings-card preferences">
+                        <h2 class="card-title">Preferências</h2>
+                        <div class="card-content">
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label for="idioma">Idioma</label>
+                                    <select id="idioma">
+                                        <option value="pt-BR">Português (Brasil)</option>
+                                        <option value="en-US">English (US)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fuso">Fuso Horário</label>
+                                    <select id="fuso">
+                                        <option value="utc3">(UTC-03:00) Brasília</option>
+                                        <option value="utc">UTC</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="formato-data">Formato de Data</label>
+                                    <select id="formato-data">
+                                        <option value="dd-mm-yyyy">DD/MM/AAAA</option>
+                                        <option value="mm-dd-yyyy">MM/DD/AAAA</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="itens-pagina">Itens por Página</label>
+                                    <select id="itens-pagina">
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                </div> <!-- FIM DA GRADE -->
+
+            </div> <!-- FIM DO CONTAINER DE CONFIGURAÇÕES -->
+
+        </main> <!-- FIM DO CONTEÚDO PRINCIPAL -->
+
+    </div> <!-- FIM DO APP-WRAPPER -->
+
+</body>
+</html>

@@ -1,10 +1,15 @@
+const API_URL = 'http://localhost:3000';
 const studentForm = document.getElementById('studentForm');
 
-function saveStudent(student) {
-  const stored = localStorage.getItem('students');
-  const students = stored ? JSON.parse(stored) : [];
-  students.unshift(student);
-  localStorage.setItem('students', JSON.stringify(students));
+function getLoggedUserId() {
+  const userStr = localStorage.getItem('user');
+  if (!userStr) return null;
+  try {
+    const user = JSON.parse(userStr);
+    return user.id || null;
+  } catch {
+    return null;
+  }
 }
 
 function getStudentGradeValue(turma) {
@@ -15,7 +20,7 @@ function getStudentGradeValue(turma) {
 }
 
 if (studentForm) {
-  studentForm.addEventListener('submit', function (event) {
+  studentForm.addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const student = {
@@ -37,7 +42,7 @@ if (studentForm) {
       telefone: document.getElementById('telefone').value.trim(),
       email: document.getElementById('email').value.trim(),
       gradeValue: getStudentGradeValue(document.getElementById('turma').value),
-      createdAt: new Date().toISOString()
+      registeredBy: getLoggedUserId()
     };
 
     if (!student.nome || !student.matricula || !student.cpf || !student.responsavel) {
@@ -50,7 +55,24 @@ if (studentForm) {
       return;
     }
 
-    saveStudent(student);
-    window.location.href = '../students/index.html';
+    try {
+      const response = await fetch(`${API_URL}/students`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        window.location.href = '../students/index.html';
+        return;
+      }
+
+      alert(result.error || 'Erro ao cadastrar aluno.');
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+    }
   });
 }

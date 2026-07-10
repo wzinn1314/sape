@@ -1,13 +1,15 @@
+@import url('../assets/theme.css');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
 }
 
 body {
   min-height: 100vh;
-  background: #eef7ff;
+  background: var(--base-bg);
 }
 
 .register-page {
@@ -18,18 +20,19 @@ body {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(160deg, var(--base-surface) 0%, var(--base-bg) 60%, var(--secondary-light) 100%);
 }
 
 .register-card {
   width: 100%;
   max-width: 650px;
-  background: #ffffff;
-  border: 3px solid #063f78;
-  border-radius: 28px;
+  background: var(--base-surface);
+  border: 2px solid var(--secondary);
+  border-radius: var(--radius-xl);
   padding: 42px;
   position: relative;
   z-index: 2;
-  box-shadow: 12px 12px 0 #ffd736;
+  box-shadow: var(--shadow-lg), var(--shadow-accent);
 }
 
 .logo {
@@ -53,13 +56,14 @@ body {
 }
 
 .register-header h1 {
-  color: #063f78;
+  color: var(--secondary-dark);
   font-size: clamp(2rem, 5vw, 3.2rem);
   margin-bottom: 12px;
+  font-weight: 900;
 }
 
 .register-header p {
-  color: #063b7a;
+  color: var(--base-text);
   font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   line-height: 1.5;
 }
@@ -70,27 +74,29 @@ body {
 
 .form-group label {
   display: block;
-  color: #063f78;
-  font-size: 1.05rem;
-  font-weight: 800;
+  color: var(--secondary-dark);
+  font-size: 1rem;
+  font-weight: 700;
   margin-bottom: 8px;
 }
 
 .form-group input {
   width: 100%;
   height: 56px;
-  border: 2px solid #d5dce8;
-  border-radius: 15px;
+  border: 2px solid var(--base-border);
+  border-radius: var(--radius-md);
   padding: 0 18px;
-  background: #f8faff;
-  color: #061b45;
+  background: var(--base-bg);
+  color: var(--secondary-dark);
   font-size: 1rem;
   outline: none;
+  transition: var(--transition);
 }
 
 .form-group input:focus {
-  border-color: #1b66d2;
-  background: #ffffff;
+  border-color: var(--secondary);
+  background: var(--base-surface);
+  box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
 }
 
 .checkbox-group {
@@ -98,7 +104,7 @@ body {
   align-items: flex-start;
   gap: 10px;
   margin: 20px 0;
-  color: #063b7a;
+  color: var(--base-text);
   font-size: 0.95rem;
   line-height: 1.4;
 }
@@ -107,131 +113,93 @@ body {
   margin-top: 3px;
   min-width: 18px;
   height: 18px;
+  accent-color: var(--secondary);
 }
 
 .checkbox-group a,
 .login-link a {
-  color: #1b66d2;
-  font-weight: 800;
+  color: var(--secondary);
+  font-weight: 700;
   text-decoration: none;
 }
 
 #loading,
 #message {
   text-align: center;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 14px;
 }
 
-#loading {
-  color: #063f78;
-}
+#loading { color: var(--secondary-dark); }
 
 .button-link {
   width: 100%;
   height: 60px;
   border: none;
-  border-radius: 15px;
-  background: #063f78;
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 900;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--secondary-dark);
+  font-size: 1.2rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: 0.3s;
+  transition: var(--transition);
+  box-shadow: var(--shadow-accent);
 }
 
 .button-link:hover {
-  background: #0b5ead;
+  background: var(--accent-warm);
   transform: translateY(-2px);
 }
 
 .button-link.disabled,
 .button-link:disabled {
-  background: #9aa9bd;
+  background: var(--base-muted);
+  color: var(--base-text-light);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .note {
   margin-top: 16px;
   text-align: center;
-  color: #063b7a;
+  color: var(--base-text);
   font-size: 0.9rem;
 }
 
 .login-link {
   margin-top: 22px;
   text-align: center;
-  color: #063b7a;
+  color: var(--base-text);
   font-weight: 600;
 }
 
 .puzzle {
   position: absolute;
-  width: 130px;
-  height: 130px;
-  border-radius: 28px;
-  opacity: 0.9;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  opacity: 0.18;
   z-index: 1;
 }
 
-.puzzle-red {
-  background: #ef2b2b;
-  top: -30px;
-  left: -25px;
-  transform: rotate(25deg);
-}
-
-.puzzle-blue {
-  background: #1b66d2;
-  top: 25px;
-  left: 90px;
-  transform: rotate(-25deg);
-}
-
-.puzzle-yellow {
-  background: #ffd736;
-  right: -35px;
-  top: 35%;
-  transform: rotate(20deg);
-}
-
-.puzzle-green {
-  background: #33b84c;
-  left: -35px;
-  bottom: 20%;
-  transform: rotate(-18deg);
-}
+.puzzle-red    { background: var(--puzzle-red);    top: -25px; left: -20px; transform: rotate(25deg); }
+.puzzle-blue   { background: var(--puzzle-blue);   top: 25px;  left: 90px;  transform: rotate(-25deg); }
+.puzzle-yellow { background: var(--puzzle-yellow); right: -30px; top: 35%;  transform: rotate(20deg); }
+.puzzle-green  { background: var(--puzzle-green);  left: -30px; bottom: 20%; transform: rotate(-18deg); }
 
 @media (max-width: 768px) {
-  .register-page {
-    padding: 18px;
-  }
+  .register-page { padding: 18px; }
 
   .register-card {
     max-width: 520px;
     padding: 34px 28px;
-    box-shadow: 8px 8px 0 #ffd736;
   }
 
-  .logo {
-    width: 110px;
-    height: 110px;
-  }
-
-  .form-group input {
-    height: 52px;
-  }
-
-  .button-link {
-    height: 56px;
-    font-size: 1.1rem;
-  }
-
-  .puzzle {
-    width: 90px;
-    height: 90px;
-  }
+  .logo { width: 110px; height: 110px; }
+  .form-group input { height: 52px; }
+  .button-link { height: 56px; font-size: 1.1rem; }
+  .puzzle { width: 70px; height: 70px; }
 }
 
 @media (max-width: 480px) {
@@ -243,59 +211,21 @@ body {
   .register-card {
     margin-top: 18px;
     padding: 28px 20px;
-    border-radius: 22px;
-    box-shadow: 6px 6px 0 #ffd736;
+    border-radius: var(--radius-lg);
   }
 
-  .logo {
-    width: 95px;
-    height: 95px;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    font-size: 0.95rem;
-  }
-
-  .form-group input {
-    height: 50px;
-    font-size: 0.95rem;
-    padding: 0 14px;
-  }
-
-  .checkbox-group {
-    font-size: 0.85rem;
-  }
-
-  .note,
-  .login-link {
-    font-size: 0.85rem;
-  }
-
-  .puzzle {
-    width: 65px;
-    height: 65px;
-  }
+  .logo { width: 95px; height: 95px; }
+  .form-group { margin-bottom: 15px; }
+  .form-group label { font-size: 0.95rem; }
+  .form-group input { height: 50px; font-size: 0.95rem; padding: 0 14px; }
+  .checkbox-group { font-size: 0.85rem; }
+  .note, .login-link { font-size: 0.85rem; }
+  .puzzle { width: 55px; height: 55px; }
 }
 
 @media (max-width: 360px) {
-  .register-card {
-    padding: 24px 16px;
-  }
-
-  .logo {
-    width: 80px;
-    height: 80px;
-  }
-
-  .form-group input {
-    height: 48px;
-  }
-
-  .button-link {
-    height: 52px;
-  }
+  .register-card { padding: 24px 16px; }
+  .logo { width: 80px; height: 80px; }
+  .form-group input { height: 48px; }
+  .button-link { height: 52px; }
 }

@@ -1,0 +1,376 @@
+@import url('../assets/theme.css');
+
+/* =========================================
+   RESETS E ESTILOS GERAIS — 10·30·60
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+body {
+    min-height: 100vh;
+    background: var(--base-bg);
+    color: var(--base-text);
+}
+
+.main-content {
+    padding: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   CABEÇALHO
+   ========================================= */
+.settings-header {
+    margin-bottom: 32px;
+}
+
+.main-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--secondary-dark);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: var(--base-text);
+}
+
+/* =========================================
+   BARRA DE ABAS
+   ========================================= */
+.settings-tabs {
+    border-bottom: 1px solid var(--base-border);
+    margin-bottom: 32px;
+}
+
+.tab-list {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 12px;
+}
+
+.tab-list::-webkit-scrollbar { display: none; }
+.tab-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--base-text);
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: var(--transition);
+}
+
+.tab-item:hover {
+    color: var(--secondary-dark);
+    background-color: var(--secondary-light);
+}
+
+.tab-item.active {
+    color: var(--secondary);
+    border-bottom: 3px solid var(--accent);
+    font-weight: 700;
+}
+
+/* =========================================
+   CONTEÚDO E CARDS
+   ========================================= */
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cards-grid {
+    display: flex;
+    gap: 24px;
+}
+
+.settings-card {
+    background-color: var(--base-surface);
+    border: 1px solid var(--base-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 24px;
+    flex: 1;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--secondary-dark);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--base-muted);
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.photo-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary-light);
+}
+
+/* =========================================
+   FORMULÁRIOS
+   ========================================= */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--base-text);
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid var(--base-border);
+    border-radius: 8px;
+    background-color: var(--base-bg);
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--secondary);
+    background: var(--base-surface);
+    box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px;
+    padding-right: 40px;
+}
+
+/* =========================================
+   BOTÕES — 10% destaque
+   ========================================= */
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--secondary-dark);
+    border: none;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    align-self: flex-start;
+    margin-top: 8px;
+    box-shadow: var(--shadow-accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-warm);
+    transform: translateY(-2px);
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-text:hover {
+    color: var(--secondary-hover);
+    text-decoration: underline;
+}
+
+.activity-grid {
+    display: flex;
+    gap: 16px;
+}
+
+.activity-item {
+    background-color: var(--base-bg);
+    border: 1px solid var(--base-border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--base-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--secondary-dark);
+}
+
+/* =========================================
+   LAYOUT APP — 30% sidebar
+   ========================================= */
+.app-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100vh;
+    gap: 24px;
+    background-color: var(--base-bg);
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: var(--secondary-light);
+    border-right: 1px solid var(--base-border);
+    padding: 32px;
+}
+
+.main-content {
+    margin-left: 320px;
+    flex: 1;
+    padding: 40px;
+    max-width: 1600px;
+    min-width: 0;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-header {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--secondary-dark);
+  margin-bottom: 16px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--base-text);
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 13px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.menu a:hover {
+  background: var(--base-surface);
+  color: var(--secondary);
+  transform: translateX(4px);
+}
+
+.menu a.active {
+  background: var(--secondary);
+  color: var(--base-surface);
+  box-shadow: var(--shadow-md);
+  border-left: 3px solid var(--accent);
+}
+
+@media (max-width: 1400px) {
+  .main-content { padding: 35px; }
+}
+
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; }
+  .main-content { padding: 25px; }
+  .cards-grid { flex-direction: column; }
+  .activity-grid { flex-direction: column; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { width: 200px; padding: 20px 12px; }
+  .main-content { padding: 20px; }
+  .main-title { font-size: 28px; }
+  .photo-section { flex-direction: column; align-items: flex-start; }
+  .profile-photo { width: 80px; height: 80px; }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper { flex-direction: column; }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--base-border);
+  }
+
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .cards-grid { flex-direction: column; }
+  .settings-card { width: 100%; }
+  .btn-primary { width: 100%; }
+  .activity-grid { flex-direction: column; }
+}

@@ -1,13 +1,15 @@
+@import url('../assets/theme.css');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
 }
 
 body {
   min-height: 100vh;
-  background: #eef7ff;
+  background: var(--base-bg);
 }
 
 .background {
@@ -18,17 +20,18 @@ body {
   align-items: center;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(160deg, var(--base-surface) 0%, var(--base-bg) 60%, var(--secondary-light) 100%);
 }
 
 .login-card {
   width: 100%;
   max-width: 520px;
-  background: #ffffff;
-  border: 3px solid #1b66d2;
-  border-radius: 26px;
+  background: var(--base-surface);
+  border: 2px solid var(--secondary);
+  border-radius: var(--radius-xl);
   padding: 45px 45px 35px;
   text-align: center;
-  box-shadow: 12px 12px 0 #ffd736;
+  box-shadow: var(--shadow-lg), var(--shadow-accent);
   position: relative;
   z-index: 2;
 }
@@ -54,51 +57,51 @@ h1 {
   margin-bottom: 8px;
 }
 
-.blue { color: #1b66d2; }
-.red { color: #e82929; }
-.yellow { color: #ffc400; }
-.green { color: #31b84b; }
+.blue   { color: var(--puzzle-blue); }
+.red    { color: var(--puzzle-red); }
+.yellow { color: var(--puzzle-yellow); }
+.green  { color: var(--puzzle-green); }
 
 .subtitle {
-  color: #063b7a;
+  color: var(--secondary-deep);
   font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.4;
   margin-bottom: 15px;
 }
 
-.heart {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-}
-
-form {
-  text-align: left;
-}
+form { text-align: left; }
 
 label {
   display: block;
-  color: #063b7a;
-  font-size: 1.3rem;
-  font-weight: 800;
+  color: var(--secondary-dark);
+  font-size: 1.1rem;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
 .input-box {
   width: 100%;
   height: 58px;
-  border: 2px solid #1b66d2;
-  border-radius: 13px;
+  border: 2px solid var(--base-border);
+  border-radius: var(--radius-sm);
   padding: 0 18px;
   margin-bottom: 25px;
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #ffffff;
+  background: var(--base-bg);
+  transition: var(--transition);
+}
+
+.input-box:focus-within {
+  border-color: var(--secondary);
+  background: var(--base-surface);
+  box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
 }
 
 .input-box i {
-  color: #1b66d2;
+  color: var(--secondary);
   font-size: 1.2rem;
 }
 
@@ -107,83 +110,63 @@ label {
   border: none;
   outline: none;
   font-size: 1rem;
-  color: #000;
+  color: var(--secondary-dark);
+  background: transparent;
 }
 
 .input-box input::placeholder {
-  color: #999;
+  color: var(--base-text-light);
 }
 
-button {
+/* 10% — botão de ação */
+button[type="submit"] {
   width: 100%;
   height: 64px;
   border: none;
-  border-radius: 13px;
-  background: #063f78;
-  color: #ffffff;
-  font-size: 1.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--secondary-dark);
+  font-size: 1.3rem;
   font-weight: 800;
   cursor: pointer;
-  transition: 0.3s;
+  transition: var(--transition);
+  box-shadow: var(--shadow-accent);
 }
 
-button:hover {
-  background: #0b5ead;
+button[type="submit"]:hover {
+  background: var(--accent-warm);
   transform: translateY(-2px);
 }
 
-.footer {
-  margin-top: 30px;
-  color: #063b7a;
-  font-size: 1rem;
+#message {
+  text-align: center;
   font-weight: 600;
+  margin-bottom: 10px;
 }
 
-
+/* Decorações — 10% pontual */
 .puzzle {
   position: absolute;
-  width: 130px;
-  height: 130px;
-  opacity: 0.9;
-  border-radius: 25px;
+  width: 100px;
+  height: 100px;
+  opacity: 0.18;
+  border-radius: var(--radius-lg);
   z-index: 1;
 }
 
-.puzzle-red {
-  background: #ef2b2b;
-  top: -25px;
-  left: -25px;
-  transform: rotate(25deg);
-}
-
-.puzzle-blue {
-  background: #1b66d2;
-  top: 15px;
-  left: 80px;
-  transform: rotate(-25deg);
-}
-
-.puzzle-yellow {
-  background: #ffd736;
-  right: -25px;
-  top: 35%;
-  transform: rotate(20deg);
-}
-
-.puzzle-green {
-  background: #33b84c;
-  left: -35px;
-  bottom: 25%;
-  transform: rotate(-18deg);
-}
+.puzzle-red    { background: var(--puzzle-red);    top: -20px;  left: -20px;  transform: rotate(25deg); }
+.puzzle-blue   { background: var(--puzzle-blue);   top: 15px;   left: 80px;  transform: rotate(-25deg); }
+.puzzle-yellow { background: var(--puzzle-yellow); right: -20px; top: 35%;   transform: rotate(20deg); }
+.puzzle-green  { background: var(--puzzle-green);  left: -30px; bottom: 25%; transform: rotate(-18deg); }
 
 .waves {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 130px;
+  height: 100px;
   left: 0;
   z-index: 1;
+  opacity: 0.12;
 }
 
 .wave {
@@ -194,126 +177,44 @@ button:hover {
   border-radius: 50% 50% 0 0;
 }
 
-.blue-wave {
-  background: #1b66d2;
-  left: -5%;
-}
-
-.red-wave {
-  background: #ef2b2b;
-  left: 22%;
-}
-
-.yellow-wave {
-  background: #ffd736;
-  left: 43%;
-}
-
-.green-wave {
-  background: #33b84c;
-  right: -5%;
-}
-
+.blue-wave   { background: var(--secondary); }
+.red-wave    { background: var(--puzzle-red); }
+.yellow-wave { background: var(--accent); }
+.green-wave  { background: var(--accent-success); }
 
 @media (max-width: 768px) {
   .login-card {
     max-width: 450px;
     padding: 35px 30px 30px;
-    box-shadow: 8px 8px 0 #ffd736;
   }
 
-  .logo {
-    width: 140px;
-    height: 140px;
-  }
-
-  h1 {
-    font-size: 3.2rem;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-  }
-
-  label {
-    font-size: 1.1rem;
-  }
-
-  .input-box {
-    height: 54px;
-  }
-
-  button {
-    height: 58px;
-    font-size: 1.2rem;
-  }
+  .logo { width: 140px; height: 140px; }
+  h1 { font-size: 3.2rem; }
+  .subtitle { font-size: 1rem; }
+  label { font-size: 1rem; }
+  .input-box { height: 54px; }
+  button[type="submit"] { height: 58px; font-size: 1.2rem; }
 }
 
-
 @media (max-width: 480px) {
-  .background {
-    padding: 15px;
-  }
+  .background { padding: 15px; }
 
   .login-card {
     padding: 28px 22px;
-    border-radius: 22px;
-    box-shadow: 6px 6px 0 #ffd736;
+    border-radius: var(--radius-lg);
   }
 
-  .logo {
-    width: 120px;
-    height: 120px;
-  }
-
-  h1 {
-    font-size: 2.7rem;
-  }
-
-  .subtitle {
-    font-size: 0.95rem;
-  }
-
-  label {
-    font-size: 1rem;
-  }
-
-  .input-box {
-    height: 52px;
-    padding: 0 14px;
-  }
-
-  button {
-    height: 55px;
-    font-size: 1.1rem;
-  }
-
-  .footer {
-    font-size: 0.9rem;
-  }
-
-  .puzzle {
-    width: 80px;
-    height: 80px;
-  }
-
-  .waves {
-    height: 90px;
-  }
+  .logo { width: 120px; height: 120px; }
+  h1 { font-size: 2.7rem; }
+  .subtitle { font-size: 0.95rem; }
+  .input-box { height: 52px; padding: 0 14px; }
+  button[type="submit"] { height: 55px; font-size: 1.1rem; }
+  .puzzle { width: 70px; height: 70px; }
+  .waves { height: 70px; }
 }
 
-
 @media (max-width: 360px) {
-  .logo {
-    width: 100px;
-    height: 100px;
-  }
-
-  h1 {
-    font-size: 2.3rem;
-  }
-
-  .login-card {
-    padding: 24px 18px;
-  }
+  .logo { width: 100px; height: 100px; }
+  h1 { font-size: 2.3rem; }
+  .login-card { padding: 24px 18px; }
 }
