@@ -5,30 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - SAPE</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="../../assets/foto.png" type="image/png">
+  <link rel="stylesheet" href="../shared/sidebar.css" />
+  <link rel="icon" href="../assets/foto.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="../shared/roles.js"></script>
+  <script src="../shared/auth-admin.js" data-base="../" defer></script>
 </head>
 <body>
 
   <aside class="sidebar">
     <div class="logo">
-      <img src="../../assets/foto.png" alt="Logo SAPE">
-      <div>
-        <span>SAPE</span>
-        <p>Suporte e Acolhimento</p>
-      </div>
+      <a href="../index.html" class="logo-link">
+        <img src="../assets/logo0.png" alt="Logo SAPE">
+        <div>
+          <span>SAPE</span>
+          <p>Administração</p>
+        </div>
+      </a>
     </div>
 
     <nav class="menu">
-      <a class="active"href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a class="active" href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
       <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
-      <a href="#"><i class="fas fa-user"></i> Perfil do Aluno</a>
-      <a href="#"><i class="fas fa-star"></i> Características</a>
-      <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
-      <a href="#"><i class="fas fa-chart-bar"></i> Histórico Escolar</a>
-      <a href="#"><i class="fas fa-book"></i> Plano de Apoio</a>
-      <a href="#"><i class="fas fa-comments"></i> Observações</a>
-      <a href="#"><i class="fas fa-users"></i> Responsáveis</a>
+      <a href="../professores/index.html"><i class="fas fa-chalkboard-teacher"></i> Professores</a>
+      <a href="../new_students/index.html"><i class="fas fa-user-plus"></i> Novo Aluno</a>
       <a href="#"><i class="fas fa-cog"></i> Configurações</a>
     </nav>
 
@@ -49,7 +49,7 @@
       <div class="header-content">
         <div class="header-greeting">
           <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>! 👋</h1>
-          <p id="headerSubtitle">Painel de controle e gerenciamento de alunos</p>
+          <p id="headerSubtitle">Painel administrativo do sistema SAPE</p>
         </div>
         <div class="header-right">
           <div class="header-date">
@@ -72,7 +72,7 @@
           <h3 class="card-number">48</h3>
           <small>Cadastrados</small>
         </div>
-        <a href="../index.html" class="card-link">Ver todos →</a>
+        <a href="../students/index.html" class="card-link">Ver todos →</a>
       </div>
 
       <div class="card card-blue">
@@ -81,7 +81,7 @@
           <h3 class="card-number">18</h3>
           <small>Com necessidades especiais</small>
         </div>
-        <a href="../index.html" class="card-link">Ver todos →</a>
+        <a href="../students/index.html" class="card-link">Ver todos →</a>
       </div>
 
       <div class="card card-yellow">

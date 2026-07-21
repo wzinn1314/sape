@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações - SAPE</title>
+  <link rel="stylesheet" href="../deshboard/styles.css" />
+  <link rel="stylesheet" href="../shared/sidebar.css" />
+  <link rel="icon" href="../assets/foto.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="../shared/roles.js"></script>
+  <script src="../shared/auth-admin.js" data-base="../" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <a href="../index.html" class="logo-link">
+        <img src="../assets/logo0.png" alt="Logo SAPE" />
+        <div>
+          <span>SAPE</span>
+          <p>Administração</p>
+        </div>
+      </a>
+    </div>
+
+    <nav class="menu">
+      <a href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
+      <a href="../professores/index.html"><i class="fas fa-chalkboard-teacher"></i> Professores</a>
+      <a href="../new_students/index.html"><i class="fas fa-user-plus"></i> Novo Aluno</a>
+      <a class="active" href="index.html"><i class="fas fa-cog"></i> Configurações</a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div class="profile-info">
+        <strong id="professorName">Usuário</strong>
+        <span id="userType">Desenvolvedor(a)</span>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <div>
+        <h2>Configurações do Sistema</h2>
+        <p>Área exclusiva para desenvolvedores e administradores.</p>
+      </div>
+    </header>
+
+    <section class="dashboard-grid">
+      <div class="left-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Geral</h3>
+          </div>
+          <div class="aviso-item aviso-blue">
+            <div class="aviso-content">
+              <strong>Identidade do sistema</strong>
+              <p>Nome, logo e informações institucionais do SAPE.</p>
+            </div>
+          </div>
+          <div class="aviso-item aviso-yellow">
+            <div class="aviso-content">
+              <strong>Domínios de e-mail</strong>
+              <p>Controle de domínios permitidos para cadastro e login.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Administração</h3>
+          </div>
+          <div class="aviso-item aviso-green">
+            <div class="aviso-content">
+              <strong>Usuários e permissões</strong>
+              <p>Gerencie perfis de desenvolvedores, professores e alunos.</p>
+            </div>
+          </div>
+          <div class="aviso-item aviso-red">
+            <div class="aviso-content">
+              <strong>Backup e manutenção</strong>
+              <p>Rotinas de backup do banco de dados e logs do sistema.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

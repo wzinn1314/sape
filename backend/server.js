@@ -35,6 +35,9 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
             { name: 'password', addSql: 'ALTER TABLE user ADD COLUMN password TEXT DEFAULT ""' },
             { name: 'cpf', addSql: 'ALTER TABLE user ADD COLUMN cpf TEXT DEFAULT ""' },
             { name: 'role', addSql: "ALTER TABLE user ADD COLUMN role TEXT DEFAULT 'Aluno'" },
+            { name: 'perfil', addSql: 'ALTER TABLE user ADD COLUMN perfil TEXT DEFAULT ""' },
+            { name: 'caracteristicas', addSql: 'ALTER TABLE user ADD COLUMN caracteristicas TEXT DEFAULT ""' },
+            { name: 'observacao', addSql: 'ALTER TABLE user ADD COLUMN observacao TEXT DEFAULT ""' },
             { name: 'emailVerified', addSql: "ALTER TABLE user ADD COLUMN emailVerified INTEGER DEFAULT 0" },
             { name: 'approved', addSql: "ALTER TABLE user ADD COLUMN approved INTEGER DEFAULT 0" }
           ];
@@ -72,7 +75,7 @@ app.get('/config', (req, res) => {
 
 
 app.get('/users', (req, res) => {
-  db.all('SELECT id, name, email, cpf, role FROM user', ... [], (err, rows) => {
+  db.all('SELECT id, name, email, cpf, role, perfil, caracteristicas, observacao FROM user', ... [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
@@ -245,7 +248,23 @@ app.post('/login', async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+const DEFAULT_PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+
+function startServer(port) {
+  const server = app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      const nextPort = port + 1;
+      console.warn(`Porta ${port} já está em uso. Tentando porta ${nextPort}...`);
+      startServer(nextPort);
+    } else {
+      console.error('Erro ao iniciar o servidor:', error);
+      process.exit(1);
+    }
+  });
+}
+
+startServer(DEFAULT_PORT);

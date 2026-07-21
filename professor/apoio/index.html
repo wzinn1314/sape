@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apoio Educacional - Portal do Professor - SAPE</title>
+  <link rel="stylesheet" href="../../deshboard/styles.css" />
+  <link rel="stylesheet" href="../../shared/sidebar.css" />
+  <link rel="icon" href="../../assets/foto.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="../../shared/roles.js"></script>
+  <script src="../../shared/auth-professor.js" data-base="../../" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <a href="../../index.html" class="logo-link">
+        <img src="../../assets/logo0.png" alt="Logo SAPE" />
+        <div>
+          <span>SAPE</span>
+          <p>Apoio Especializado</p>
+        </div>
+      </a>
+    </div>
+
+    <nav class="menu">
+      <a href="../index.html"><i class="fas fa-home"></i> Início</a>
+      <a href="../alunos/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
+      <a class="active" href="index.html"><i class="fas fa-hands-helping"></i> Apoio Educacional</a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div class="profile-info">
+        <strong id="professorName">Usuário</strong>
+        <span id="userType">Professor(a)</span>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <div>
+        <h2>Apoio Educacional</h2>
+        <p>Planejamento de suporte e recursos para estudantes em atendimento.</p>
+      </div>
+    </header>
+
+    <section class="stats-cards">
+      <div class="card card-purple">
+        <div class="card-content">
+          <p class="card-label">Apoios Ativos</p>
+          <h3 class="card-number">14</h3>
+          <small>Intervenções</small>
+        </div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-content">
+          <p class="card-label">Recursos Disponíveis</p>
+          <h3 class="card-number">9</h3>
+          <small>Materiais e serviços</small>
+        </div>
+      </div>
+      <div class="card card-yellow">
+        <div class="card-content">
+          <p class="card-label">Novos Encaminhamentos</p>
+          <h3 class="card-number">4</h3>
+          <small>Semana atual</small>
+        </div>
+      </div>
+      <div class="card card-green">
+        <div class="card-content">
+          <p class="card-label">Atendimentos Concluídos</p>
+          <h3 class="card-number">7</h3>
+          <small>Últimos 7 dias</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="left-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Ações de Apoio</h3>
+            <a href="#" class="link-small">Ver todos</a>
+          </div>
+          <div class="aviso-item aviso-blue">
+            <div class="aviso-content">
+              <strong>Inclusão Escolar</strong>
+              <p>Plano de acompanhamento para 6 alunos com necessidades específicas.</p>
+            </div>
+          </div>
+          <div class="aviso-item aviso-yellow">
+            <div class="aviso-content">
+              <strong>Estratégias de Leitura</strong>
+              <p>Oficina sobre compreensão textual e adaptações de material.</p>
+            </div>
+          </div>
+          <div class="aviso-item aviso-red">
+            <div class="aviso-content">
+              <strong>Reunião de Pais</strong>
+              <p>Agendar encontro para alinhar adaptações de prova.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Recursos Principais</h3>
+            <a href="#" class="link-small">Detalhes</a>
+          </div>
+          <div class="students-focus">
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">AP</div>
+              <div class="student-focus-content">
+                <strong>Material Visual</strong>
+                <span>Cartazes, roteiros e mapas mentais</span>
+              </div>
+            </div>
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">RD</div>
+              <div class="student-focus-content">
+                <strong>Atendimento Domiciliar</strong>
+                <span>Contatos com psicopedagogos e cuidadores</span>
+              </div>
+            </div>
+            <div class="student-focus-item">
+              <div class="student-focus-avatar">PE</div>
+              <div class="student-focus-content">
+                <strong>Plano de Ensino Individual</strong>
+                <span>Atualização trimestral e metas de aprendizado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

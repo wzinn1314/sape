@@ -15,33 +15,6 @@ function closeModal(studentId) {
   }
 }
 
-function loadUserProfile() {
-  const userStr = localStorage.getItem('user');
-  if (!userStr) return;
-
-  try {
-    const user = JSON.parse(userStr);
-    const userName = user.name || 'Usuário';
-    const userRole = user.role || 'Professor(a)';
-    const profileName = document.getElementById('professorName');
-    const profileRole = document.getElementById('userType');
-    const avatarProfile = document.getElementById('avatarProfile');
-
-    if (profileName) profileName.textContent = userName;
-    if (profileRole) profileRole.textContent = userRole;
-    if (avatarProfile) avatarProfile.textContent = userName.charAt(0).toUpperCase();
-  } catch (error) {
-    console.error('Erro ao carregar perfil do usuário:', error);
-  }
-}
-
-function checkAuth() {
-  const user = localStorage.getItem('user');
-  if (!user) {
-    window.location.href = '../login/index.html';
-  }
-}
-
 document.addEventListener('click', function(event) {
   if (event.target.classList.contains('modal')) {
     event.target.classList.remove('active');
@@ -61,21 +34,202 @@ document.addEventListener('keydown', function(event) {
 });
 
 
+const API_BASE_URL = (() => {
+  const hostname = window.location.hostname;
+  const host = hostname && hostname !== '' ? hostname : '127.0.0.1';
+  return `http://${host}:3000`;
+})();
 const searchInput = document.getElementById('searchInput');
 const gradeFilter = document.getElementById('gradeFilter');
 const typeFilter = document.getElementById('typeFilter');
+const statusBar = document.getElementById('statusBar');
+const headerSubtitle = document.getElementById('headerSubtitle');
 const emptyState = document.getElementById('emptyState');
 
-function getCourseType(course) {
-  if (!course) return 'outro';
-  const value = course.toLowerCase();
-  if (value.includes('log')) return 'tdah';
-  if (value.includes('tds')) return 'dislexia';
+function setStatusMessage(message, type = 'info') {
+  if (!statusBar) return;
+  statusBar.textContent = message;
+  statusBar.className = `status-bar ${type}`;
+}
+
+function setHeaderSubtitle(count) {
+  if (!headerSubtitle) return;
+  headerSubtitle.textContent = count === 0
+    ? 'Nenhum aluno encontrado'
+    : `Total de ${count} aluno${count === 1 ? '' : 's'} encontrado${count === 1 ? '' : 's'}`;
+}
+
+function getDiagnosticoType(diagnostico) {
+  if (!diagnostico) return 'outro';
+  const value = diagnostico.toLowerCase();
+  if (value.includes('tdah')) return 'tdah';
+  if (value.includes('dislexia')) return 'dislexia';
+  if (value.includes('discalculia')) return 'discalculia';
+  if (value.includes('tea') || value.includes('autismo')) return 'autismo';
   return 'outro';
 }
 
 function formatTurmaText(turma, curso) {
-  return `${turma} - Turma ${curso}`;
+  if (turma && curso) return `${turma} - Turma ${curso}`;
+  if (turma) return turma;
+  if (curso) return `Turma ${curso}`;
+  return 'Turma não informada';
+}
+
+function clearStudentGrid() {
+  const grid = document.querySelector('.students-grid');
+  if (!grid) return;
+  grid.querySelectorAll('.student-card').forEach(card => card.remove());
+  document.querySelectorAll('.modal[data-dynamic="true"]').forEach(modal => modal.remove());
+}
+
+function createStudentCardFromDb(student) {
+  const card = document.createElement('div');
+  card.className = 'student-card';
+  card.dataset.grade = '7';
+  card.dataset.type = 'aluno';
+  card.dataset.matricula = student.id;
+
+  const type = 'aluno';
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="badge-type ${type}">Aluno</div>
+      <div class="card-actions">
+        <button class="info-btn" onclick="openModal('dbAluno${student.id}')">
+          <i class="fas fa-info-circle"></i>
+        </button>
+      </div>
+    </div>
+    <div class="student-avatar">
+      <i class="fas fa-user-circle"></i>
+    </div>
+    <h3>${student.name}</h3>
+    <p class="matricula">ID: ${student.id}</p>
+    <p class="turma">CPF: ${student.cpf || 'Não informado'}</p>
+    <div class="quick-info">
+      <div class="info-item">
+        <span class="label">Email:</span>
+        <span class="value">${student.email || 'Não informado'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Perfil:</span>
+        <span class="value">${student.perfil || student.role || 'Aluno'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Características:</span>
+        <span class="value">${student.caracteristicas || 'Não informado'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Observação:</span>
+        <span class="value">${student.observacao || 'Não informado'}</span>
+      </div>
+    </div>
+    <button class="btn-details" onclick="openModal('dbAluno${student.id}')">Ver Detalhes Completos</button>
+  `;
+
+  return card;
+}
+
+function createStudentModalFromDb(student) {
+  const modal = document.createElement('div');
+  modal.id = `modalDbAluno${student.id}`;
+  modal.className = 'modal';
+  modal.dataset.dynamic = 'true';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('dbAluno${student.id}')">✕</button>
+      <div class="modal-header">
+        <div class="modal-avatar"><i class="fas fa-user-circle"></i></div>
+        <div class="modal-title">
+          <h2>${student.name}</h2>
+          <p>ID: ${student.id} | CPF: ${student.cpf || 'Não informado'}</p>
+        </div>
+        <div class="badge-large aluno">Aluno</div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-section">
+          <h3>📋 Informações Básicas</h3>
+          <div class="info-box">
+            <p><strong>Nome:</strong> ${student.name || 'Não informado'}</p>
+            <p><strong>Email:</strong> ${student.email || 'Não informado'}</p>
+            <p><strong>CPF:</strong> ${student.cpf || 'Não informado'}</p>
+            <p><strong>Perfil:</strong> ${student.role || 'Aluno'}</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>📝 Perfil e Observações</h3>
+          <div class="info-box">
+            <p><strong>Perfil:</strong> ${student.perfil || student.role || 'Aluno'}</p>
+            <p><strong>Características:</strong> ${student.caracteristicas || 'Não informado'}</p>
+            <p><strong>Observação:</strong> ${student.observacao || 'Não informado'}</p>
+          </div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('dbAluno${student.id}')">Fechar</button>
+      </div>
+    </div>
+  `;
+
+  return modal;
+}
+
+function renderStudentsFromDb() {
+  const grid = document.querySelector('.students-grid');
+  if (!grid) return;
+
+  setStatusMessage('Carregando alunos...', 'info');
+
+  fetch(`${API_BASE_URL}/users`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`API retornou status ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const students = Array.isArray(data)
+        ? data.filter(user => user.role && user.role.toLowerCase() === 'aluno')
+        : [];
+
+      clearStudentGrid();
+
+      if (students.length === 0) {
+        setStatusMessage('Nenhum aluno encontrado.', 'warning');
+        setHeaderSubtitle(0);
+        updateEmptyState();
+        return;
+      }
+
+      setStatusMessage(`Foram encontrados ${students.length} aluno(s).`, 'success');
+      setHeaderSubtitle(students.length);
+
+      students.forEach(student => {
+        const card = createStudentCardFromDb(student);
+        grid.insertBefore(card, grid.firstChild);
+        const modal = createStudentModalFromDb(student);
+        document.body.appendChild(modal);
+      });
+
+      addDeleteButtons();
+      updateEmptyState();
+
+      const cards = updateStudentCards();
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.3s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 50);
+      });
+    })
+    .catch((error) => {
+      setStatusMessage('Não foi possível carregar os alunos. Usando dados locais.', 'error');
+      console.error('Erro ao carregar alunos:', error);
+      renderStoredStudents();
+    });
 }
 
 function updateStudentCards() {
@@ -117,7 +271,7 @@ function filterStudents() {
 
 function createStudentCard(student) {
   const card = document.createElement('div');
-  const type = getCourseType(student.curso);
+  const type = getDiagnosticoType(student.diagnostico);
   card.className = 'student-card';
   card.dataset.grade = student.gradeValue || '7';
   card.dataset.type = type;
@@ -143,6 +297,18 @@ function createStudentCard(student) {
     <p class="turma">${formatTurmaText(student.turma, student.curso)}</p>
     <div class="quick-info">
       <div class="info-item">
+        <span class="label">Perfil:</span>
+        <span class="value">${student.perfil || student.role || 'Aluno'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Características:</span>
+        <span class="value">${student.caracteristicas || 'Não informado'}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Observação:</span>
+        <span class="value">${student.observacao || 'Não informado'}</span>
+      </div>
+      <div class="info-item">
         <span class="label">Dificuldades:</span>
         <span class="value">${student.gatilhos || 'Não informado'}</span>
       </div>
@@ -163,7 +329,7 @@ function createStudentCard(student) {
 
 function createStudentModal(student) {
   const modal = document.createElement('div');
-  const type = getCourseType(student.curso);
+  const type = getDiagnosticoType(student.diagnostico);
   modal.id = `modalNovoAluno${student.matricula}`;
   modal.className = 'modal';
   modal.innerHTML = `
@@ -187,7 +353,15 @@ function createStudentModal(student) {
           </div>
         </section>
         <section class="modal-section">
-          <h3>💬 Responsável</h3>
+          <h3>� Perfil e Características</h3>
+          <div class="info-box">
+            <p><strong>Perfil:</strong> ${student.perfil || student.role || 'Aluno'}</p>
+            <p><strong>Características:</strong> ${student.caracteristicas || 'Não informado'}</p>
+            <p><strong>Observação:</strong> ${student.observacao || 'Não informado'}</p>
+          </div>
+        </section>
+        <section class="modal-section">
+          <h3>�💬 Responsável</h3>
           <div class="info-box">
             <p><strong>Nome:</strong> ${student.responsavel || 'Não informado'}</p>
             <p><strong>Parentesco:</strong> ${student.parentesco || 'Não informado'}</p>
@@ -284,21 +458,7 @@ if (gradeFilter) gradeFilter.addEventListener('change', filterStudents);
 if (typeFilter) typeFilter.addEventListener('change', filterStudents);
 
 window.addEventListener('load', function() {
-  checkAuth();
-  loadUserProfile();
-  renderStoredStudents();
-  addDeleteButtons();
-  updateEmptyState();
-  const cards = updateStudentCards();
-  cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    setTimeout(() => {
-      card.style.transition = 'all 0.3s ease';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, index * 50);
-  });
+  renderStudentsFromDb();
 });
 
 const infoButtons = document.querySelectorAll('.info-btn');

@@ -3,34 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Informações dos Alunos - SAPE</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="../shared/sidebar.css" />
-  <link rel="icon" href="../assets/foto.png" type="image/png">
+  <title>Alunos - Portal do Professor - SAPE</title>
+  <link rel="stylesheet" href="../../students/styles.css" />
+  <link rel="stylesheet" href="../../shared/sidebar.css" />
+  <link rel="icon" href="../../assets/foto.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="../shared/roles.js"></script>
-  <script src="../shared/auth-admin.js" data-base="../" defer></script>
-  <script src="script.js" defer></script>
+  <style>
+    .sidebar .logo img {
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+  </style>
+  <script src="../../shared/roles.js"></script>
+  <script src="../../shared/auth-professor.js" data-base="../../" defer></script>
+  <script src="../../students/script.js" defer></script>
 </head>
 <body>
 
   <aside class="sidebar">
     <div class="logo">
-      <a href="../index.html" class="logo-link">
-        <img src="../assets/logo0.png" alt="Logo SAPE">
+      <a href="../../index.html" class="logo-link">
+        <img src="../../assets/logo0.png" alt="Logo SAPE">
         <div>
           <span>SAPE</span>
-          <p>Administração</p>
+          <p>Apoio Especializado</p>
         </div>
       </a>
     </div>
 
     <nav class="menu">
-      <a href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="../index.html"><i class="fas fa-home"></i> Início</a>
       <a class="active" href="index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
-      <a href="../professores/index.html"><i class="fas fa-chalkboard-teacher"></i> Professores</a>
-      <a href="../new_students/index.html"><i class="fas fa-user-plus"></i> Novo Aluno</a>
-      <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+      <a href="../apoio/index.html"><i class="fas fa-hands-helping"></i> Apoio Educacional</a>
     </nav>
 
     <div class="profile">
@@ -48,12 +53,10 @@
   <main class="main">
     <header class="top-header">
       <div>
-        <h2>Gestão de Alunos</h2>
-        <p>Cadastro, consulta e administração dos estudantes no sistema</p>
+        <h2>Alunos Neurodivergentes</h2>
+        <p id="headerSubtitle">Buscando número de alunos...</p>
       </div>
     </header>
-
-    <div class="status-bar" id="statusBar"></div>
 
     <!-- FILTROS E BUSCA -->
     <div class="filters-section">

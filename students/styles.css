@@ -16,6 +16,38 @@ body {
   color: #2c3e50;
 }
 
+.status-bar {
+  width: calc(100% - 280px);
+  margin: 0 0 16px 280px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.status-bar.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.status-bar.warning {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.status-bar.success {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #86efac;
+}
+
 .sidebar {
   width: 260px;
   height: 100vh;
@@ -119,6 +151,38 @@ body {
   font-size: 11px;
   color: #999;
   display: block;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-info strong {
+  font-size: 13px;
+  display: block;
+}
+
+.profile-info span {
+  font-size: 11px;
+  color: #999;
+  display: block;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.logout-btn:hover {
+  background: #fee;
+  color: #e74c3c;
 }
 
 
@@ -272,6 +336,11 @@ body {
 .badge-type.dislexia {
   background: #ede7f6;
   color: #7c3aed;
+}
+
+.badge-type.autismo {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .badge-type.discalculia {

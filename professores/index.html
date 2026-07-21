@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Professores - SAPE</title>
+  <link rel="stylesheet" href="../deshboard/styles.css" />
+  <link rel="stylesheet" href="../shared/sidebar.css" />
+  <link rel="icon" href="../assets/foto.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="../shared/roles.js"></script>
+  <script src="../shared/auth-admin.js" data-base="../" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <a href="../index.html" class="logo-link">
+        <img src="../assets/logo0.png" alt="Logo SAPE" />
+        <div>
+          <span>SAPE</span>
+          <p>Administração</p>
+        </div>
+      </a>
+    </div>
+
+    <nav class="menu">
+      <a href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
+      <a class="active" href="index.html"><i class="fas fa-chalkboard-teacher"></i> Professores</a>
+      <a href="../new_students/index.html"><i class="fas fa-user-plus"></i> Novo Aluno</a>
+      <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div class="profile-info">
+        <strong id="professorName">Usuário</strong>
+        <span id="userType">Professor(a)</span>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="top-header">
+      <div>
+        <h2>Professores</h2>
+        <p>Gestão dos professores e equipes de atendimento.</p>
+      </div>
+    </header>
+
+    <section class="stats-cards">
+      <div class="card card-purple">
+        <div class="card-content">
+          <p class="card-label">Total de Professores</p>
+          <h3 class="card-number">12</h3>
+          <small>Ativos</small>
+        </div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-content">
+          <p class="card-label">Professores Orientadores</p>
+          <h3 class="card-number">5</h3>
+          <small>Especializados</small>
+        </div>
+      </div>
+      <div class="card card-yellow">
+        <div class="card-content">
+          <p class="card-label">Reuniões Agendadas</p>
+          <h3 class="card-number">3</h3>
+          <small>Esta semana</small>
+        </div>
+      </div>
+      <div class="card card-green">
+        <div class="card-content">
+          <p class="card-label">Suporte Pedagógico</p>
+          <h3 class="card-number">8</h3>
+          <small>Em andamento</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="left-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Equipe de Professores</h3>
+            <a href="#" class="link-small">Ver todos</a>
+          </div>
+
+          <div class="record-list">
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Amanda Rocha</div>
+                <div class="record-meta">Matemática • Coordenadora Pedagógica</div>
+              </div>
+              <div class="record-date">Ativo</div>
+            </div>
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Fabio Santos</div>
+                <div class="record-meta">Português • Atendimento Especial</div>
+              </div>
+              <div class="record-date">Ativo</div>
+            </div>
+            <div class="record-item">
+              <div class="record-info">
+                <div class="record-name">Juliana Lima</div>
+                <div class="record-meta">CIências • Orientação EMAPA</div>
+              </div>
+              <div class="record-date">Ativo</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-header">
+            <h3>Professor em Destaque</h3>
+            <a href="#" class="link-small">Detalhes</a>
+          </div>
+          <div class="aviso-item aviso-blue">
+            <div class="aviso-content">
+              <strong>Maria Fernanda</strong>
+              <p>Referência em adaptação de provas e coordenação de Apoio Educacional.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="box">
+          <div class="box-header">
+            <h3>Indicadores de Capacitação</h3>
+            <span class="badge-secondary">Últimos 30 dias</span>
+          </div>
+          <div class="analytics">
+            <div class="analytics-item">
+              <div class="analytics-label">Formações concluídas</div>
+              <div class="analytics-value">4</div>
+              <div class="analytics-bar"><div class="analytics-progress" style="width: 80%"></div></div>
+            </div>
+            <div class="analytics-item">
+              <div class="analytics-label">Atendimentos com alunos</div>
+              <div class="analytics-value">28</div>
+              <div class="analytics-bar"><div class="analytics-progress" style="width: 70%"></div></div>
+            </div>
+            <div class="analytics-item">
+              <div class="analytics-label">Reuniões com famílias</div>
+              <div class="analytics-value">6</div>
+              <div class="analytics-bar"><div class="analytics-progress" style="width: 55%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-header">
+            <h3>Recados Rápidos</h3>
+            <a href="#" class="link-small">Ver detalhes</a>
+          </div>
+          <div class="aviso-item aviso-yellow">
+            <div class="aviso-content">
+              <strong>Plano Pedagógico</strong>
+              <p>Revisar o plano de intervenção para os próximos 30 dias.</p>
+            </div>
+          </div>
+          <div class="aviso-item aviso-green">
+            <div class="aviso-content">
+              <strong>Nova integração</strong>
+              <p>Compartilhar resultados do grupo de apoio com a coordenação.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

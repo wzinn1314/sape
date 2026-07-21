@@ -1,10 +1,24 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assets/foto.png">
     <link rel="stylesheet" href="styles.css">
+    <script src="../shared/roles.js"></script>
+    <script>
+      const AUTH_BASE_PATH = '../';
+      function getLoginPath() {
+        return `${AUTH_BASE_PATH}login/index.html`;
+      }
+      function checkNewStudentAccess() {
+        const user = getCurrentUser();
+        if (!user || (!isAdmin(user) && !isProfessor(user))) {
+          window.location.href = getLoginPath();
+        }
+      }
+      window.addEventListener('load', checkNewStudentAccess);
+    </script>
     <script src="script.js" defer></script>
     <title>Cadastro de Novo Aluno - SAPE</title>
 </head>
@@ -90,11 +104,20 @@
                                 <option>TEA - Nível 1</option>
                                 <option>TDAH</option>
                                 <option>Dislexia</option>
+                                <option>Discalculia</option>
                             </select>
+                        </label>
+                        <label class="field">
+                            <span>Perfil do Aluno</span>
+                            <input id="perfil" type="text" placeholder="Ex: Estudante metódico" />
                         </label>
                         <label class="field toggle-field">
                             <span>Possui PEI?</span>
                             <input id="pei" type="checkbox" />
+                        </label>
+                        <label class="field">
+                            <span>Características</span>
+                            <input id="caracteristicas" type="text" placeholder="Ex: Criativo, sensível" />
                         </label>
                         <label class="field">
                             <span>Nível de Suporte</span>
@@ -115,6 +138,10 @@
                             <input id="gatilhos" type="text" placeholder="Luz forte, barulho alto, mudança de rotina" />
                         </label>
                     </div>
+                    <label class="field">
+                        <span>Observação</span>
+                        <textarea id="observacao" rows="3" placeholder="Registro de observações e considerações"></textarea>
+                    </label>
                     <label class="field">
                         <span>Estratégias de Calma</span>
                         <textarea id="estrategias" rows="3" placeholder="Ex: Espaço tranquilo, fones, descanso breve"></textarea>
