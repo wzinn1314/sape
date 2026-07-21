@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios | SAPE</title>
+    <link rel="icon" href="../assets/foto.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <main class="main-container">
+
+       
+        <header class="top-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div class="header-titles">
+                    <h1>Relatórios</h1>
+                    <p>Consulte, pesquise e faça download dos relatórios cadastrados.</p>
+                </div>
+            </div>
+            <button class="btn-new">
+                <i class="fa-solid fa-plus"></i>
+                Novo Relatório
+            </button>
+        </header>
+
+       
+        <section class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-content">
+                    <div class="icon-box"><i class="fa-solid fa-file-lines"></i></div>
+                    <div>
+                        <h2 id="totalReports">0</h2>
+                        <span>Total Relatórios</span>
+                        <small>Todos os registros</small>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chart-line card-decoration"></i>
+            </div>
+
+            <div class="stat-card green">
+                <div class="stat-content">
+                    <div class="icon-box"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div>
+                        <h2 id="totalStudents">0</h2>
+                        <span>Alunos</span>
+                        <small>Ativos no sistema</small>
+                    </div>
+                </div>
+                <i class="fa-solid fa-users card-decoration"></i>
+            </div>
+
+            <div class="stat-card purple">
+                <div class="stat-content">
+                    <div class="icon-box"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div>
+                        <h2 id="totalTeachers">0</h2>
+                        <span>Professores</span>
+                        <small>Corpo docente</small>
+                    </div>
+                </div>
+                <i class="fa-solid fa-shield-halved card-decoration"></i>
+            </div>
+
+            <div class="stat-card orange">
+                <div class="stat-content">
+                    <div class="icon-box"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div>
+                        <h2 id="todayReports">0</h2>
+                        <span>Hoje</span>
+                        <small id="todayDate">10/07/2026</small>
+                    </div>
+                </div>
+                <i class="fa-solid fa-calendar-days card-decoration"></i>
+            </div>
+        </section>
+
+
+        <section class="filters-container">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchReport" placeholder="Pesquisar relatório, aluno ou professor...">
+                <button class="clear-search"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="select-group">
+                <select class="custom-select" id="filterProfessor">
+                    <option value="">Todos os Professores</option>
+                </select>
+
+                <select class="custom-select" id="filterAluno">
+                    <option value="">Todos os Alunos</option>
+                </select>
+
+                <button class="btn-clear-filters">
+                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                    Limpar
+                </button>
+            </div>
+        </section>
+
+
+        <section class="table-card">
+            <div class="table-responsive">
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Relatório</th>
+                            <th>Aluno</th>
+                            <th>Professor</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportBody">
+                        <!-- Exemplo de linha para visualização -->
+                        <tr>
+                            <td>
+                                <div class="report-cell">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                    <div>
+                                        <strong>Avaliação Mensal</strong>
+                                        <span>REF-2024-001</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>João Silva</td>
+                            <td>Prof. Ricardo Santos</td>
+                            <td>10/07/2026</td>
+                            <td><span class="status-badge status-finalizado">Finalizado</span></td>
+                            <td>
+                                <div class="report-buttons">
+                                    <button class="btn-action btn-view" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                                    <button class="btn-action btn-download" title="Download"><i class="fa-solid fa-download"></i></button>
+                                    <button class="btn-action btn-delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="report-empty" id="emptyMessage" style="display:none;">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>Nenhum relatório encontrado</h3>
+                <p>Ajuste seus filtros ou adicione um novo registro.</p>
+            </div>
+
+            <!-- Footer Tabela -->
+            <div class="table-footer">
+                <p>Mostrando <strong>1</strong> a <strong>10</strong> de <strong id="totalRows">128</strong> relatórios</p>
+                <div class="pagination">
+                    <button class="prev-btn"><i class="fa-solid fa-angle-left"></i></button>
+                    <button class="page-num active">1</button>
+                    <button class="page-num">2</button>
+                    <button class="next-btn"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="main-footer">
+            <p><i class="fa-solid fa-shield-halved"></i> Sistema SAPE &copy; 2024 • Gestão Escolar Inteligente</p>
+        </footer>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

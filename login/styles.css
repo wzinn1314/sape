@@ -1,0 +1,186 @@
+/* Definição de Variáveis - Cores mais suaves e amigáveis */
+:root {
+  --base-bg: #f0f4f8;
+  --base-surface: #ffffff;
+  --base-text: #2d3436;
+  --base-text-light: #636e72;
+  --secondary: #4a90e2;
+  --secondary-dark: #2c3e50;
+  --accent: #ffd166; /* Amarelo mais suave */
+  --accent-warm: #ffbd69;
+  
+  /* Cores do Autismo em tons pastéis (menos agressivas) */
+  --puzzle-blue: #a2d2ff;
+  --puzzle-red: #ffafcc;
+  --puzzle-yellow: #fcf6bd;
+  --puzzle-green: #b9fbc0;
+  
+  --radius-sm: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+  
+  --transition: all 0.3s ease;
+  --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--base-bg);
+  color: var(--base-text);
+  line-height: 1.6; /* Melhor para leitura */
+}
+
+.background {
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  /* Gradiente mais suave para não cansar a vista */
+  background: radial-gradient(circle at top left, #ffffff, var(--base-bg));
+}
+
+.login-card {
+  width: 100%;
+  max-width: 500px;
+  background: var(--base-surface);
+  border: 3px solid var(--puzzle-blue); /* Borda mais grossa e visível, mas cor suave */
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 2;
+}
+
+.logo {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 20px;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+h1 {
+  font-size: 2.5rem; /* Reduzi o tamanho para não ser "gritante" */
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+/* Cores do título com contraste acessível */
+.blue   { color: #0056b3; }
+.red    { color: #d63031; }
+.yellow { color: #f39c12; }
+.green  { color: #27ae60; }
+
+.subtitle {
+  color: var(--base-text-light);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+
+form { text-align: left; }
+
+label {
+  display: block;
+  color: var(--secondary-dark);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  margin-left: 4px;
+}
+
+.input-box {
+  width: 100%;
+  height: 60px;
+  border: 2px solid #dfe6e9;
+  border-radius: var(--radius-sm);
+  padding: 0 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fdfdfd;
+  transition: var(--transition);
+}
+
+/* Feedback visual claro de onde o usuário está clicando */
+.input-box:focus-within {
+  border-color: var(--secondary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+}
+
+.input-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  color: var(--secondary-dark);
+  background: transparent;
+}
+
+/* Botão grande e fácil de clicar */
+button[type="submit"] {
+  width: 100%;
+  height: 65px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--secondary);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+button[type="submit"]:hover {
+  background: #357abd;
+  transform: translateY(-2px);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Decorações mais discretas (10% de opacidade para não distrair) */
+.puzzle {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  opacity: 0.1; /* Reduzida a opacidade */
+  z-index: 1;
+  pointer-events: none; /* Garante que não atrapalhe cliques */
+}
+
+.puzzle-red    { background: var(--puzzle-red);    top: 5%;  left: 5%;  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+.puzzle-blue   { background: var(--puzzle-blue);   bottom: 10%; right: 5%; border-radius: 50%; }
+
+/* Media Queries Ajustadas */
+@media (max-width: 600px) {
+  .login-card {
+    padding: 30px 20px;
+    margin: 10px;
+  }
+  
+  h1 { font-size: 2rem; }
+  
+  .input-box { height: 55px; }
+}

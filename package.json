@@ -2,6 +2,7 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "html-pdf-node": "^1.0.8",
     "mysql2": "^3.22.3"
   }
 }
