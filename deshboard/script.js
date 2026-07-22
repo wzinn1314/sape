@@ -1,4 +1,4 @@
-// ========== DATA ATUAL ==========
+
 function updateDate() {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   const today = new Date();
@@ -15,22 +15,22 @@ function loadProfessorData() {
       const userName = user.name || 'Usuário';
       const userRole = user.role || 'Professor(a)';
       
-      // Atualiza saudação no header
+    
       document.getElementById('professorGreeting').textContent = userName;
       
-      // Atualiza nome no perfil da sidebar
+      
       document.getElementById('professorName').textContent = userName;
       
-      // Atualiza tipo de usuário
+      
       if (document.getElementById('userType')) {
         document.getElementById('userType').textContent = userRole;
       }
       
-      // Atualiza avatar com primeira letra do nome
+     
       const firstLetter = userName.charAt(0).toUpperCase();
       document.getElementById('avatarProfile').textContent = firstLetter;
       
-      // Atualiza subtítulo baseado no tipo de usuário
+      
       const subtitleEl = document.getElementById('headerSubtitle');
       if (subtitleEl) {
         if (userRole.toLowerCase().includes('aluno') || userRole.toLowerCase().includes('Aluno')) {

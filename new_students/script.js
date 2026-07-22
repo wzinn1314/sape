@@ -3,6 +3,8 @@ const studentForm = document.getElementById('studentForm');
 function saveStudent(student) {
   const stored = localStorage.getItem('students');
   const students = stored ? JSON.parse(stored) : [];
+  
+
   students.unshift(student);
   localStorage.setItem('students', JSON.stringify(students));
 }
@@ -18,7 +20,9 @@ if (studentForm) {
   studentForm.addEventListener('submit', function (event) {
     event.preventDefault();
 
+
     const student = {
+      id: Date.now(), 
       nome: document.getElementById('studentName').value.trim(),
       nascimento: document.getElementById('birthDate').value,
       matricula: document.getElementById('matricula').value.trim(),
@@ -32,6 +36,15 @@ if (studentForm) {
       hiperfocos: document.getElementById('hiperfocos').value.trim(),
       gatilhos: document.getElementById('gatilhos').value.trim(),
       estrategias: document.getElementById('estrategias').value.trim(),
+      
+
+      pdi: {
+        objetivos: document.getElementById('pdiObjetivos').value.trim(),
+        estrategias: document.getElementById('pdiEstrategias').value.trim(),
+        avaliacao: document.getElementById('pdiAvaliacao').value.trim()
+      },
+      historico: [],
+      
       responsavel: document.getElementById('responsavelNome').value.trim(),
       parentesco: document.getElementById('parentesco').value,
       telefone: document.getElementById('telefone').value.trim(),
@@ -40,8 +53,9 @@ if (studentForm) {
       createdAt: new Date().toISOString()
     };
 
-    if (!student.nome || !student.matricula || !student.cpf || !student.responsavel) {
-      alert('Por favor, preencha os dados obrigatórios antes de salvar.');
+    
+    if (!student.nome || !student.matricula || !student.cpf) {
+      alert('Por favor, preencha os dados básicos (Nome, Matrícula e CPF).');
       return;
     }
 
@@ -51,6 +65,9 @@ if (studentForm) {
     }
 
     saveStudent(student);
+    alert('Aluno cadastrado com sucesso!');
+    
+    
     window.location.href = '../students/index.html';
   });
 }

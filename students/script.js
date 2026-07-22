@@ -14,6 +14,49 @@ function closeModal(studentId) {
     document.body.style.overflow = 'auto';
   }
 }
+function savePDIDinamico(matricula) {
+  let students = JSON.parse(localStorage.getItem('students') || '[]');
+  const idx = students.findIndex(s => s.matricula === matricula);
+  
+  if (idx !== -1) {
+    students[idx].pdi = {
+      objetivos: document.getElementById(`pdiObj_${matricula}`).value,
+      estrategias: document.getElementById(`pdiEst_${matricula}`).value
+    };
+    localStorage.setItem('students', JSON.stringify(students));
+    alert('PDI atualizado com sucesso!');
+  }
+}
+
+// Função para salvar uma nova Evolução no histórico
+function saveEvolucaoDinamica(matricula) {
+  const data = document.getElementById(`evDate_${matricula}`).value;
+  const texto = document.getElementById(`evText_${matricula}`).value;
+
+  if (!texto) return alert("Por favor, descreva a evolução.");
+
+  let students = JSON.parse(localStorage.getItem('students') || '[]');
+  const idx = students.findIndex(s => s.matricula === matricula);
+
+  if (idx !== -1) {
+    if (!students[idx].historico) students[idx].historico = [];
+    
+    // Adiciona o novo registro ao início da lista
+    students[idx].historico.unshift({ data, texto });
+    localStorage.setItem('students', JSON.stringify(students));
+
+    // Atualiza a visualização do histórico no modal sem precisar fechar
+    const historyBox = document.getElementById(`historyBox_${matricula}`);
+    historyBox.innerHTML = students[idx].historico.map(h => `
+      <div style="border-bottom: 1px solid #eee; padding: 5px 0; font-size: 0.85rem;">
+        <strong>${h.data}:</strong> ${h.texto}
+      </div>
+    `).join('');
+    
+    document.getElementById(`evText_${matricula}`).value = ''; // Limpa o campo
+    alert('Registro de evolução salvo!');
+  }
+}
 
 function loadUserProfile() {
   const userStr = localStorage.getItem('user');
@@ -166,6 +209,7 @@ function createStudentModal(student) {
   const type = getCourseType(student.curso);
   modal.id = `modalNovoAluno${student.matricula}`;
   modal.className = 'modal';
+  
   modal.innerHTML = `
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal('novoAluno${student.matricula}')">✕</button>
@@ -177,34 +221,44 @@ function createStudentModal(student) {
         </div>
         <div class="badge-large ${type}">${student.diagnostico || 'Inclusão'}</div>
       </div>
+      
       <div class="modal-grid">
-        <section class="modal-section">
-          <h3>📋 Diagnóstico e Avaliação</h3>
-          <div class="info-box">
-            <p><strong>Diagnóstico:</strong> ${student.diagnostico || 'Não informado'}</p>
-            <p><strong>PEI:</strong> ${student.pei ? 'Sim' : 'Não'}</p>
-            <p><strong>Nível de Suporte:</strong> ${student.suporte || 'Não informado'}</p>
+        <!-- PDI: APENAS LEITURA (Conforme sua regra) -->
+        <section class="modal-section full-width">
+          <h3>🎯 Planejamento PEI (Definido no Cadastro)</h3>
+          <div class="info-box" style="background-color: #f8fafc;">
+            <p><strong>Objetivos:</strong><br> ${student.pdi?.objetivos || 'Não informados no cadastro.'}</p>
+            <p style="margin-top:10px;"><strong>Estratégias:</strong><br> ${student.pdi?.estrategias || 'Não informadas no cadastro.'}</p>
           </div>
         </section>
+
+        <!-- REGISTRO DE EVOLUÇÃO (DIÁRIO) -->
         <section class="modal-section">
-          <h3>💬 Responsável</h3>
+          <h3>📝 Registrar Atendimento de Hoje</h3>
           <div class="info-box">
-            <p><strong>Nome:</strong> ${student.responsavel || 'Não informado'}</p>
-            <p><strong>Parentesco:</strong> ${student.parentesco || 'Não informado'}</p>
-            <p><strong>Telefone:</strong> ${student.telefone || 'Não informado'}</p>
-            <p><strong>Email:</strong> ${student.email || 'Não informado'}</p>
+            <input type="date" id="evDate_${student.matricula}" value="${new Date().toISOString().split('T')[0]}" style="margin-bottom: 10px; width:100%;">
+            <textarea id="evText_${student.matricula}" placeholder="O que foi trabalhado hoje?" style="width:100%; border-radius:8px; padding:8px; border:1px solid #ddd;" rows="3"></textarea>
+            <button class="btn btn-success" style="width:100%; margin-top: 10px;" onclick="saveEvolucaoDinamica('${student.matricula}')">
+              Salvar no Diário
+            </button>
           </div>
         </section>
+
+        <!-- HISTÓRICO DE EVOLUÇÃO -->
         <section class="modal-section">
-          <h3>📝 Estratégias e Observações</h3>
-          <div class="info-box">
-            <p><strong>Hiperfocos:</strong> ${student.hiperfocos || 'Não informado'}</p>
-            <p><strong>Gatilhos:</strong> ${student.gatilhos || 'Não informado'}</p>
-            <p><strong>Estratégias de calma:</strong> ${student.estrategias || 'Não informado'}</p>
+          <h3>📋 Histórico de Evolução</h3>
+          <div class="info-box" id="historyBox_${student.matricula}" style="max-height: 200px; overflow-y: auto;">
+            ${(student.historico || []).map(h => `
+              <div style="border-bottom: 1px solid #eee; padding: 5px 0; font-size: 0.85rem;">
+                <strong>${h.data}:</strong> ${h.texto}
+              </div>
+            `).join('') || '<p style="color: #999;">Nenhum registro ainda.</p>'}
           </div>
         </section>
       </div>
+
       <div class="modal-actions">
+        <button class="btn btn-info" onclick="window.print()">🖨️ Imprimir PEI e Diário</button>
         <button class="btn btn-secondary" onclick="closeModal('novoAluno${student.matricula}')">Fechar</button>
       </div>
     </div>
@@ -212,6 +266,8 @@ function createStudentModal(student) {
 
   return modal;
 }
+
+// Mantenha a função saveEvolucaoDinamica que te mandei antes para o diário funcionar
 
 function deleteStudent(matricula, button) {
   if (!confirm('Deseja realmente excluir este aluno?')) return;

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPE - Criar Relatório Pedagógico</title>
+    <!-- Ícones FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="relatorio-criar.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">📘</div>
+            <div>
+                <span>SAPE</span>
+                <p>Apoio Pedagógico</p>
+            </div>
+        </div>
+
+        <div class="profile">
+            <div class="avatar">P</div>
+            <div>
+                <strong>Prof. Carlos</strong>
+                <span>Atendimento Especial</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main">
+        
+        <header class="top-header">
+            <h2>Criar Relatório Pedagógico</h2>
+            <p>Registre a evolução, conduta e adaptações recomendadas para o aluno acompanhado.</p>
+        </header>
+
+        <form id="form-relatorio" onsubmit="salvarRelatorio(event)">
+            <div class="form-grid">
+                
+                <!-- COLUNA DA ESQUERDA: Seleção e Dados Básicos -->
+                <div class="form-column">
+                    
+                    <!-- Passo 1: Selecionar Aluno -->
+                    <div class="form-card">
+                        <div class="card-title">
+                            <span class="step-badge">1</span>
+                            <h3>Identificação do Aluno</h3>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="aluno-select">Aluno Acompanhado <span class="required">*</span></label>
+                            <div class="select-wrapper">
+                                <i class="fas fa-search input-icon"></i>
+                                <select id="aluno-select" required onchange="atualizarInfoAluno()">
+                                    <option value="" disabled selected>Selecione um aluno...</option>
+                                    <option value="1" data-neuro="autismo" data-turma="5º Ano A">Gabriel Silva (Mat. 13310)</option>
+                                    <option value="2" data-neuro="tdah" data-turma="6º Ano B">Mariana Souza (Mat. 14205)</option>
+                                    <option value="3" data-neuro="dislexia" data-turma="4º Ano C">Lucas Ferreira (Mat. 15102)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Card de resumo rápido do Aluno selecionado -->
+                        <div id="aluno-preview" class="student-preview-box hidden">
+                            <div class="preview-header">
+                                <div class="student-avatar-mini"><i class="fas fa-user-circle"></i></div>
+                                <div>
+                                    <strong id="preview-nome">Gabriel Silva</strong>
+                                    <span id="preview-turma">5º Ano A</span>
+                                </div>
+                                <span id="preview-badge" class="badge-type">Autismo</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <label for="tipo-relatorio">Tipo de Relatório <span class="required">*</span></label>
+                            <select id="tipo-relatorio" required>
+                                <option value="Acompanhamento Trimestral">Acompanhamento Trimestral</option>
+                                <option value="Avaliação Inicial">Avaliação Inicial / Anamnese</option>
+                                <option value="Evolução Comportamental">Evolução Comportamental</option>
+                                <option value="Encaminhamento Externo">Encaminhamento Externo (Psicopedagógico)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="periodo">Período de Avaliação</label>
+                            <input type="text" id="periodo" placeholder="Ex: 1º Trimestre / 2026">
+                        </div>
+                    </div>
+
+                    <!-- Passo 2: Avaliação de Habilidades -->
+                    <div class="form-card">
+                        <div class="card-title">
+                            <span class="step-badge">2</span>
+                            <h3>Métricas e Desenvolvimento</h3>
+                        </div>
+
+                        <div class="skills-checklist">
+                            <label class="section-sublabel">Marque as áreas com progresso notável:</label>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="habilidade" value="Comunicação Verbal">
+                                <span class="custom-checkbox"></span>
+                                <span>Comunicação e Expressão Verbal</span>
+                            </label>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="habilidade" value="Interação Social">
+                                <span class="custom-checkbox"></span>
+                                <span>Interação Social com Pares</span>
+                            </label>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="habilidade" value="Foco e Atenção">
+                                <span class="custom-checkbox"></span>
+                                <span>Sustentação de Foco / Atenção nas Tarefas</span>
+                            </label>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="habilidade" value="Autonomia nas Provas">
+                                <span class="custom-checkbox"></span>
+                                <span>Autonomia em Avaliações Adaptadas</span>
+                            </label>
+
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="habilidade" value="Regulação Emocional">
+                                <span class="custom-checkbox"></span>
+                                <span>Autorregulação em Situações de Estresse</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLUNA DA DIREITA: Detalhamento do Texto -->
+                <div class="form-column">
+                    
+                    <div class="form-card full-height-card">
+                        <div class="card-title">
+                            <span class="step-badge">3</span>
+                            <h3>Parecer Pedagógico e Observações</h3>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="titulo-relatorio">Título do Relatório <span class="required">*</span></label>
+                            <input type="text" id="titulo-relatorio" placeholder="Ex: Relatório de Acompanhamento e Adaptações Propostas" required>
+                        </div>
+
+                        <!-- Barra de Ferramentas Simples para o Editor -->
+                        <div class="editor-toolbar">
+                            <button type="button" class="tool-btn" title="Negrito"><i class="fas fa-bold"></i></button>
+                            <button type="button" class="tool-btn" title="Itálico"><i class="fas fa-italic"></i></button>
+                            <button type="button" class="tool-btn" title="Sublinhado"><i class="fas fa-underline"></i></button>
+                            <span class="toolbar-separator"></span>
+                            <button type="button" class="tool-btn" title="Lista Marcadores"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" class="tool-btn" title="Lista Numerada"><i class="fas fa-list-ol"></i></button>
+                        </div>
+
+                        <div class="input-group flex-expand">
+                            <label for="observacoes">Conteúdo Detalhado <span class="required">*</span></label>
+                            <textarea id="observacoes" rows="10" placeholder="Descreva os avanços pedagógicos, comportamento em sala de aula, respostas às adaptações de provas e recomendações para os próximos passos..." required></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="recomendacoes">Recomendações e Próximos Passos</label>
+                            <textarea id="recomendacoes" rows="3" placeholder="Ex: Manter redução de enunciados em provas de Matemática; Permitir pausa de 5 min..."></textarea>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="window.history.back()">Cancelar</button>
+                            <button type="submit" class="btn-info"><i class="fas fa-save"></i> Salvar e Gerar Relatório</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </form>
+
+    </main>
+    <script src="script.js"></script>
+    
+</body>
+</html>
