@@ -1,103 +1,84 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Relatório | SAPE</title>
-    <link rel="icon" href="../assets/foto.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="style.css"> <!-- Seus estilos globais -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Relatórios - AEE / SAPE</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<main class="main-container">
-
-    
-    <header class="top-header">
-        <div class="header-left">
-            <div class="header-icon report-color">
-               
-            </div>
-            <div class="header-titles">
-                <h1>Gerar Relatório</h1>
-                <p>Crie documentos oficiais e salve diretamente no prontuário do aluno.</p>
-            </div>
-       
+  <div class="container">
+    <header class="header">
+      <i class="ph ph-note-pencil icon-header"></i>
+      <h1>Gerador de Relatórios Pedagógicos</h1>
+      <p>Preencha as observações do aluno com deficiência para gerar o PDF e registrar no sistema.</p>
     </header>
 
-    <!-- ================= FORMULÁRIO ESTILIZADO ================= -->
-    <section class="form-container-card">
-        <form id="reportForm" class="animated-fade-up">
-            
-            <div class="form-section-title">
-                <span class="step-badge">1</span>
-                <h3>Informações Básicas</h3>
-            </div>
+    <form id="reportForm" class="form-card">
+      
+      <!-- Cabeçalho Automático com Data e Hora -->
+      <div class="meta-info-bar">
+        <span><i class="ph ph-calendar"></i> Data: <strong id="currentDate">--/--/----</strong></span>
+        <span><i class="ph ph-clock"></i> Hora: <strong id="currentTime">--:--</strong></span>
+      </div>
 
-            <div class="input-grid">
-                <!-- Seleção de Aluno com Ícone -->
-                <div class="input-group">
-                    <label for="aluno_id">Alunos</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-user-graduate input-icon"></i>
-                        <select id="aluno_id" required>
-                            <option value="" disabled selected>Selecione um aluno da lista...</option>
-                            <!-- JS popula aqui -->
-                        </select>
-                    </div>
-                </div>
+      <!-- Seleção do Aluno -->
+      <div class="input-group">
+        <label for="studentSelect">Aluno com Deficiência *</label>
+        <div class="input-wrapper">
+          <i class="ph ph-user-focus"></i>
+          <select id="studentSelect" required>
+            <option value="">Carregando alunos do banco...</option>
+          </select>
+        </div>
+      </div>
 
-                <!-- Data de Referência -->
-                <div class="input-group">
-                    <label for="data_relatorio">Data de Emissão</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-calendar-alt input-icon"></i>
-                        <input type="date" id="data_relatorio" required>
-                    </div>
-                </div>
-            </div>
+      <!-- Tipo de Relatório -->
+      <div class="input-group">
+        <label for="reportType">Tipo de Relatório *</label>
+        <div class="input-wrapper">
+          <i class="ph ph-tag"></i>
+          <select id="reportType" required>
+            <option value="Acompanhamento AEE">Acompanhamento AEE</option>
+            <option value="Plano de Desenvolvimento Individual (PDI)">Plano de Desenvolvimento Individual (PDI)</option>
+            <option value="Avaliação Diagnóstica Inclusiva">Avaliação Diagnóstica Inclusiva</option>
+            <option value="Parecer Pedagógico Semestral">Parecer Pedagógico Semestral</option>
+          </select>
+        </div>
+      </div>
 
-            <div class="input-group">
-                <label for="titulo">Título do Documento</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-pen-nib input-icon"></i>
-                    <input type="text" id="titulo" placeholder="Ex: Relatório Semestral de Acompanhamento PEI" required>
-                </div>
-            </div>
+      <!-- Corpo do Relatório / Observações -->
+      <div class="input-group">
+        <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
+        <textarea 
+          id="reportContent" 
+          rows="6" 
+          placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
+          required
+        ></textarea>
+      </div>
 
-            <div class="form-section-title" style="margin-top: 2rem;">
-                <span class="step-badge purple">2</span>
-                <h3>Conteúdo do Relatório</h3>
-            </div>
+      <!-- Encaminhamentos / Recomendações -->
+      <div class="input-group">
+        <label for="reportRecommendations">Encaminhamentos e Recomendações (Opcional)</label>
+        <textarea 
+          id="reportRecommendations" 
+          rows="3" 
+          placeholder="Ex: Adaptação de material, encaminhamento para fonoaudiologia, adequação curricular..."
+        ></textarea>
+      </div>
 
-            <div class="input-group">
-                <label for="conteudo">Descrição Detalhada</label>
-                <textarea id="conteudo" rows="12" placeholder="Escreva aqui as observações pedagógicas, evolução e necessidades do aluno..." required></textarea>
-                <small class="helper-text">O texto acima será formatado automaticamente no papel timbrado da escola.</small>
-            </div>
+      <!-- Botão para Gerar PDF e Salvar -->
+      <button type="submit" id="btnSubmit" class="btn-submit">
+        <i class="ph ph-file-pdf"></i>
+        Salvar Relatório
+      </button>
+    </form>
 
-            <!-- Botões de Ação -->
-            <div class="form-footer">
-                <button type="reset" class="btn-clear">
-                    <i class="fa-solid fa-eraser"></i> Limpar Tudo
-                </button>
-                <button type="submit" class="btn-generate" id="btnSubmit">
-                    <span>Gerar PDF Oficial</span>
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                </button>
-            </div>
 
-        </form>
-    </section>
-
-    <footer class="footer">
-        <i class="fa-solid fa-shield-halved"></i>
-        Sistema SAPE • Gerencie seus relatórios com segurança e praticidade.
-    </footer>
-
-</main>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>

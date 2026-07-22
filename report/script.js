@@ -1,108 +1,83 @@
-const tbody = document.getElementById("reportBody");
-const empty = document.getElementById("emptyMessage");
+document.addEventListener('DOMContentLoaded', () => {
+    carregarRelatorios();
+});
 
-async function loadReports() {
-    try {
+function carregarRelatorios() {
+    const tbody = document.getElementById('reportBody');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const totalReports = document.getElementById('totalReports');
+    const totalRows = document.getElementById('totalRows');
 
-        const response = await fetch("http://localhost:3000/students");
+    
+    const relatorios = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
 
-        if (!response.ok) {
-            throw new Error("Erro ao carregar relatórios.");
-        }
+    if (totalReports) totalReports.textContent = relatorios.length;
+    if (totalRows) totalRows.textContent = relatorios.length;
 
-        const reports = await response.json();
 
-        console.log("Relatórios:", reports);
-
-        renderReports(reports);
-
-    } catch (error) {
-
-        console.error(error);
-
-        tbody.innerHTML = "";
-
-        empty.style.display = "block";
-    }
-}
-
-function renderReports(reports) {
-
-    tbody.innerHTML = "";
-
-    if (!reports || reports.length === 0) {
-
-        empty.style.display = "block";
+    if (relatorios.length === 0) {
+        tbody.innerHTML = '';
+        if (emptyMessage) emptyMessage.style.display = 'block';
         return;
-
     }
 
-    empty.style.display = "none";
+    if (emptyMessage) emptyMessage.style.display = 'none';
 
-    reports.forEach(report => {
+    
+    tbody.innerHTML = '';
 
-        tbody.innerHTML += `
-            <tr>
+    
+    relatorios.forEach((rel) => {
+        const tr = document.createElement('tr');
 
-                <td>
-                    <div class="report-title">
-                        <strong>${report.title || "Sem título"}</strong>
-                        <span>${report.description || ""}</span>
+        tr.innerHTML = `
+            <td>
+                <div class="report-cell">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <div>
+                        <strong>${rel.titulo}</strong>
+                        <span>${rel.id}</span>
                     </div>
-                </td>
-
-                <td>${report.student || "-"}</td>
-
-                <td>${report.teacher || "-"}</td>
-
-                <td>${formatDate(report.createdAt)}</td>
-
-                <td>
-
-                    <div class="report-buttons">
-
-                        <button
-                            class="btn-report btn-view"
-                            onclick="viewReport(${report.id})">
-
-                            <i class="fa-regular fa-eye"></i>
-
-                        </button>
-
-                        <button
-                            class="btn-report btn-download"
-                            onclick="downloadReport(${report.id})">
-
-                            <i class="fa-solid fa-download"></i>
-
-                        </button>
-
-                    </div>
-
-                </td>
-
-            </tr>
+                </div>
+            </td>
+            <td>${rel.aluno}</td>
+            <td>${rel.professor}</td>
+            <td>${rel.data}</td>
+            <td><span class="status-badge status-finalizado">${rel.status}</span></td>
+            <td>
+                <div class="report-buttons">
+                    <button class="btn-action btn-view" title="Visualizar" onclick="visualizarRelatorio('${rel.id}')">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="btn-action btn-download" title="Download" onclick="baixarRelatorio('${rel.id}')">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                    <button class="btn-action btn-delete" title="Excluir" onclick="deletarRelatorio('${rel.id}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </td>
         `;
+
+        tbody.appendChild(tr);
     });
 }
 
-function formatDate(date) {
+// Exemplo da ação do botão Olhar (Olho)
+function visualizarRelatorio(id) {
+    const relatorios = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+    const relatorio = relatorios.find(r => r.id === id);
 
-    if (!date) return "-";
-
-    return new Date(date).toLocaleDateString("pt-BR");
+    if (relatorio) {
+        // Exemplo: Abre modal ou insere os dados para o usuário ler na tela
+        alert(`Visualizando Relatório:\n\nAluno: ${relatorio.aluno}\nTexto: ${relatorio.conteudo}`);
+    }
 }
 
-function viewReport(id) {
 
-    window.open(`http://localhost:3000/api/reports/${id}`, "_blank");
-
+function deletarRelatorio(id) {
+    let relatorios = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+    relatorios = relatorios.filter(r => r.id !== id);
+    localStorage.setItem('relatoriosSAPE', JSON.stringify(relatorios));
+    carregarRelatorios();
 }
-
-function downloadReport(id) {
-
-    window.open(`http://localhost:3000/api/reports/${id}/download`, "_blank");
-
-}
-
-loadReports();

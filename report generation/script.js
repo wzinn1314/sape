@@ -1,63 +1,150 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    const alunoSelect = document.getElementById('aluno_id');
-    const reportForm = document.getElementById('reportForm');
+const API_URL = 'http://localhost:3000';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const studentSelect = document.getElementById('studentSelect');
+  const reportType = document.getElementById('reportType');
+  const reportContent = document.getElementById('reportContent');
+  const reportRecommendations = document.getElementById('reportRecommendations');
+  const reportForm = document.getElementById('reportForm');
+  const reportList = document.getElementById('reportList');
+  const btnRefresh = document.getElementById('btnRefresh');
+  const btnSubmit = document.getElementById('btnSubmit');
+
+  // Atualizar Data e Hora no Topo do Formulário
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
+  function updateDateTime() {
+    const now = new Date();
+    const dateEl = document.getElementById('currentDate');
+    const timeEl = document.getElementById('currentTime');
     
-    // Preenche a data de hoje por padrão
-    document.getElementById('data_relatorio').valueAsDate = new Date();
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('pt-BR');
+    if (timeEl) timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
 
-    // 1. Buscar Alunos do Banco para preencher o Select
+  // Carregar Alunos e Histórico
+  loadStudents();
+  if (reportList) fetchReports();
+
+  // Buscar alunos no Banco SQLite
+  async function loadStudents() {
     try {
-        const response = await fetch('http://localhost:3000/students');
-        const students = await response.json();
+      const response = await fetch(`${API_URL}/students`);
+      if (!response.ok) throw new Error('Erro ao carregar alunos');
+      
+      const students = await response.json();
+      
+      if (students.length === 0) {
+        studentSelect.innerHTML = '<option value="">Nenhum aluno cadastrado no sistema</option>';
+        return;
+      }
 
-        alunoSelect.innerHTML = '<option value="">Selecione um aluno...</option>';
-        students.forEach(student => {
-            const option = document.createElement('option');
-            option.value = student.id;
-            option.textContent = `${student.nome} (Matrícula: ${student.matricula})`;
-            alunoSelect.appendChild(option);
-        });
+      studentSelect.innerHTML = '<option value="">-- Selecione o Aluno --</option>' + 
+        students.map(s => `
+          <option value="${s.id}" data-name="${s.name}" data-disability="${s.disability_type || ''}">
+            ${s.name} ${s.disability_type ? `(${s.disability_type})` : ''}
+          </option>
+        `).join('');
     } catch (error) {
-        console.error("Erro ao carregar alunos:", error);
-        alunoSelect.innerHTML = '<option value="">Erro ao carregar lista</option>';
+      console.error(error);
+      studentSelect.innerHTML = '<option value="">Erro ao conectar com o banco de dados</option>';
     }
+  }
 
-    // 2. Enviar Formulário e Gerar PDF
+  // Submeter Formulário: Salva os dados e Redireciona para a pasta report
+  if (reportForm) {
     reportForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      e.preventDefault();
 
-        const btnSubmit = document.getElementById('btnSubmit');
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PDF...';
+      const studentId = studentSelect.value;
+      const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+      const studentName = selectedOption.getAttribute('data-name');
+      const disability = selectedOption.getAttribute('data-disability');
+      
+      const type = reportType.value;
+      const content = reportContent.value.trim();
+      const recommendations = reportRecommendations.value.trim();
+      const currentDate = document.getElementById('currentDate')?.textContent || new Date().toLocaleDateString('pt-BR');
+      const currentTime = document.getElementById('currentTime')?.textContent || new Date().toLocaleTimeString('pt-BR');
+      const nowFormatted = `${currentDate} às ${currentTime}`;
 
-        const formData = {
-            titulo: document.getElementById('titulo').value,
-            conteudo: document.getElementById('conteudo').value,
-            aluno_id: document.getElementById('aluno_id').value,
-            nome_aluno: alunoSelect.options[alunoSelect.selectedIndex].text,
-            professor_id: 1, // Aqui você deve pegar o ID do professor logado (LocalStorage ou Sessão)
-            data: document.getElementById('data_relatorio').value
-        };
+      if (!studentId) {
+        alert('Selecione um aluno cadastrado.');
+        return;
+      }
 
-        try {
-            const response = await fetch('http://localhost:3000/generate-report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="ph ph-spinner"></i> Enviando Relatório...';
 
-            if (response.ok) {
-                const result = await response.json();
-                alert('Sucesso! Relatório gerado e salvo com sucesso.');
-                window.location.href = 'index.html'; // Volta para a tela principal
-            } else {
-                throw new Error('Erro ao gerar relatório no servidor');
-            }
-        } catch (error) {
-            alert('Erro: ' + error.message);
-        } finally {
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Gerar e Salvar PDF';
-        }
+      // 1. Montar Texto Consolidado
+      const fullReportText = `[${type}]\nData/Hora: ${nowFormatted}\n\nDESENVOLVIMENTO:\n${content}${recommendations ? `\n\nENCAMINHAMENTOS:\n${recommendations}` : ''}`;
+
+      // 2. Salvar no LocalStorage para a tela na pasta report conseguir ler
+      const novoRelatorio = {
+        id: 'REF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
+        titulo: type || 'Relatório de Acompanhamento',
+        aluno: studentName,
+        professor: 'Professor Responsável',
+        data: currentDate,
+        status: 'Finalizado',
+        conteudo: fullReportText
+      };
+
+      let relatoriosLocais = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+      relatoriosLocais.unshift(novoRelatorio);
+      localStorage.setItem('relatoriosSAPE', JSON.stringify(relatoriosLocais));
+
+      // 3. Salvar no Backend SQLite
+      try {
+        await fetch(`${API_URL}/reports`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentId: studentId,
+            pdfContent: fullReportText,
+            fileName: `Relatorio_${studentName.replace(/\s+/g, '_')}.pdf`
+          })
+        });
+      } catch (err) {
+        console.warn('Erro ao salvar no banco backend, mas salvo localmente:', err);
+      }
+
+      // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML (Sem baixar PDF)
+      // Ajuste o caminho de acordo com a localização do formulário:
+      // - Se o formulário está em uma subpasta (ex: /pages/): '../report/index.html'
+      // - Se o formulário está na raiz do projeto: 'report/index.html'
+      window.location.href = '../report/index.html'; 
     });
+  }
+
+  // Listar Histórico de Relatórios (se houver essa lista na tela)
+  async function fetchReports() {
+    if (!reportList) return;
+    try {
+      const response = await fetch(`${API_URL}/reports`);
+      const reports = await response.json();
+
+      if (!reports || reports.length === 0) {
+        reportList.innerHTML = '<li class="empty-state">Nenhum relatório cadastrado ainda.</li>';
+        return;
+      }
+
+      reportList.innerHTML = reports.map(r => `
+        <li class="report-item">
+          <div class="report-header-info">
+            <span class="student-name"><i class="ph ph-user"></i> ${r.student_name}</span>
+            <span class="report-badge">${new Date(r.created_at).toLocaleString('pt-BR')}</span>
+          </div>
+          <div class="report-body">${r.pdf_content}</div>
+        </li>
+      `).join('');
+    } catch (err) {
+      reportList.innerHTML = '<li class="empty-state">Erro ao buscar histórico.</li>';
+    }
+  }
+
+  if (btnRefresh) {
+    btnRefresh.addEventListener('click', fetchReports);
+  }
 });

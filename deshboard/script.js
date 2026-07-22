@@ -4,7 +4,10 @@ const REFRESH_INTERVAL_MS = 8000;
 function updateDate() {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   const today = new Date();
-  document.getElementById('currentDate').textContent = today.toLocaleDateString('pt-BR', options);
+  const dateEl = document.getElementById('currentDate');
+  if (dateEl) {
+    dateEl.textContent = today.toLocaleDateString('pt-BR', options);
+  }
 }
 
 function loadProfessorData() {
@@ -16,14 +19,15 @@ function loadProfessorData() {
     const userName = user.name || 'Usuário';
     const userRole = user.role || 'Professor(a)';
 
-    document.getElementById('professorGreeting').textContent = userName;
-    document.getElementById('professorName').textContent = userName;
+    const greetingEl = document.getElementById('professorGreeting');
+    const nameEl = document.getElementById('professorName');
+    const typeEl = document.getElementById('userType');
+    const avatarEl = document.getElementById('avatarProfile');
 
-    if (document.getElementById('userType')) {
-      document.getElementById('userType').textContent = userRole;
-    }
-
-    document.getElementById('avatarProfile').textContent = userName.charAt(0).toUpperCase();
+    if (greetingEl) greetingEl.textContent = userName;
+    if (nameEl) nameEl.textContent = userName;
+    if (typeEl) typeEl.textContent = userRole;
+    if (avatarEl) avatarEl.textContent = userName.charAt(0).toUpperCase();
 
     const subtitleEl = document.getElementById('headerSubtitle');
     if (subtitleEl) {
@@ -74,6 +78,8 @@ function formatRelativeDate(isoDate) {
   if (!isoDate) return 'Data não informada';
 
   const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return 'Data inválida';
+
   const now = new Date();
   const diffMs = now - date;
   const diffMinutes = Math.floor(diffMs / 60000);
@@ -102,6 +108,7 @@ function formatTurmaText(turma, curso) {
   return turma || curso || 'Turma não informada';
 }
 
+/* RENDERIZA OS ÚLTIMOS ALUNOS REGISTRADOS */
 function renderRecentStudents(students) {
   const listEl = document.getElementById('recentStudentsList');
   const emptyEl = document.getElementById('recentStudentsEmpty');
@@ -109,7 +116,7 @@ function renderRecentStudents(students) {
 
   listEl.querySelectorAll('.record-item').forEach(item => item.remove());
 
-  if (!students.length) {
+  if (!students || !students.length) {
     if (emptyEl) {
       emptyEl.textContent = 'Nenhum aluno cadastrado ainda.';
       emptyEl.style.display = 'block';
@@ -122,12 +129,16 @@ function renderRecentStudents(students) {
   students.forEach(student => {
     const item = document.createElement('div');
     item.className = 'record-item';
+    
+    const studentName = student.nome || student.name || 'Aluno sem nome';
+    const registeredBy = student.registeredByName || student.createdBy || 'Usuário';
+
     item.innerHTML = `
       <div class="record-info">
-        <div class="record-name">${student.nome}</div>
+        <div class="record-name">${studentName}</div>
         <div class="record-meta">
           ${formatTurmaText(student.turma, student.curso)}
-          • Cadastrado por ${student.registeredByName || 'usuário'}
+          • Cadastrado por ${registeredBy}
         </div>
       </div>
       <div class="record-date">${formatRelativeDate(student.createdAt)}</div>
@@ -136,6 +147,7 @@ function renderRecentStudents(students) {
   });
 }
 
+/* RENDERIZA OS ALUNOS EM FOCO */
 function renderStudentsFocus(students) {
   const listEl = document.getElementById('studentsFocusList');
   const emptyEl = document.getElementById('studentsFocusEmpty');
@@ -143,7 +155,7 @@ function renderStudentsFocus(students) {
 
   listEl.querySelectorAll('.student-focus-item').forEach(item => item.remove());
 
-  const focusStudents = students.slice(0, 3);
+  const focusStudents = (students || []).slice(0, 3);
 
   if (!focusStudents.length) {
     if (emptyEl) {
@@ -158,10 +170,12 @@ function renderStudentsFocus(students) {
   focusStudents.forEach(student => {
     const item = document.createElement('div');
     item.className = 'student-focus-item';
+    const studentName = student.nome || student.name || 'Aluno sem nome';
+
     item.innerHTML = `
-      <div class="student-focus-avatar">${getInitials(student.nome)}</div>
+      <div class="student-focus-avatar">${getInitials(studentName)}</div>
       <div class="student-focus-content">
-        <strong>${student.nome}</strong>
+        <strong>${studentName}</strong>
         <span>${formatTurmaText(student.turma, student.curso)} • ${student.diagnostico || 'Inclusão'}</span>
       </div>
       <div class="student-focus-status green">Novo</div>
@@ -170,6 +184,7 @@ function renderStudentsFocus(students) {
   });
 }
 
+/* CARREGA DADOS DO DASHBOARD VIA API */
 async function loadDashboardData() {
   const totalEl = document.getElementById('totalStudents');
 
@@ -180,7 +195,7 @@ async function loadDashboardData() {
     const data = await response.json();
 
     if (totalEl) {
-      totalEl.textContent = data.total ?? 0;
+      totalEl.textContent = data.total ?? (data.recent ? data.recent.length : 0);
     }
 
     renderRecentStudents(data.recent || []);
@@ -239,11 +254,5 @@ document.querySelectorAll('.aviso-item').forEach(item => {
   });
   item.addEventListener('mouseleave', function () {
     this.style.transform = 'translateX(0)';
-  });
-});
-
-document.querySelectorAll('.card-link').forEach(link => {
-  link.addEventListener('click', function (e) {
-    if (this.getAttribute('href') === '#') e.preventDefault();
   });
 });

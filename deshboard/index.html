@@ -12,21 +12,21 @@
 
   <aside class="sidebar">
     <div class="logo">
-      <img src="../../assets/logo.png" alt="Logo SAPE">
-      <div>
+      <img src="../../assets/foto.png" alt="Logo SAPE">
+      <div class="logo-text">
         <span>SAPE</span>
         <p>Suporte e Acolhimento</p>
       </div>
     </div>
 
     <nav class="menu">
-      <a class="active"href="../deshboard/index.html"><i class="fas fa-home"></i> Dashboard</a>
-      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> Alunos</a>
-      <a href="#"><i class="fas fa-user"></i> Perfil do Aluno</a>
-      <a href="#"><i class="fas fa-star"></i> Características</a>
-      <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
-      <a href="#"><i class="fas fa-book"></i> Plano de Apoio</a>
-      <a href="#"><i class="fas fa-comments"></i> Observações</a>
+      <a class="active" href="../deshboard/index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
+      <a href="#"><i class="fas fa-user"></i> <span>Perfil do Aluno</span></a>
+      <a href="#"><i class="fas fa-star"></i> <span>Características</span></a>
+      <a href="#"><i class="fas fa-file-alt"></i> <span>Adaptações de Provas</span></a>
+      <a href="#"><i class="fas fa-book"></i> <span>Plano de Apoio</span></a>
+      <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
     </nav>
 
     <div class="profile">
@@ -45,15 +45,13 @@
     <header class="top-header">
       <div class="header-content">
         <div class="header-greeting">
-          <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>! </h1>
-          
+          <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
+          <p id="headerSubtitle">Painel de controle e gerenciamento de alunos</p>
         </div>
         <div class="header-right">
           <div class="header-date">
             <i class="fas fa-calendar-alt"></i>
             <span id="currentDate"></span>
-          </div>
-      
           </div>
         </div>
       </div>
@@ -62,7 +60,7 @@
     <!-- CARDS DE ESTATÍSTICAS -->
     <section class="stats-cards">
       <div class="card card-purple">
-        <div class="card-content">
+        <div class="card-info">
           <p class="card-label">Total de Alunos</p>
           <h3 class="card-number" id="totalStudents">—</h3>
           <small>Cadastrados no sistema</small>
@@ -70,17 +68,15 @@
         <a href="../students/index.html" class="card-link">Ver todos →</a>
       </div>
 
-
       <div class="card card-yellow">
-        <div class="card-content">
+        <div class="card-info">
           <p class="card-label">Questionários Pendentes</p>
           <h3 class="card-number">7</h3>
           <small>Aguardando preenchimento</small>
         </div>
         <a href="#" class="card-link">Ver todos →</a>
       </div>
-
-     
+    </section>
 
     <!-- SEÇÃO PRINCIPAL -->
     <section class="dashboard-grid">
@@ -88,34 +84,36 @@
       <!-- COLUNA ESQUERDA -->
       <div class="left-column">
 
-      
+        <!-- QUADRO DE AVISOS -->
         <div class="box">
           <div class="box-header">
+            <h3>Avisos e Lembretes</h3>
             <a href="#" class="link-small">Ver todos</a>
           </div>
 
           <div class="aviso-item aviso-red">
             <div class="aviso-content">
-              <strong>Entrega de Relatórios</strong>
+              <strong>Entrega de Relatórios:</strong>
               <p>Prazo final: 30 de maio de 2024</p>
             </div>
           </div>
 
           <div class="aviso-item aviso-yellow">
             <div class="aviso-content">
-              <strong>Reunião com Responsáveis</strong>
+              <strong>Reunião com Responsáveis:</strong>
               <p>Data: 25/05 às 14h - Sala de Reuniões</p>
             </div>
           </div>
 
           <div class="aviso-item aviso-blue">
             <div class="aviso-content">
-              <strong>Atualizar Planos de Apoio</strong>
+              <strong>Atualizar Planos de Apoio:</strong>
               <p>Verifique planos com mais de 30 dias</p>
             </div>
           </div>
         </div>
 
+        <!-- LISTA DOS ÚLTIMOS ALUNOS REGISTRADOS -->
         <div class="box">
           <div class="box-header">
             <h3>Últimos Alunos Registrados</h3>
@@ -132,7 +130,7 @@
       <!-- COLUNA DIREITA -->
       <div class="right-column">
 
-        <!-- GRÁFICO RÁPIDO -->
+        <!-- GRÁFICO / ANÁLISE RÁPIDA -->
         <div class="box">
           <div class="box-header">
             <h3>Análise Rápida</h3>
@@ -142,17 +140,9 @@
           <div class="analytics">
             <div class="analytics-item">
               <div class="analytics-label">Observações Registradas</div>
-              <div class="analytics-value">36</div>
+              <div class="analytics-value">0</div>
               <div class="analytics-bar">
                 <div class="analytics-progress" style="width: 85%"></div>
-              </div>
-            </div>
-
-            <div class="analytics-item">
-              <div class="analytics-label">Reuniões com Responsáveis</div>
-              <div class="analytics-value">12</div>
-              <div class="analytics-bar">
-                <div class="analytics-progress" style="width: 60%"></div>
               </div>
             </div>
 
@@ -168,7 +158,7 @@
               <div class="analytics-label">Metas em Andamento</div>
               <div class="analytics-value">22</div>
               <div class="analytics-bar">
-                <div class="analytics-progress" style="width: 90%"></div>
+                <div class="analytics-progress" style="width: 33%"></div>
               </div>
             </div>
           </div>
@@ -186,28 +176,26 @@
           </div>
         </div>
 
-
+        <!-- ATALHOS RÁPIDOS -->
         <div class="box">
           <div class="box-header">
-            <h3> Atalhos Rápidos</h3>
+            <h3>Atalhos Rápidos</h3>
           </div>
 
           <div class="quick-links">
-            <a class = "quick-link-btn" href="../report/index.html">
-            <button class="quick-link-btn">
+            <a class="quick-link-btn" href="../report/index.html">
               <i class="fas fa-file-pdf"></i>
-              <span>Gerar Relatório</span>
-            </button>
-          </a>
+              <span>Relatórios</span>
+            </a>
             <a class="quick-link-btn" href="../new_students/index.html">
               <i class="fas fa-plus-circle"></i>
               <span>Novo Aluno</span>
             </a>
-            <button class="quick-link-btn">
+            <a class="quick-link-btn" href="../report generation/index.html">
               <i class="fas fa-clipboard-list"></i>
-              <span>Nova Observação</span>
-            </button>
-            <button class="quick-link-btn">
+              <span>Novo Relatório</span>
+            </a>
+            <button class="quick-link-btn" type="button">
               <i class="fas fa-envelope"></i>
               <span>Contatar Família</span>
             </button>

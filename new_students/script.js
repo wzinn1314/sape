@@ -65,7 +65,9 @@ if (studentForm) {
       const result = await response.json();
 
       if (response.ok) {
-        window.location.href = '../students/index.html';
+        alert('Aluno cadastrado com sucesso!');
+       
+        window.location.href = '../deshboard/index.html';
         return;
       }
 
