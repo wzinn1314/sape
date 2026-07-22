@@ -1,40 +1,13 @@
-/* Definição de Variáveis - Cores mais suaves e amigáveis */
-:root {
-  --base-bg: #f0f4f8;
-  --base-surface: #ffffff;
-  --base-text: #2d3436;
-  --base-text-light: #636e72;
-  --secondary: #4a90e2;
-  --secondary-dark: #2c3e50;
-  --accent: #ffd166; /* Amarelo mais suave */
-  --accent-warm: #ffbd69;
-  
-  /* Cores do Autismo em tons pastéis (menos agressivas) */
-  --puzzle-blue: #a2d2ff;
-  --puzzle-red: #ffafcc;
-  --puzzle-yellow: #fcf6bd;
-  --puzzle-green: #b9fbc0;
-  
-  --radius-sm: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 30px;
-  
-  --transition: all 0.3s ease;
-  --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-family);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
   min-height: 100vh;
-  background: var(--base-bg);
-  color: var(--base-text);
-  line-height: 1.6; /* Melhor para leitura */
+  background: #eef7ff;
 }
 
 .background {
@@ -45,27 +18,28 @@ body {
   align-items: center;
   position: relative;
   overflow: hidden;
-  /* Gradiente mais suave para não cansar a vista */
-  background: radial-gradient(circle at top left, #ffffff, var(--base-bg));
 }
 
 .login-card {
   width: 100%;
-  max-width: 500px;
-  background: var(--base-surface);
-  border: 3px solid var(--puzzle-blue); /* Borda mais grossa e visível, mas cor suave */
-  border-radius: var(--radius-xl);
-  padding: 40px;
+  max-width: 520px;
+  background: #ffffff;
+  border: 3px solid #1b66d2;
+  border-radius: 26px;
+  padding: 45px 45px 35px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 12px 12px 0 #ffd736;
   position: relative;
   z-index: 2;
 }
 
 .logo {
-  width: 140px;
-  height: 140px;
-  margin: 0 auto 20px;
+  width: 170px;
+  height: 170px;
+  margin: 0 auto 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .logo img {
@@ -75,112 +49,271 @@ body {
 }
 
 h1 {
-  font-size: 2.5rem; /* Reduzi o tamanho para não ser "gritante" */
-  font-weight: 800;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 8px;
 }
 
-/* Cores do título com contraste acessível */
-.blue   { color: #0056b3; }
-.red    { color: #d63031; }
-.yellow { color: #f39c12; }
-.green  { color: #27ae60; }
+.blue { color: #1b66d2; }
+.red { color: #e82929; }
+.yellow { color: #ffc400; }
+.green { color: #31b84b; }
 
 .subtitle {
-  color: var(--base-text-light);
+  color: #063b7a;
   font-size: 1.1rem;
-  font-weight: 500;
-  margin-bottom: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 15px;
 }
 
-form { text-align: left; }
+.heart {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+form {
+  text-align: left;
+}
 
 label {
   display: block;
-  color: var(--secondary-dark);
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  margin-left: 4px;
+  color: #063b7a;
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
 .input-box {
   width: 100%;
-  height: 60px;
-  border: 2px solid #dfe6e9;
-  border-radius: var(--radius-sm);
-  padding: 0 20px;
-  margin-bottom: 20px;
+  height: 58px;
+  border: 2px solid #1b66d2;
+  border-radius: 13px;
+  padding: 0 18px;
+  margin-bottom: 25px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  background: #fdfdfd;
-  transition: var(--transition);
+  gap: 14px;
+  background: #ffffff;
 }
 
-/* Feedback visual claro de onde o usuário está clicando */
-.input-box:focus-within {
-  border-color: var(--secondary);
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+.input-box i {
+  color: #1b66d2;
+  font-size: 1.2rem;
 }
 
 .input-box input {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 1.1rem;
-  color: var(--secondary-dark);
-  background: transparent;
+  font-size: 1rem;
+  color: #000;
 }
 
-/* Botão grande e fácil de clicar */
-button[type="submit"] {
+.input-box input::placeholder {
+  color: #999;
+}
+
+button {
   width: 100%;
-  height: 65px;
+  height: 64px;
   border: none;
-  border-radius: var(--radius-sm);
-  background: var(--secondary);
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 700;
+  border-radius: 13px;
+  background: #063f78;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: var(--transition);
-  margin-top: 10px;
-  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+  transition: 0.3s;
 }
 
-button[type="submit"]:hover {
-  background: #357abd;
+button:hover {
+  background: #0b5ead;
   transform: translateY(-2px);
 }
 
-button[type="submit"]:active {
-  transform: translateY(0);
+.footer {
+  margin-top: 30px;
+  color: #063b7a;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-/* Decorações mais discretas (10% de opacidade para não distrair) */
+
 .puzzle {
   position: absolute;
-  width: 120px;
-  height: 120px;
-  opacity: 0.1; /* Reduzida a opacidade */
+  width: 130px;
+  height: 130px;
+  opacity: 0.9;
+  border-radius: 25px;
   z-index: 1;
-  pointer-events: none; /* Garante que não atrapalhe cliques */
 }
 
-.puzzle-red    { background: var(--puzzle-red);    top: 5%;  left: 5%;  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
-.puzzle-blue   { background: var(--puzzle-blue);   bottom: 10%; right: 5%; border-radius: 50%; }
+.puzzle-red {
+  background: #ef2b2b;
+  top: -25px;
+  left: -25px;
+  transform: rotate(25deg);
+}
 
-/* Media Queries Ajustadas */
-@media (max-width: 600px) {
+.puzzle-blue {
+  background: #1b66d2;
+  top: 15px;
+  left: 80px;
+  transform: rotate(-25deg);
+}
+
+.puzzle-yellow {
+  background: #ffd736;
+  right: -25px;
+  top: 35%;
+  transform: rotate(20deg);
+}
+
+.puzzle-green {
+  background: #33b84c;
+  left: -35px;
+  bottom: 25%;
+  transform: rotate(-18deg);
+}
+
+.waves {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 130px;
+  left: 0;
+  z-index: 1;
+}
+
+.wave {
+  position: absolute;
+  bottom: -60px;
+  width: 55%;
+  height: 140px;
+  border-radius: 50% 50% 0 0;
+}
+
+.blue-wave {
+  background: #1b66d2;
+  left: -5%;
+}
+
+.red-wave {
+  background: #ef2b2b;
+  left: 22%;
+}
+
+.yellow-wave {
+  background: #ffd736;
+  left: 43%;
+}
+
+.green-wave {
+  background: #33b84c;
+  right: -5%;
+}
+
+
+@media (max-width: 768px) {
   .login-card {
-    padding: 30px 20px;
-    margin: 10px;
+    max-width: 450px;
+    padding: 35px 30px 30px;
+    box-shadow: 8px 8px 0 #ffd736;
   }
-  
-  h1 { font-size: 2rem; }
-  
-  .input-box { height: 55px; }
+
+  .logo {
+    width: 140px;
+    height: 140px;
+  }
+
+  h1 {
+    font-size: 3.2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  label {
+    font-size: 1.1rem;
+  }
+
+  .input-box {
+    height: 54px;
+  }
+
+  button {
+    height: 58px;
+    font-size: 1.2rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .background {
+    padding: 15px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+    border-radius: 22px;
+    box-shadow: 6px 6px 0 #ffd736;
+  }
+
+  .logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  h1 {
+    font-size: 2.7rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+
+  .input-box {
+    height: 52px;
+    padding: 0 14px;
+  }
+
+  button {
+    height: 55px;
+    font-size: 1.1rem;
+  }
+
+  .footer {
+    font-size: 0.9rem;
+  }
+
+  .puzzle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .waves {
+    height: 90px;
+  }
+}
+
+
+@media (max-width: 360px) {
+  .logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  h1 {
+    font-size: 2.3rem;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
 }
