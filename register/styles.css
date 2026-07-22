@@ -1,196 +1,231 @@
-/* Importação de fonte moderna */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
 }
 
 body {
-    background-color: #f4f7f9;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
+  min-height: 100vh;
+  background: var(--base-bg);
 }
 
-/* Container Principal */
 .register-page {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--base-surface) 0%, var(--base-bg) 60%, var(--secondary-light) 100%);
 }
 
-/* Elementos Decorativos (Quebra-cabeças/Cores do Autismo) */
-.puzzle {
-    position: absolute;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.4;
-    z-index: -1;
-}
-
-.puzzle-red { top: 10%; left: 10%; background-color: #ff4d4d; }
-.puzzle-blue { bottom: 10%; right: 10%; background-color: #4d79ff; }
-.puzzle-yellow { top: 10%; right: 15%; background-color: #ffcc00; }
-.puzzle-green { bottom: 15%; left: 15%; background-color: #4caf50; }
-
-/* Card de Registro */
 .register-card {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 450px;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    border: 1px solid #eef2f6;
+  width: 100%;
+  max-width: 650px;
+  background: var(--base-surface);
+  border: 2px solid var(--secondary);
+  border-radius: var(--radius-xl);
+  padding: 42px;
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--shadow-lg), var(--shadow-accent);
+}
+
+.logo {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .register-header {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 28px;
 }
 
 .register-header h1 {
-    color: #2c3e50;
-    font-size: 1.8rem;
-    margin-bottom: 10px;
+  color: var(--secondary-dark);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin-bottom: 12px;
+  font-weight: 900;
 }
 
 .register-header p {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    line-height: 1.5;
+  color: var(--base-text);
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  line-height: 1.5;
 }
 
-/* Formulário */
 .form-group {
-    margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    color: #444;
+  display: block;
+  color: var(--secondary-dark);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
-.form-group input, 
-.form-group select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e1e8ed;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    outline: none;
+.form-group input {
+  width: 100%;
+  height: 56px;
+  border: 2px solid var(--base-border);
+  border-radius: var(--radius-md);
+  padding: 0 18px;
+  background: var(--base-bg);
+  color: var(--secondary-dark);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition);
 }
 
-.form-group input:focus, 
-.form-group select:focus {
-    border-color: #4d79ff;
-    box-shadow: 0 0 0 4px rgba(77, 121, 255, 0.1);
+.form-group input:focus {
+  border-color: var(--secondary);
+  background: var(--base-surface);
+  box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
 }
 
-/* Checkbox */
 .checkbox-group {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin: 20px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0;
+  color: var(--base-text);
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .checkbox-group input {
-    margin-top: 4px;
-    cursor: pointer;
+  margin-top: 3px;
+  min-width: 18px;
+  height: 18px;
+  accent-color: var(--secondary);
 }
 
-.checkbox-group label {
-    font-size: 0.85rem;
-    color: #666;
-    line-height: 1.4;
+.checkbox-group a,
+.login-link a {
+  color: var(--secondary);
+  font-weight: 700;
+  text-decoration: none;
 }
 
-.checkbox-group a {
-    color: #4d79ff;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.checkbox-group a:hover {
-    text-decoration: underline;
-}
-
-/* Botão */
-.button-link {
-    width: 100%;
-    padding: 14px;
-    background-color: #4d79ff;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 10px;
-}
-
-.button-link:hover:not(.disabled) {
-    background-color: #355fdb;
-    transform: translateY(-2px);
-}
-
-.button-link.disabled {
-    background-color: #bdc3c7;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-/* Notas e Mensagens */
-.note {
-    font-size: 0.75rem;
-    color: #95a5a6;
-    text-align: center;
-    margin-top: 15px;
-}
-
+#loading,
 #message {
-    text-align: center;
-    font-size: 0.85rem;
-    margin: 10px 0;
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+#loading { color: var(--secondary-dark); }
+
+.button-link {
+  width: 100%;
+  height: 60px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--secondary-dark);
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-accent);
+}
+
+.button-link:hover {
+  background: var(--accent-warm);
+  transform: translateY(-2px);
+}
+
+.button-link.disabled,
+.button-link:disabled {
+  background: var(--base-muted);
+  color: var(--base-text-light);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.note {
+  margin-top: 16px;
+  text-align: center;
+  color: var(--base-text);
+  font-size: 0.9rem;
 }
 
 .login-link {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 0.9rem;
-    color: #666;
+  margin-top: 22px;
+  text-align: center;
+  color: var(--base-text);
+  font-weight: 600;
 }
 
-.login-link a {
-    color: #4d79ff;
-    text-decoration: none;
-    font-weight: 700;
+.puzzle {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  opacity: 0.18;
+  z-index: 1;
 }
 
-/* Responsividade */
+.puzzle-red    { background: var(--puzzle-red);    top: -25px; left: -20px; transform: rotate(25deg); }
+.puzzle-blue   { background: var(--puzzle-blue);   top: 25px;  left: 90px;  transform: rotate(-25deg); }
+.puzzle-yellow { background: var(--puzzle-yellow); right: -30px; top: 35%;  transform: rotate(20deg); }
+.puzzle-green  { background: var(--puzzle-green);  left: -30px; bottom: 20%; transform: rotate(-18deg); }
+
+@media (max-width: 768px) {
+  .register-page { padding: 18px; }
+
+  .register-card {
+    max-width: 520px;
+    padding: 34px 28px;
+  }
+
+  .logo { width: 110px; height: 110px; }
+  .form-group input { height: 52px; }
+  .button-link { height: 56px; font-size: 1.1rem; }
+  .puzzle { width: 70px; height: 70px; }
+}
+
 @media (max-width: 480px) {
-    .register-card {
-        padding: 25px;
-    }
-    
-    .puzzle {
-        display: none; /* Remove elementos flutuantes em telas muito pequenas para limpar o visual */
-    }
+  .register-page {
+    padding: 14px;
+    align-items: flex-start;
+  }
+
+  .register-card {
+    margin-top: 18px;
+    padding: 28px 20px;
+    border-radius: var(--radius-lg);
+  }
+
+  .logo { width: 95px; height: 95px; }
+  .form-group { margin-bottom: 15px; }
+  .form-group label { font-size: 0.95rem; }
+  .form-group input { height: 50px; font-size: 0.95rem; padding: 0 14px; }
+  .checkbox-group { font-size: 0.85rem; }
+  .note, .login-link { font-size: 0.85rem; }
+  .puzzle { width: 55px; height: 55px; }
+}
+
+@media (max-width: 360px) {
+  .register-card { padding: 24px 16px; }
+  .logo { width: 80px; height: 80px; }
+  .form-group input { height: 48px; }
+  .button-link { height: 52px; }
 }
