@@ -2,18 +2,11 @@ require('dotenv').config();
 
 const sqlite3 = require('sqlite3').verbose();
 const express = require('express');
-<<<<<<< HEAD
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const https = require('https');
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-
-=======
-const cors = require('cors');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -21,8 +14,14 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Conexão e Inicialização do Banco de Dados SQLite
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
+// Domínios permitidos para registro (configurar em .env como CSV, ex: "escola.edu.br,dominio.com")
+const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS 
+  ? process.env.ALLOWED_EMAIL_DOMAINS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) 
+  : null;
+
+// ==========================================
+// CONEXÃO E INICIALIZAÇÃO DO BANCO DE DADOS
+// ==========================================
 const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
   if (err) {
     console.error('Erro ao conectar no DB:', err.message);
@@ -30,7 +29,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
     console.log('Conectado ao banco de dados SQLite!');
 
     db.serialize(() => {
-<<<<<<< HEAD
+      // 1. Tabela de Usuários (Login / Cadastro)
       db.run(`CREATE TABLE IF NOT EXISTS user (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -42,6 +41,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         approved INTEGER DEFAULT 0
       )`);
 
+      // Verifica e adiciona colunas se a tabela 'user' já existir sem elas
       db.all('PRAGMA table_info(user)', [], (err, columns) => {
         if (!err && columns) {
           const requiredColumns = [
@@ -61,17 +61,18 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
               });
             }
           });
-          // tabela para tokens de verificação
-          db.run(`CREATE TABLE IF NOT EXISTS email_verification (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            token TEXT NOT NULL,
-            expires_at INTEGER NOT NULL
-          )`);
         }
       });
-=======
-      // 1. Tabela de Alunos Completa do SAPE
+
+      // 2. Tabela de Tokens de Verificação de E-mail
+      db.run(`CREATE TABLE IF NOT EXISTS email_verification (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token TEXT NOT NULL,
+        expires_at INTEGER NOT NULL
+      )`);
+
+      // 3. Tabela de Alunos Completa do SAPE
       db.run(`CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -96,7 +97,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
 
-      // 2. Tabela de Relatórios do AEE
+      // 4. Tabela de Relatórios do AEE
       db.run(`CREATE TABLE IF NOT EXISTS reports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
@@ -105,24 +106,19 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (student_id) REFERENCES students (id)
       )`);
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
     });
   }
 });
 
-<<<<<<< HEAD
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-// Domínios permitidos para registro (configurar em .env como CSV, ex: "seudominio.edu.br,escola.edu.br")
-const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS ? process.env.ALLOWED_EMAIL_DOMAINS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : null;
-
+// ==========================================
+// ROTAS DE CONFIGURAÇÃO E USUÁRIOS
+// ==========================================
 app.get('/config', (req, res) => {
   res.json({ allowedDomains });
 });
 
-
 app.get('/users', (req, res) => {
-  db.all('SELECT id, name, email, cpf, role FROM user', ... [], (err, rows) => {
+  db.all('SELECT id, name, email, cpf, role FROM user', [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
@@ -139,7 +135,7 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    // validação de domínio (se configurado)
+    // Validação de domínio (se configurado)
     if (allowedDomains && allowedDomains.length > 0) {
       const domain = (email.split('@')[1] || '').toLowerCase();
       if (!domain || !allowedDomains.includes(domain)) {
@@ -149,20 +145,22 @@ app.post('/register', async (req, res) => {
     
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    
     // Para alunos, marcamos emailVerified/approved como true automaticamente
     const isStudent = (role && role.toLowerCase() === 'aluno') || (role && role.toLowerCase() === 'student');
     const emailVerified = isStudent ? 1 : 0;
     const approved = isStudent ? 1 : 0;
 
-    db.run('INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) VALUES (?, ?, ?, ?, ?, ?, ?)', [name, email, hashedPassword, cpf, role || 'Aluno', emailVerified, approved], function(err) {
-      if (err) {
-        if (err.message.includes('UNIQUE constraint failed')) {
-          res.status(409).json({ error: 'Email já cadastrado' });
-        } else {
-          res.status(500).json({ error: err.message });
+    db.run(
+      'INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+      [name, email, hashedPassword, cpf, role || 'Aluno', emailVerified, approved], 
+      function(err) {
+        if (err) {
+          if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(409).json({ error: 'Email já cadastrado' });
+          }
+          return res.status(500).json({ error: err.message });
         }
-      } else {
+
         const userId = this.lastID;
 
         // Se for professor, criar token de verificação e enviar e-mail (ou retornar URL em dev)
@@ -174,7 +172,6 @@ app.post('/register', async (req, res) => {
 
           const verificationUrl = `${req.protocol}://${req.get('host')}/verify-email?token=${token}`;
 
-          // Se variáveis SMTP estiverem configuradas, enviar email
           if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
             const transporter = nodemailer.createTransport({
               host: process.env.SMTP_HOST,
@@ -202,22 +199,19 @@ app.post('/register', async (req, res) => {
               return res.status(201).json({ message: 'Usuário cadastrado com sucesso. E-mail de verificação enviado.' });
             });
           } else {
-            // Ambiente de desenvolvimento: retornar URL para verificação
             return res.status(201).json({ message: 'Usuário cadastrado com sucesso', id: userId, verifyUrl: verificationUrl });
           }
+        } else {
+          return res.status(201).json({ message: 'Usuário cadastrado com sucesso', id: userId });
         }
-
-        // Para alunos ou professores que não precisam de verificação, retornar sucesso simples
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso', id: userId });
       }
-    });
+    );
   } catch (error) {
     res.status(500).json({ error: 'Erro ao processar senha' });
   }
 });
 
-
-// Rota para verificar email via token
+// Rota para verificar e-mail via token
 app.get('/verify-email', (req, res) => {
   const { token } = req.query;
   if (!token) return res.status(400).send('Token é obrigatório');
@@ -230,17 +224,76 @@ app.get('/verify-email', (req, res) => {
       return res.status(400).send('Token expirado');
     }
 
-    // Atualiza usuário para emailVerified e approved
     db.run('UPDATE user SET emailVerified = 1, approved = 1 WHERE id = ?', [row.user_id], (updateErr) => {
       if (updateErr) return res.status(500).send('Erro ao atualizar usuário');
 
-      // Remove token
       db.run('DELETE FROM email_verification WHERE id = ?', [row.id]);
 
       return res.send('Email verificado com sucesso. Você já pode entrar como Professor.');
-=======
+    });
+  });
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+  }
+
+  db.get('SELECT * FROM user WHERE email = ?', [email], async (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!row) {
+      return res.status(401).json({ error: 'Email ou senha inválidos' });
+    }
+
+    if (allowedDomains && allowedDomains.length > 0) {
+      const domain = (email.split('@')[1] || '').toLowerCase();
+      if (!domain || !allowedDomains.includes(domain)) {
+        return res.status(403).json({ error: `Acesso permitido somente para domínios: ${allowedDomains.join(', ')}` });
+      }
+    }
+
+    try {
+      const passwordMatches = await bcrypt.compare(password, row.password);
+
+      if (!passwordMatches) {
+        return res.status(401).json({ error: 'Email ou senha inválidos' });
+      }
+
+      const roleLower = (row.role || '').toString().toLowerCase();
+      if (roleLower.includes('prof') || roleLower.includes('teacher')) {
+        if (!row.emailVerified) {
+          return res.status(403).json({ error: 'Email não verificado. Verifique seu email.' });
+        }
+        if (!row.approved) {
+          return res.status(403).json({ error: 'Aprovação pendente. Aguarde aprovação do administrador.' });
+        }
+      }
+
+      res.json({
+        message: 'Login bem-sucedido',
+        user: { 
+          id: row.id, 
+          name: row.name, 
+          email: row.email, 
+          cpf: row.cpf, 
+          role: row.role, 
+          emailVerified: !!row.emailVerified, 
+          approved: !!row.approved 
+        }
+      });
+    } catch (compareError) {
+      res.status(500).json({ error: 'Erro ao verificar a senha' });
+    }
+  });
+});
+
 // ==========================================
-// ROTA: CADASTRAR ALUNO (POST /students)
+// ROTAS DE ALUNOS
 // ==========================================
 app.post('/students', (req, res) => {
   const {
@@ -265,7 +318,6 @@ app.post('/students', (req, res) => {
     registeredBy
   } = req.body;
 
-  // Validação flexível: apenas exige que o campo nome não esteja em branco
   if (!nome || nome.trim() === '') {
     return res.status(400).json({ error: 'O nome do aluno é obrigatório.' });
   }
@@ -312,75 +364,15 @@ app.post('/students', (req, res) => {
     res.status(201).json({
       message: 'Aluno cadastrado com sucesso!',
       studentId: this.lastID
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
     });
   });
 });
 
-<<<<<<< HEAD
-
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email e senha são obrigatórios' });
-  }
-
-  db.get('SELECT * FROM user WHERE email = ?', [email], async (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    if (!row) {
-      return res.status(401).json({ error: 'Email ou senha inválidos' });
-    }
-
-    // valida domínio do email no login (se configurado)
-    if (allowedDomains && allowedDomains.length > 0) {
-      const domain = (email.split('@')[1] || '').toLowerCase();
-      if (!domain || !allowedDomains.includes(domain)) {
-        return res.status(403).json({ error: `Acesso permitido somente para domínios: ${allowedDomains.join(', ')}` });
-      }
-    }
-
-    try {
-      const passwordMatches = await bcrypt.compare(password, row.password);
-
-      if (!passwordMatches) {
-        return res.status(401).json({ error: 'Email ou senha inválidos' });
-      }
-
-      // Se for professor, exige email verificado e aprovação
-      const roleLower = (row.role || '').toString().toLowerCase();
-      if (roleLower.includes('prof') || roleLower.includes('teacher')) {
-        if (!row.emailVerified) {
-          return res.status(403).json({ error: 'Email não verificado. Verifique seu email.' });
-        }
-        if (!row.approved) {
-          return res.status(403).json({ error: 'Aprovação pendente. Aguarde aprovação do administrador.' });
-        }
-      }
-
-      res.json({
-        message: 'Login bem-sucedido',
-        user: { id: row.id, name: row.name, email: row.email, cpf: row.cpf, role: row.role, emailVerified: !!row.emailVerified, approved: !!row.approved }
-      });
-    } catch (compareError) {
-      res.status(500).json({ error: 'Erro ao verificar a senha' });
-    }
-  });
-});
-
-=======
-// ==========================================
-// ROTA: LISTAR ALUNOS (GET /students)
-// ==========================================
 app.get('/students', (req, res) => {
   const query = 'SELECT * FROM students ORDER BY name ASC';
   db.all(query, [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    // Mapeia para que o Frontend consiga ler .nome, .name, .matricula, etc.
     const studentsFormatted = rows.map((student) => ({
       ...student,
       nome: student.name,
@@ -431,8 +423,9 @@ app.get('/reports', (req, res) => {
   });
 });
 
-// Inicialização do Servidor
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
+// ==========================================
+// INICIALIZAÇÃO DO SERVIDOR
+// ==========================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

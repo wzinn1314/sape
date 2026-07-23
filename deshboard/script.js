@@ -1,69 +1,9 @@
-<<<<<<< HEAD
-=======
 const API_URL = 'http://localhost:3000';
 const REFRESH_INTERVAL_MS = 8000;
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
 
 function updateDate() {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   const today = new Date();
-<<<<<<< HEAD
-  const dateString = today.toLocaleDateString('pt-BR', options);
-  document.getElementById('currentDate').textContent = dateString;
-}
-
-
-function loadProfessorData() {
-  const userStr = localStorage.getItem('user');
-  if (userStr) {
-    try {
-      const user = JSON.parse(userStr);
-      const userName = user.name || 'Usuário';
-      const userRole = user.role || 'Professor(a)';
-      
-    
-      document.getElementById('professorGreeting').textContent = userName;
-      
-      
-      document.getElementById('professorName').textContent = userName;
-      
-      
-      if (document.getElementById('userType')) {
-        document.getElementById('userType').textContent = userRole;
-      }
-      
-     
-      const firstLetter = userName.charAt(0).toUpperCase();
-      document.getElementById('avatarProfile').textContent = firstLetter;
-      
-      
-      const subtitleEl = document.getElementById('headerSubtitle');
-      if (subtitleEl) {
-        if (userRole.toLowerCase().includes('aluno') || userRole.toLowerCase().includes('Aluno')) {
-          subtitleEl.textContent = 'Acompanhe seu desempenho e evolução';
-        } else {
-          subtitleEl.textContent = 'Painel de controle e gerenciamento de alunos';
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar dados do usuário:', error);
-    }
-  }
-}
-
-
-function checkAuth() {
-  const user = localStorage.getItem('user');
-  if (!user) {
-    window.location.href = '../../login/index.html';
-  }
-}
-
-
-function animateCards() {
-  const cards = document.querySelectorAll('.card, .box');
-  cards.forEach((card, index) => {
-=======
   const dateEl = document.getElementById('currentDate');
   if (dateEl) {
     dateEl.textContent = today.toLocaleDateString('pt-BR', options);
@@ -109,7 +49,6 @@ function checkAuth() {
 
 function animateCards() {
   document.querySelectorAll('.card, .box').forEach((card, index) => {
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
     card.style.opacity = '0';
     card.style.transform = 'translateY(20px)';
     setTimeout(() => {
@@ -120,52 +59,6 @@ function animateCards() {
   });
 }
 
-<<<<<<< HEAD
-
-function logout() {
-  localStorage.removeItem('user');
-  window.location.href = '../../login/index.html';
-}
-
-
-window.addEventListener('load', function() {
-  checkAuth();
-  loadProfessorData();
-  updateDate();
-  animateCards();
-});
-
-
-setInterval(updateDate, 60000);
-
-const menuLinks = document.querySelectorAll('.menu a');
-menuLinks.forEach(link => {
-  link.addEventListener('click', function(e) {
-  
-    if (this.href === '#') {
-      e.preventDefault();
-    }
-  });
-});
-
-
-
-
-const avisoItems = document.querySelectorAll('.aviso-item');
-avisoItems.forEach(item => {
-  item.addEventListener('mouseenter', function() {
-    this.style.transform = 'translateX(8px)';
-  });
-  item.addEventListener('mouseleave', function() {
-    this.style.transform = 'translateX(0)';
-  });
-});
-
-
-function animateProgressBars() {
-  const bars = document.querySelectorAll('.analytics-progress');
-  bars.forEach(bar => {
-=======
 function logout() {
   localStorage.removeItem('user');
   window.location.href = '../login/index.html';
@@ -327,7 +220,6 @@ async function loadDashboardData() {
 
 function animateProgressBars() {
   document.querySelectorAll('.analytics-progress').forEach(bar => {
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
     const width = bar.style.width;
     bar.style.width = '0';
     setTimeout(() => {
@@ -337,24 +229,6 @@ function animateProgressBars() {
   });
 }
 
-<<<<<<< HEAD
-
-window.addEventListener('load', animateProgressBars);
-
-document.querySelectorAll('.card-link').forEach(link => {
-  link.addEventListener('click', function(e) {
-    if (this.href !== '#') {
-      // Se for um link real, deixar passar normalmente
-      return;
-    }
-    e.preventDefault();
-  });
-});
-
-
-console.log('Dashboard SAPE carregada com sucesso!');
-console.log('Hora da página:', new Date().toLocaleTimeString('pt-BR'));
-=======
 window.addEventListener('load', function () {
   checkAuth();
   loadProfessorData();
@@ -382,4 +256,3 @@ document.querySelectorAll('.aviso-item').forEach(item => {
     this.style.transform = 'translateX(0)';
   });
 });
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
