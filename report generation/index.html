@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Relatórios - AEE / SAPE</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <header class="header">
+      <i class="ph ph-note-pencil icon-header"></i>
+      <h1>Gerador de Relatórios Pedagógicos</h1>
+      <p>Preencha as observações do aluno com deficiência para gerar o PDF e registrar no sistema.</p>
+    </header>
+
+    <form id="reportForm" class="form-card">
+      
+      <!-- Cabeçalho Automático com Data e Hora -->
+      <div class="meta-info-bar">
+        <span><i class="ph ph-calendar"></i> Data: <strong id="currentDate">--/--/----</strong></span>
+        <span><i class="ph ph-clock"></i> Hora: <strong id="currentTime">--:--</strong></span>
+      </div>
+
+      <!-- Seleção do Aluno -->
+      <div class="input-group">
+        <label for="studentSelect">Aluno com Deficiência *</label>
+        <div class="input-wrapper">
+          <i class="ph ph-user-focus"></i>
+          <select id="studentSelect" required>
+            <option value="">Carregando alunos do banco...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tipo de Relatório -->
+      <div class="input-group">
+        <label for="reportType">Tipo de Relatório *</label>
+        <div class="input-wrapper">
+          <i class="ph ph-tag"></i>
+          <select id="reportType" required>
+            <option value="Acompanhamento AEE">Acompanhamento AEE</option>
+            <option value="Plano de Desenvolvimento Individual (PDI)">Plano de Desenvolvimento Individual (PDI)</option>
+            <option value="Avaliação Diagnóstica Inclusiva">Avaliação Diagnóstica Inclusiva</option>
+            <option value="Parecer Pedagógico Semestral">Parecer Pedagógico Semestral</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Corpo do Relatório / Observações -->
+      <div class="input-group">
+        <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
+        <textarea 
+          id="reportContent" 
+          rows="6" 
+          placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
+          required
+        ></textarea>
+      </div>
+
+      <!-- Encaminhamentos / Recomendações -->
+      <div class="input-group">
+        <label for="reportRecommendations">Encaminhamentos e Recomendações (Opcional)</label>
+        <textarea 
+          id="reportRecommendations" 
+          rows="3" 
+          placeholder="Ex: Adaptação de material, encaminhamento para fonoaudiologia, adequação curricular..."
+        ></textarea>
+      </div>
+
+      <!-- Botão para Gerar PDF e Salvar -->
+      <button type="submit" id="btnSubmit" class="btn-submit">
+        <i class="ph ph-file-pdf"></i>
+        Salvar Relatório
+      </button>
+    </form>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
