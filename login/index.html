@@ -3,23 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Os Autistas</title>
+  <title>Login - SAPE</title>
 
   <link rel="stylesheet" href="styles.css">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
   <div class="background">
-
     <div class="puzzle puzzle-red"></div>
     <div class="puzzle puzzle-blue"></div>
     <div class="puzzle puzzle-yellow"></div>
     <div class="puzzle puzzle-green"></div>
 
     <div class="login-card">
-
       <div class="logo">
         <img src="../assets/foto.png" alt="Logo Os Autistas">
       </div>
@@ -39,17 +36,18 @@
 
       <form id="loginForm">
 
-        <label for="email">E-mail</label>
+        <label for="loginIdentifier">E-mail ou Matrícula</label>
         <div class="input-box">
           <i class="fa-solid fa-id-card"></i>
           <input 
-            type="email" 
-            id="email" 
-            placeholder="Digite seu e-mail" 
+            type="text" 
+            id="loginIdentifier" 
+            placeholder="Digite seu e-mail ou matrícula (Ex: ADM2026)" 
             required
+            autocomplete="username"
           >
         </div>
-
+      
         <label for="password">Senha</label>
         <div class="input-box">
           <i class="fa-solid fa-lock"></i>
@@ -58,20 +56,20 @@
             id="password" 
             placeholder="Digite sua senha" 
             required
+            autocomplete="current-password"
           >
-          <i class="fa-regular fa-eye"></i>
+          <i class="fa-regular fa-eye" id="togglePassword" style="cursor: pointer;"></i>
         </div>
-
-        <p id="loading" style="display: none;">
+      
+        <p id="loading" style="display: none; color: #1b66d2; font-weight: 600; margin-top: 10px;">
           Verificando dados...
         </p>
-
-        <p id="message"></p>
-
-        <button type="submit">Entrar</button>
-
+      
+        <p id="message" style="margin-top: 10px; font-size: 0.9rem; font-weight: 600;"></p>
+      
+        <button type="submit" id="btnEntrar">Entrar</button>
+      
       </form>
-
     </div>
 
     <div class="waves">
@@ -80,9 +78,9 @@
       <div class="wave yellow-wave"></div>
       <div class="wave green-wave"></div>
     </div>
-
   </div>
 
+  <!-- O JS deve ser carregado no FINAL do body para que os elementos HTML já existam -->
   <script src="login.js"></script>
 </body>
 </html>

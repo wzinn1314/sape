@@ -4,9 +4,22 @@ const REFRESH_INTERVAL_MS = 8000;
 function updateDate() {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   const today = new Date();
+  const userLogado = JSON.parse(localStorage.getItem('userLogado'));
   const dateEl = document.getElementById('currentDate');
   if (dateEl) {
     dateEl.textContent = today.toLocaleDateString('pt-BR', options);
+  }
+}
+
+if (userLogado) {
+  const abaAdmin = document.getElementById('abaAdminMenu'); // ID da sua aba no HTML
+  
+  if (abaAdmin) {
+    if (userLogado.role === 'Admin' && userLogado.matricula === 'ADM2026') {
+      abaAdmin.style.display = 'block';
+    } else {
+      abaAdmin.style.display = 'none';
+    }
   }
 }
 
