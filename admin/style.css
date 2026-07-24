@@ -1,0 +1,341 @@
+/* ============ RESET E BASE ============ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f5f7fb;
+    color: #2c3e50;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  
+  /* ============ ESTRUTURA PRINCIPAL (TELA CHEIA) ============ */
+  .page-shell {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .registration-panel {
+    width: 100%;
+    max-width: 1400px; /* Mantém legível em telas ultrawide */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* ============ CABEÇALHO DO PAINEL ============ */
+  .panel-header {
+    background: linear-gradient(135deg, rgba(27, 102, 210, 0.08) 0%, rgba(11, 79, 168, 0.03) 100%);
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid #e5e7f0;
+  }
+  
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #1b66d2;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  
+  .panel-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1b66d2;
+  }
+  
+  /* ============ CARDS DE SEÇÃO ============ */
+  .section-card {
+    background: #ffffff;
+    border: 1px solid #e5e7f0;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    width: 100%;
+  }
+  
+  .section-heading {
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f3f7;
+  }
+  
+  .section-heading strong {
+    font-size: 1rem;
+    color: #1b66d2;
+    font-weight: 700;
+  }
+  
+  /* ============ ESTRUTURA DE GRADES DO FORMULÁRIO ============ */
+  .registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+  
+  .form-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+  
+  .form-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  
+  /* ============ CAMPOS DE ENTRADA (INPUTS, SELECTS, TEXTAREAS) ============ */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .field span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555555;
+  }
+  
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="date"],
+  .field input[type="tel"],
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #333;
+    background-color: #fdfdfd;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: #1b66d2;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
+  }
+  
+  .field textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  /* FIELD TOGGLE / CHECKBOX */
+  .toggle-field {
+    justify-content: center;
+  }
+  
+  .toggle-field input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #1b66d2;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  
+  /* ============ CHECKBOX CONTAINER (SELEÇÃO DE ALUNOS) ============ */
+  .checkbox-container {
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fdfdfd;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Scrollbar personalizada */
+  .checkbox-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  .checkbox-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #444;
+    cursor: pointer;
+  }
+  
+  .checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1b66d2;
+    cursor: pointer;
+  }
+  
+  /* ============ TABELA RESPONSIVA ============ */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e5e7f0;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: #ffffff;
+    white-space: nowrap;
+  }
+  
+  .data-table th, 
+  .data-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7f0;
+  }
+  
+  .data-table th {
+    background: #f8f9fa;
+    color: #1b66d2;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .data-table tbody tr:hover {
+    background-color: #f9fbfd;
+  }
+  
+  .data-table td ul {
+    padding-left: 16px;
+    margin: 0;
+  }
+  
+  /* ============ BOTÕES E AÇÕES ============ */
+  .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-top: 10px;
+  }
+  
+  .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  
+  .checkbox-field input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1b66d2;
+  }
+  
+  .buttons-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .btn-primary, 
+  .btn-secondary, 
+  .btn-danger-small {
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #1b66d2 0%, #0b4fa8 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(27, 102, 210, 0.2);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(27, 102, 210, 0.3);
+  }
+  
+  .btn-secondary {
+    background: #e5e7f0;
+    color: #444;
+    text-decoration: none;
+  }
+  
+  .btn-secondary:hover {
+    background: #d8dbe5;
+  }
+  
+  .btn-danger-small {
+    background: #ef2b2b;
+    color: #ffffff;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .btn-danger-small:hover {
+    background: #d32f2f;
+  }
+  
+  /* ============ REGRAS DE RESPONSIVIDADE (MOBILE / TABLET) ============ */
+  @media (max-width: 768px) {
+    .page-shell {
+      padding: 12px;
+    }
+  
+    .section-card {
+      padding: 16px;
+    }
+  
+    .form-grid, 
+    .form-grid-2, 
+    .form-grid-3 {
+      grid-template-columns: 1fr; /* Força 1 coluna única no celular */
+    }
+  
+    .buttons-row {
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .btn-primary, 
+    .btn-secondary {
+      width: 100%;
+    }
+  }

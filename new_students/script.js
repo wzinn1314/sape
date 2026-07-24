@@ -1,130 +1,85 @@
-<<<<<<< HEAD
-const studentForm = document.getElementById('studentForm');
+document.addEventListener('DOMContentLoaded', () => {
+  const studentForm = document.getElementById('studentForm');
 
-function saveStudent(student) {
-  const stored = localStorage.getItem('students');
-  const students = stored ? JSON.parse(stored) : [];
-  
+  if (!studentForm) return;
 
-  students.unshift(student);
-  localStorage.setItem('students', JSON.stringify(students));
-=======
-const API_URL = 'http://localhost:3000';
-const studentForm = document.getElementById('studentForm');
+  studentForm.addEventListener('submit', async (e) => {
+    // 1. IMPEDE O RECARREGAMENTO PADRÃO DA PÁGINA (Fundamental!)
+    e.preventDefault();
 
-function getLoggedUserId() {
-  const userStr = localStorage.getItem('user');
-  if (!userStr) return null;
-  try {
-    const user = JSON.parse(userStr);
-    return user.id || null;
-  } catch {
-    return null;
-  }
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
-}
-
-function getStudentGradeValue(turma) {
-  if (turma.startsWith('1º')) return '7';
-  if (turma.startsWith('2º')) return '8';
-  if (turma.startsWith('3º')) return '9';
-  return turma;
-}
-
-if (studentForm) {
-<<<<<<< HEAD
-  studentForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-
-    const student = {
-      id: Date.now(), 
-=======
-  studentForm.addEventListener('submit', async function (event) {
-    event.preventDefault();
-
-    const student = {
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
-      nome: document.getElementById('studentName').value.trim(),
-      nascimento: document.getElementById('birthDate').value,
-      matricula: document.getElementById('matricula').value.trim(),
-      cpf: document.getElementById('cpf').value.trim(),
-      turma: document.getElementById('turma').value,
-      curso: document.getElementById('curso').value,
-      anoLetivo: document.getElementById('anoLetivo').value.trim(),
-      diagnostico: document.getElementById('diagnostico').value,
-      pei: document.getElementById('pei').checked,
-      suporte: document.getElementById('suporte').value,
-      hiperfocos: document.getElementById('hiperfocos').value.trim(),
-      gatilhos: document.getElementById('gatilhos').value.trim(),
-      estrategias: document.getElementById('estrategias').value.trim(),
-<<<<<<< HEAD
-      
-
-      pdi: {
-        objetivos: document.getElementById('pdiObjetivos').value.trim(),
-        estrategias: document.getElementById('pdiEstrategias').value.trim(),
-        avaliacao: document.getElementById('pdiAvaliacao').value.trim()
-      },
-      historico: [],
-      
-=======
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
-      responsavel: document.getElementById('responsavelNome').value.trim(),
-      parentesco: document.getElementById('parentesco').value,
-      telefone: document.getElementById('telefone').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      gradeValue: getStudentGradeValue(document.getElementById('turma').value),
-<<<<<<< HEAD
-      createdAt: new Date().toISOString()
-    };
-
-    
-    if (!student.nome || !student.matricula || !student.cpf) {
-      alert('Por favor, preencha os dados básicos (Nome, Matrícula e CPF).');
-=======
-      registeredBy: getLoggedUserId()
-    };
-
-    if (!student.nome || !student.matricula || !student.cpf || !student.responsavel) {
-      alert('Por favor, preencha os dados obrigatórios antes de salvar.');
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
+    // Validação da caixa de confirmação
+    const confirmCheckbox = document.getElementById('confirm');
+    if (confirmCheckbox && !confirmCheckbox.checked) {
+      alert('Por favor, confirme que as informações prestadas são verdadeiras.');
       return;
     }
 
-    if (!document.getElementById('confirm').checked) {
-      alert('Por favor, confirme que as informações são verdadeiras.');
+    // 2. CAPTURA DOS CAMPOS DO SEU HTML
+    const studentName = document.getElementById('studentName')?.value.trim();
+    const birthDate = document.getElementById('birthDate')?.value;
+    const matricula = document.getElementById('matricula')?.value.trim();
+    const cpf = document.getElementById('cpf')?.value.trim();
+
+    const turma = document.getElementById('turma')?.value;
+    const curso = document.getElementById('curso')?.value;
+    const anoLetivo = document.getElementById('anoLetivo')?.value;
+
+    const diagnostico = document.getElementById('diagnostico')?.value;
+    const pei = document.getElementById('pei')?.checked ? 1 : 0;
+    const suporte = document.getElementById('suporte')?.value;
+
+    const responsavelNome = document.getElementById('responsavelNome')?.value.trim();
+    const parentesco = document.getElementById('parentesco')?.value;
+    const telefone = document.getElementById('telefone')?.value.trim();
+    const email = document.getElementById('email')?.value.trim();
+
+    // Validação básica
+    if (!studentName) {
+      alert('O campo Nome Completo do Aluno é obrigatório!');
       return;
     }
 
-<<<<<<< HEAD
-    saveStudent(student);
-    alert('Aluno cadastrado com sucesso!');
-    
-    
-    window.location.href = '../students/index.html';
-=======
+    // 3. MONTAGEM DO OBJETO DE DADOS (Compatível com o backend Node.js)
+    const payload = {
+      nome: studentName,
+      nascimento: birthDate || null,
+      matricula: matricula || null,
+      cpf: cpf || null,
+      turma: turma || null,
+      curso: curso || null,
+      anoLetivo: anoLetivo || null,
+      diagnostico: diagnostico || null,
+      pei: pei,
+      suporte: suporte || null,
+      responsavel: responsavelNome || null,
+      parentesco: parentesco || null,
+      telefone: telefone || null,
+      email: email || null
+    };
+
     try {
-      const response = await fetch(`${API_URL}/students`, {
+      // 4. ENVIO PARA O BACKEND VIA FETCH
+      const response = await fetch('http://localhost:3000/students', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(student)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
       if (response.ok) {
-        alert('Aluno cadastrado com sucesso!');
-       
-        window.location.href = '../deshboard/index.html';
-        return;
+        alert('✅ Aluno cadastrado com sucesso!');
+        studentForm.reset(); // Limpa o formulário após o envio
+        // Opcional: redirecionar para o dashboard
+        // window.location.href = "../deshboard/index.html";
+      } else {
+        alert(`❌ Erro ao cadastrar: ${data.error || 'Erro desconhecido'}`);
       }
-
-      alert(result.error || 'Erro ao cadastrar aluno.');
     } catch (error) {
-      console.error(error);
-      alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+      console.error('Erro na requisição:', error);
+      alert('⚠️ Não foi possível se conectar ao servidor Backend. Verifique se o servidor Node.js está rodando na porta 3000.');
     }
->>>>>>> e18d27e601234c2d5bf140e1551208a141c18e78
   });
-}
+});
