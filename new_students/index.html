@@ -20,13 +20,10 @@
 
             <form id="studentForm" class="registration-form">
 
-              
-
+                <!-- Dados Pessoais do Aluno -->
                 <div class="form-grid form-grid-2">
                     <label class="field">
                         <span>Nome Completo</span>
-
-
                         <input id="studentName" type="text" placeholder="Nome do aluno" />
                     </label>
                     <label class="field">
@@ -43,10 +40,10 @@
                     </label>
                 </div>
 
-
+                <!-- Seção: PDI -->
                 <div class="section-card">
                     <div class="section-heading">
-                        <strong>Plano de Desenvolvimento Individual (PDI) / PEI</strong>
+                        <strong>Plano de Desenvolvimento Individual (PDI)</strong>
                     </div>
                     <div class="form-grid">
                         <label class="field">
@@ -64,7 +61,28 @@
                     </div>
                 </div>
 
+                <!-- Nova Seção: PEI -->
+                <div class="section-card">
+                    <div class="section-heading">
+                        <strong>Plano Educacional Individualizado (PEI)</strong>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Adaptações Curriculares / Conteúdo</span>
+                            <textarea id="peiAdaptacoes" rows="3" placeholder="Quais modificações no currículo regular são necessárias?"></textarea>
+                        </label>
+                        <label class="field">
+                            <span>Metodologia e Recursos Acessíveis</span>
+                            <textarea id="peiMetodologia" rows="3" placeholder="Recursos visuais, tecnologia assistiva, tempo estendido, etc."></textarea>
+                        </label>
+                        <label class="field">
+                            <span>Metas e Prazos</span>
+                            <textarea id="peiMetas" rows="2" placeholder="Metas de curto, médio e longo prazo do PEI."></textarea>
+                        </label>
+                    </div>
+                </div>
 
+                <!-- Informações Escolares -->
                 <div class="section-card grid-three-columns">
                     <div class="section-heading">
                         <strong>Informações Escolares</strong>
@@ -87,10 +105,11 @@
                     </label>
                     <label class="field">
                         <span>Ano Letivo</span>
-                        <input id="anoLetivo" type="text" value="2024" />
+                        <input id="anoLetivo" type="text" value="2026" />
                     </label>
                 </div>
 
+                <!-- Informações de Inclusão -->
                 <div class="section-card">
                     <div class="section-heading">
                         <strong>Informações de Inclusão</strong>
@@ -105,7 +124,7 @@
                             </select>
                         </label>
                         <label class="field toggle-field">
-                            <span>Possui PEI?</span>
+                            <span>Possui PEI Ativo?</span>
                             <input id="pei" type="checkbox" />
                         </label>
                         <label class="field">
@@ -117,25 +136,14 @@
                             </select>
                         </label>
                     </div>
-                    <div class="form-grid form-grid-2">
-                        <label class="field">
-                            <span>Hiperfocos e Interesses</span>
-                            <input id="hiperfocos" type="text" placeholder="Astronomia, Trem, Matemática" />
-                        </label>
-                        <label class="field">
-                            <span>Gatilhos Emocionais</span>
-                            <input id="gatilhos" type="text" placeholder="Luz forte, barulho alto, mudança de rotina" />
-                        </label>
-                    </div>
-                    <label class="field">
-                        <span>Estratégias de Calma</span>
-                        <textarea id="estrategias" rows="3" placeholder="Ex: Espaço tranquilo, fones, descanso breve"></textarea>
-                    </label>
+                    
+                   
                 </div>
 
+                <!-- Dados do Responsável -->
                 <div class="section-card">
                     <div class="section-heading">
-                        <strong>Contatos dos Responsáveis</strong>
+                        <strong>Dados do Responsável</strong>
                     </div>
                     <div class="form-grid form-grid-2">
                         <label class="field">
@@ -148,7 +156,7 @@
                                 <option>Responsável</option>
                                 <option>Mãe</option>
                                 <option>Pai</option>
-                                <option>Avó</option>
+                                <option>Avó/Avô</option>
                             </select>
                         </label>
                         <label class="field">
@@ -162,6 +170,7 @@
                     </div>
                 </div>
 
+                <!-- Ações do Formulário -->
                 <div class="form-actions">
                     <div class="checkbox-field">
                         <input type="checkbox" id="confirm" />
