@@ -27,6 +27,9 @@
       <a href="#"><i class="fas fa-file-alt"></i> <span>Adaptações de Provas</span></a>
       <a href="#"><i class="fas fa-book"></i> <span>Plano de Apoio</span></a>
       <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
+      <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
+        <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
+      </a>
     </nav>
 
     <div class="profile">
@@ -209,5 +212,18 @@
   </main>
 
   <script src="script.js"></script>
+  
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userLogado = JSON.parse(localStorage.getItem('userLogado'));
+      const abaAdmin = document.getElementById('abaAdminMenu');
+
+      // Exibe a aba se a role for Admin e a matrícula for ADM2026
+      if (userLogado && (userLogado.role === 'Admin' || userLogado.matricula === 'ADM2026')) {
+        if (abaAdmin) abaAdmin.style.display = 'flex';
+      }
+    });
+  </script>
 </body>
 </html>
