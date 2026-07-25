@@ -1,341 +1,431 @@
+/* ============ VARIÁVEIS DO TEMA ============ */
+:root {
+  --primary: #1b66d2;
+  --primary-hover: #1557b8;
+  --primary-dark: #0b4fa8;
+  --primary-light: rgba(27, 102, 210, 0.08);
+  
+  --bg-page: #f5f7fb;
+  --bg-card: #ffffff;
+  --bg-input: #fdfdfd;
+  --bg-hover: #f8f9fa;
+  
+  --text-main: #2c3e50;
+  --text-muted: #555555;
+  --text-light: #777777;
+  
+  --border-color: #e5e7f0;
+  --border-input: #dcdfe6;
+  
+  --danger: #ef2b2b;
+  --danger-hover: #d32f2f;
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(27, 102, 210, 0.08);
+  --shadow-focus: 0 0 0 3px rgba(27, 102, 210, 0.15);
+  
+  --transition: all 0.2s ease-in-out;
+}
+
 /* ============ RESET E BASE ============ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-  }
-  
-  html, body {
-    width: 100%;
-    min-height: 100vh;
-    background-color: #f5f7fb;
-    color: #2c3e50;
-    line-height: 1.5;
-    overflow-x: hidden;
-  }
-  
-  /* ============ ESTRUTURA PRINCIPAL (TELA CHEIA) ============ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ============ ESTRUTURA PRINCIPAL (TELA CHEIA) ============ */
+.page-shell {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.registration-panel {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ============ CABEÇALHO DO PAINEL ============ */
+.panel-header {
+  background: linear-gradient(135deg, var(--primary-light) 0%, rgba(11, 79, 168, 0.02) 100%);
+  padding: 20px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.panel-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+/* ============ CARDS DE SEÇÃO ============ */
+.section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  transition: var(--transition);
+}
+
+.section-heading {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--bg-hover);
+}
+
+.section-heading strong {
+  font-size: 1.05rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ============ ESTRUTURA DE GRADES DO FORMULÁRIO ============ */
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ============ CAMPOS DE ENTRADA (INPUTS, SELECTS, TEXTAREAS) ============ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.field span,
+.field label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Incluído type="password" para padronizar as caixas de senha */
+.field input[type="text"],
+.field input[type="password"],
+.field input[type="email"],
+.field input[type="date"],
+.field input[type="tel"],
+.field input[type="number"],
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: var(--bg-input);
+  transition: var(--transition);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-focus);
+}
+
+.field input:disabled,
+.field select:disabled,
+.field textarea:disabled {
+  background-color: #f0f2f5;
+  color: var(--text-light);
+  cursor: not-allowed;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* FIELD TOGGLE / CHECKBOX SIMPLES */
+.toggle-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ============ CHECKBOX CONTAINER (SELEÇÃO DE ALUNOS) ============ */
+.checkbox-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--bg-input);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Scrollbar personalizada */
+.checkbox-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.checkbox-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.checkbox-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.checkbox-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ============ TABELA RESPONSIVA ============ */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.data-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table th, 
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--bg-hover);
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+  transition: var(--transition);
+}
+
+.data-table tbody tr:hover {
+  background-color: rgba(27, 102, 210, 0.02);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table td ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+/* ============ BOTÕES E AÇÕES ============ */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 10px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.buttons-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-primary, 
+.btn-secondary, 
+.btn-danger-small {
+  padding: 11px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(27, 102, 210, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: var(--text-main);
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.btn-danger-small {
+  background: var(--danger);
+  color: #ffffff;
+  padding: 6px 14px;
+  font-size: 0.775rem;
+}
+
+.btn-danger-small:hover {
+  background: var(--danger-hover);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============ REGRAS RESPONSIVAS ============ */
+@media (max-width: 768px) {
   .page-shell {
-    width: 100%;
-    min-height: 100vh;
-    padding: 20px 30px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .registration-panel {
-    width: 100%;
-    max-width: 1400px; /* Mantém legível em telas ultrawide */
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  /* ============ CABEÇALHO DO PAINEL ============ */
-  .panel-header {
-    background: linear-gradient(135deg, rgba(27, 102, 210, 0.08) 0%, rgba(11, 79, 168, 0.03) 100%);
-    padding: 20px 24px;
-    border-radius: 12px;
-    border: 1px solid #e5e7f0;
-  }
-  
-  .eyebrow {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #1b66d2;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  
-  .panel-header h1 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #1b66d2;
-  }
-  
-  /* ============ CARDS DE SEÇÃO ============ */
-  .section-card {
-    background: #ffffff;
-    border: 1px solid #e5e7f0;
-    border-radius: 12px;
-    padding: 22px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    width: 100%;
-  }
-  
-  .section-heading {
-    margin-bottom: 18px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #f0f3f7;
-  }
-  
-  .section-heading strong {
-    font-size: 1rem;
-    color: #1b66d2;
-    font-weight: 700;
-  }
-  
-  /* ============ ESTRUTURA DE GRADES DO FORMULÁRIO ============ */
-  .registration-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-  }
-  
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    width: 100%;
-  }
-  
-  .form-grid-2 {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  }
-  
-  .form-grid-3 {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-  
-  /* ============ CAMPOS DE ENTRADA (INPUTS, SELECTS, TEXTAREAS) ============ */
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-  }
-  
-  .field span {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #555555;
-  }
-  
-  .field input[type="text"],
-  .field input[type="email"],
-  .field input[type="date"],
-  .field input[type="tel"],
-  .field select,
-  .field textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #dcdfe6;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    color: #333;
-    background-color: #fdfdfd;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .field input:focus,
-  .field select:focus,
-  .field textarea:focus {
-    outline: none;
-    border-color: #1b66d2;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(27, 102, 210, 0.12);
-  }
-  
-  .field textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-  
-  /* FIELD TOGGLE / CHECKBOX */
-  .toggle-field {
-    justify-content: center;
-  }
-  
-  .toggle-field input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #1b66d2;
-    cursor: pointer;
-    margin-top: 4px;
-  }
-  
-  /* ============ CHECKBOX CONTAINER (SELEÇÃO DE ALUNOS) ============ */
-  .checkbox-container {
-    max-height: 180px;
-    overflow-y: auto;
-    border: 1px solid #dcdfe6;
-    border-radius: 8px;
     padding: 12px;
-    background: #fdfdfd;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
   }
-  
-  /* Scrollbar personalizada */
-  .checkbox-container::-webkit-scrollbar {
-    width: 6px;
+
+  .section-card {
+    padding: 16px;
   }
-  .checkbox-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
+
+  .form-grid, 
+  .form-grid-2, 
+  .form-grid-3 {
+    grid-template-columns: 1fr;
   }
-  
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.85rem;
-    color: #444;
-    cursor: pointer;
-  }
-  
-  .checkbox-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #1b66d2;
-    cursor: pointer;
-  }
-  
-  /* ============ TABELA RESPONSIVA ============ */
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid #e5e7f0;
-  }
-  
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-    background: #ffffff;
-    white-space: nowrap;
-  }
-  
-  .data-table th, 
-  .data-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #e5e7f0;
-  }
-  
-  .data-table th {
-    background: #f8f9fa;
-    color: #1b66d2;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-  }
-  
-  .data-table tbody tr:hover {
-    background-color: #f9fbfd;
-  }
-  
-  .data-table td ul {
-    padding-left: 16px;
-    margin: 0;
-  }
-  
-  /* ============ BOTÕES E AÇÕES ============ */
-  .form-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding-top: 10px;
-  }
-  
-  .checkbox-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: #555;
-  }
-  
-  .checkbox-field input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #1b66d2;
-  }
-  
+
   .buttons-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+    flex-direction: column;
+    width: 100%;
   }
-  
+
   .btn-primary, 
-  .btn-secondary, 
-  .btn-danger-small {
-    padding: 11px 20px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, #1b66d2 0%, #0b4fa8 100%);
-    color: #ffffff;
-    box-shadow: 0 3px 10px rgba(27, 102, 210, 0.2);
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px rgba(27, 102, 210, 0.3);
-  }
-  
   .btn-secondary {
-    background: #e5e7f0;
-    color: #444;
-    text-decoration: none;
+    width: 100%;
   }
-  
-  .btn-secondary:hover {
-    background: #d8dbe5;
-  }
-  
-  .btn-danger-small {
-    background: #ef2b2b;
-    color: #ffffff;
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  }
-  
-  .btn-danger-small:hover {
-    background: #d32f2f;
-  }
-  
-  /* ============ REGRAS DE RESPONSIVIDADE (MOBILE / TABLET) ============ */
-  @media (max-width: 768px) {
-    .page-shell {
-      padding: 12px;
-    }
-  
-    .section-card {
-      padding: 16px;
-    }
-  
-    .form-grid, 
-    .form-grid-2, 
-    .form-grid-3 {
-      grid-template-columns: 1fr; /* Força 1 coluna única no celular */
-    }
-  
-    .buttons-row {
-      flex-direction: column;
-      width: 100%;
-    }
-  
-    .btn-primary, 
-    .btn-secondary {
-      width: 100%;
-    }
-  }
+}

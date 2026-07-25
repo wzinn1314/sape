@@ -6,181 +6,216 @@
     <link rel="icon" href="../assets/foto.png">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
-    <title>Cadastro de Novo Aluno - SAPE</title>
+    <title>Cadastro do Aluno - SAPE</title>
 </head>
 <body>
+   
+
     <main class="page-shell">
         <section class="registration-panel">
             <header class="panel-header">
                 <div>
-                    <span class="eyebrow">Cadastrar Novo Aluno</span>
-                    <h1>Dados do aluno e inclusão escolar</h1>
+                    <span class="eyebrow">SAPE • Atendimento Educacional Especializado</span>
+                    <h1>Ficha de Inclusão do Aluno</h1>
                 </div>
             </header>
 
+            <!-- Menu de Abas para Navegação -->
+            <nav class="tabs-nav" aria-label="Seções do Formulário">
+                <button type="button" class="tab-btn active" data-tab="tab-pessoais">1. Dados Pessoais</button>
+                <button type="button" class="tab-btn" data-tab="tab-inclusao">2. Saúde & Laudos</button>
+                <button type="button" class="tab-btn" data-tab="tab-pei">3. PEI / PDI</button>
+                <button type="button" class="tab-btn" data-tab="tab-responsavel">4. Responsável</button>
+            </nav>
+
             <form id="studentForm" class="registration-form">
 
-                <!-- Dados Pessoais do Aluno -->
-                <div class="form-grid form-grid-2">
-                    <label class="field">
-                        <span>Nome Completo</span>
-                        <input id="studentName" type="text" placeholder="Nome do aluno" />
-                    </label>
-                    <label class="field">
-                        <span>Data de Nascimento</span>
-                        <input id="birthDate" type="date" />
-                    </label>
-                    <label class="field">
-                        <span>Matrícula</span>
-                        <input id="matricula" type="text" placeholder="Código ou número" />
-                    </label>
-                    <label class="field">
-                        <span>CPF</span>
-                        <input id="cpf" type="text" placeholder="000.000.000-00" />
-                    </label>
-                </div>
+                <!-- ABA 1: Dados Pessoais e Escolares -->
+                <div id="tab-pessoais" class="tab-content active">
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Identificação do Estudante</strong>
+                        </div>
+                        <div class="form-grid form-grid-2">
+                            <label class="field">
+                                <span>Nome Completo *</span>
+                                <input id="studentName" type="text" placeholder="Nome do aluno" required />
+                            </label>
+                            <label class="field">
+                                <span>Data de Nascimento *</span>
+                                <input id="birthDate" type="date" required />
+                            </label>
+                            <label class="field">
+                                <span>Matrícula *</span>
+                                <input id="matricula" type="text" placeholder="Código ou número" required />
+                            </label>
+                            <label class="field">
+                                <span>CPF</span>
+                                <input id="cpf" type="text" placeholder="000.000.000-00" />
+                            </label>
+                        </div>
+                    </div>
 
-                <!-- Seção: PDI -->
-                <div class="section-card">
-                    <div class="section-heading">
-                        <strong>Plano de Desenvolvimento Individual (PDI)</strong>
-                    </div>
-                    <div class="form-grid">
-                        <label class="field">
-                            <span>Objetivos Pedagógicos</span>
-                            <textarea id="pdiObjetivos" rows="3" placeholder="O que o aluno deve aprender?"></textarea>
-                        </label>
-                        <label class="field">
-                            <span>Estratégias de AEE</span>
-                            <textarea id="pdiEstrategias" rows="3" placeholder="Como o professor vai trabalhar?"></textarea>
-                        </label>
-                        <label class="field">
-                            <span>Critérios de Avaliação</span>
-                            <textarea id="pdiAvaliacao" rows="2" placeholder="Como medir o progresso?"></textarea>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Nova Seção: PEI -->
-                <div class="section-card">
-                    <div class="section-heading">
-                        <strong>Plano Educacional Individualizado (PEI)</strong>
-                    </div>
-                    <div class="form-grid">
-                        <label class="field">
-                            <span>Adaptações Curriculares / Conteúdo</span>
-                            <textarea id="peiAdaptacoes" rows="3" placeholder="Quais modificações no currículo regular são necessárias?"></textarea>
-                        </label>
-                        <label class="field">
-                            <span>Metodologia e Recursos Acessíveis</span>
-                            <textarea id="peiMetodologia" rows="3" placeholder="Recursos visuais, tecnologia assistiva, tempo estendido, etc."></textarea>
-                        </label>
-                        <label class="field">
-                            <span>Metas e Prazos</span>
-                            <textarea id="peiMetas" rows="2" placeholder="Metas de curto, médio e longo prazo do PEI."></textarea>
-                        </label>
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Informações Escolares</strong>
+                        </div>
+                        <div class="form-grid form-grid-3">
+                            <label class="field">
+                                <span>Turma</span>
+                                <select id="turma">
+                                    <option value="1">1º Ano</option>
+                                    <option value="2">2º Ano</option>
+                                    <option value="3">3º Ano</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>Curso</span>
+                                <select id="curso">
+                                    <option value="LOG">LOG - Logística</option>
+                                    <option value="TDS_A">TDS "A" - Des. Sistemas</option>
+                                    <option value="TDS_B">TDS "B" - Des. Sistemas</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>Ano Letivo</span>
+                                <input id="anoLetivo" type="text" value="2026" />
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Informações Escolares -->
-                <div class="section-card grid-three-columns">
-                    <div class="section-heading">
-                        <strong>Informações Escolares</strong>
+                <!-- ABA 2: Saúde, Inclusão e Laudos -->
+                <div id="tab-inclusao" class="tab-content">
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Diagnóstico e Suporte</strong>
+                        </div>
+                        <div class="form-grid form-grid-3">
+                            <label class="field">
+                                <span>Diagnóstico Formal (CID)</span>
+                                <select id="diagnostico">
+                                    <option value="TEA">TEA - Transtorno do Espectro Autista</option>
+                                    <option value="TDAH">TDAH - Transtorno do Déficit de Atenção/Hiperatividade</option>
+                                    <option value="Dislexia">Dislexia / Transtorno de Aprendizagem</option>
+                                    <option value="Deficiencia_Auditiva">Deficiência Auditiva</option>
+                                    <option value="Deficiencia_Visual">Deficiência Visual</option>
+                                    <option value="Outro">Outro / Em Investigação</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>Nível de Suporte (1 a 3)</span>
+                                <select id="suporte">
+                                    <option value="1">Nível 1 - Suporte Leve</option>
+                                    <option value="2">Nível 2 - Suporte Moderado</option>
+                                    <option value="3">Nível 3 - Suporte Substancial</option>
+                                </select>
+                            </label>
+                            <label class="field toggle-field">
+                                <span>Possui PEI Ativo?</span>
+                                <input id="peiAtivo" type="checkbox" checked />
+                            </label>
+                        </div>
                     </div>
-                    <label class="field">
-                        <span>Turma</span>
-                        <select id="turma">
-                            <option>3º Ano</option>
-                            <option>2º Ano</option>
-                            <option>1º Ano</option>
-                        </select>
-                    </label>
-                    <label class="field">
-                        <span>Curso</span>
-                        <select id="curso">
-                            <option>LOG</option>
-                            <option>TDS "A"</option>
-                            <option>TDS "B"</option>
-                        </select>
-                    </label>
-                    <label class="field">
-                        <span>Ano Letivo</span>
-                        <input id="anoLetivo" type="text" value="2026" />
-                    </label>
-                </div>
 
-                <!-- Informações de Inclusão -->
-                <div class="section-card">
-                    <div class="section-heading">
-                        <strong>Informações de Inclusão</strong>
-                    </div>
-                    <div class="form-grid form-grid-3">
-                        <label class="field">
-                            <span>Diagnóstico Formal</span>
-                            <select id="diagnostico">
-                                <option>TEA - Nível 1</option>
-                                <option>TDAH</option>
-                                <option>Dislexia</option>
-                            </select>
-                        </label>
-                        <label class="field toggle-field">
-                            <span>Possui PEI Ativo?</span>
-                            <input id="pei" type="checkbox" />
-                        </label>
-                        <label class="field">
-                            <span>Nível de Suporte</span>
-                            <select id="suporte">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                            </select>
-                        </label>
-                    </div>
-                    
-                   
-                </div>
-
-                <!-- Dados do Responsável -->
-                <div class="section-card">
-                    <div class="section-heading">
-                        <strong>Dados do Responsável</strong>
-                    </div>
-                    <div class="form-grid form-grid-2">
-                        <label class="field">
-                            <span>Nome Completo</span>
-                            <input id="responsavelNome" type="text" placeholder="Nome do responsável" />
-                        </label>
-                        <label class="field">
-                            <span>Parentesco</span>
-                            <select id="parentesco">
-                                <option>Responsável</option>
-                                <option>Mãe</option>
-                                <option>Pai</option>
-                                <option>Avó/Avô</option>
-                            </select>
-                        </label>
-                        <label class="field">
-                            <span>Telefone</span>
-                            <input id="telefone" type="tel" placeholder="(00) 00000-0000" />
-                        </label>
-                        <label class="field">
-                            <span>Email</span>
-                            <input id="email" type="email" placeholder="responsavel@email.com" />
-                        </label>
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Anexo de Laudos e Pareceres Médicos</strong>
+                        </div>
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Upload do Laudo (PDF ou Imagem)</span>
+                                <input type="file" id="laudoFile" accept=".pdf, .jpg, .png" />
+                            </label>
+                            <label class="field">
+                                <span>Observações Médicas / Alergias / Medicamentos</span>
+                                <textarea id="obsMedicas" rows="2" placeholder="Uso de medicação em horário escolar, sensibilidade sensorial, etc."></textarea>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Ações do Formulário -->
+                <!-- ABA 3: PEI e PDI Integrados -->
+                <div id="tab-pei" class="tab-content">
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Plano Educacional Individualizado (PEI / PDI)</strong>
+                        </div>
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Pontos Fortes & Interesses do Aluno</span>
+                                <textarea id="peiInteresses" rows="2" placeholder="O que motiva o aluno? Ex: Desenho, tecnologia, jogos..."></textarea>
+                            </label>
+                            <label class="field">
+                                <span>Objetivos Pedagógicos (Curto/Longo Prazo)</span>
+                                <textarea id="peiObjetivos" rows="3" placeholder="Quais habilidades o aluno deve desenvolver no semestre?"></textarea>
+                            </label>
+                            <label class="field">
+                                <span>Adaptações Curriculares e de Avaliação</span>
+                                <textarea id="peiAdaptacoes" rows="3" placeholder="Tempo estendido, provas simplificadas, recursos visuais, suporte de leitor..."></textarea>
+                            </label>
+                            <label class="field">
+                                <span>Estratégias de AEE na Sala de Recursos</span>
+                                <textarea id="pdiEstrategias" rows="2" placeholder="Atividades que serão realizadas no contraturno."></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 4: Responsável -->
+                <div id="tab-responsavel" class="tab-content">
+                    <div class="section-card">
+                        <div class="section-heading">
+                            <strong>Dados do Responsável Legal</strong>
+                        </div>
+                        <div class="form-grid form-grid-2">
+                            <label class="field">
+                                <span>Nome Completo *</span>
+                                <input id="responsavelNome" type="text" placeholder="Nome do responsável" required />
+                            </label>
+                            <label class="field">
+                                <span>Parentesco</span>
+                                <select id="parentesco">
+                                    <option value="Mãe">Mãe</option>
+                                    <option value="Pai">Pai</option>
+                                    <option value="Avó/Avô">Avó/Avô</option>
+                                    <option value="Tutor">Tutor Legal</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>Telefone / WhatsApp *</span>
+                                <input id="telefone" type="tel" placeholder="(00) 00000-0000" required />
+                            </label>
+                            <label class="field">
+                                <span>Email</span>
+                                <input id="email" type="email" placeholder="responsavel@email.com" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rodapé com Navegação Dinâmica por Etapas -->
                 <div class="form-actions">
                     <div class="checkbox-field">
-                        <input type="checkbox" id="confirm" />
-                        <label for="confirm">Declaro que as informações são verdadeiras.</label>
+                        <input type="checkbox" id="confirm" required />
+                        <label for="confirm">Declaro que as informações acima foram validadas com a equipe pedagógica.</label>
                     </div>
+                    
                     <div class="buttons-row">
-                        <button type="submit" class="btn-primary">Salvar Cadastro</button>
+                        <!-- Botão Voltar (inicia escondido na Aba 1) -->
+                        <button type="button" id="btnPrev" class="btn-secondary" style="display: none;">⬅ Voltar</button>
+                        
+                        <!-- Botão Cancelar -->
                         <button type="button" class="btn-secondary" onclick="window.location.href='../deshboard/index.html'">Cancelar</button>
+                        
+                        <!-- Botão Avançar (visível nas abas 1, 2 e 3) -->
+                        <button type="button" id="btnNext" class="btn-primary">Avançar ➔</button>
+                        
+                        <!-- Botão Salvar (visível apenas na última aba) -->
+                        <button type="submit" id="btnSubmit" class="btn-primary" style="display: none;">💾 Concluir e Salvar Cadastro</button>
                     </div>
                 </div>
+
             </form>
         </section>
     </main>
