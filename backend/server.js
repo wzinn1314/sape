@@ -61,7 +61,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         }
       });
 
-      // LIBERAÇÃO AUTOMÁTICA DE PROFESSORES JÁ CADASTRADOS (ex: Wallisson)
+      // LIBERAÇÃO AUTOMÁTICA DE PROFESSORES JÁ CADASTRADOS
       db.run("UPDATE user SET approved = 1, emailVerified = 1 WHERE LOWER(role) LIKE '%prof%' OR LOWER(role) LIKE '%teacher%'");
 
       // 2. Tabela de Tokens de Verificação de E-mail
@@ -107,6 +107,16 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         FOREIGN KEY (student_id) REFERENCES students (id)
       )`);
 
+      // 5. Tabela de Diário de Evolução / Atendimentos
+      db.run(`CREATE TABLE IF NOT EXISTS evolucoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER NOT NULL,
+        data TEXT NOT NULL,
+        relato TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+      )`);
+
       // ==========================================
       // SEMEADURA AUTOMÁTICA DO ADMINISTRADOR
       // ==========================================
@@ -121,19 +131,23 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         }
 
         if (!row) {
-          const hashedPassword = await bcrypt.hash(adminPassword, 10);
-          const queryAdmin = `
-            INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) 
-            VALUES (?, ?, ?, ?, ?, 1, 1)
-          `;
+          try {
+            const hashedPassword = await bcrypt.hash(adminPassword, 10);
+            const queryAdmin = `
+              INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) 
+              VALUES (?, ?, ?, ?, ?, 1, 1)
+            `;
 
-          db.run(queryAdmin, ['Administrador SAPE', adminEmail.toLowerCase(), hashedPassword, adminMatricula, 'Admin'], function (err) {
-            if (err) {
-              console.error('Erro ao criar usuário Admin padrão:', err.message);
-            } else {
-              console.log(`✅ Usuário Administrador padrão pronto! Matrícula/CPF: ${adminMatricula}`);
-            }
-          });
+            db.run(queryAdmin, ['Administrador SAPE', adminEmail.toLowerCase(), hashedPassword, adminMatricula, 'Admin'], function (insertErr) {
+              if (insertErr) {
+                console.error('Erro ao criar usuário Admin padrão:', insertErr.message);
+              } else {
+                console.log(`✅ Usuário Administrador padrão pronto! Matrícula/CPF: ${adminMatricula}`);
+              }
+            });
+          } catch (hashError) {
+            console.error('Erro ao gerar hash para o Admin padrão:', hashError);
+          }
         }
       });
     });
@@ -167,7 +181,6 @@ app.put('/users/:id/approve', (req, res) => {
 
   const isApproved = approved ? 1 : 0;
 
-  // Atualiza 'approved' e 'emailVerified' simultaneamente ao aprovar
   db.run(
     `UPDATE user 
      SET approved = ?, 
@@ -201,7 +214,6 @@ app.post('/register', async (req, res) => {
     const roleNormalized = (role || 'Aluno').trim();
     const roleLower = roleNormalized.toLowerCase();
 
-    // Professores, Alunos e Administradores cadastrados já entram liberados e aprovados
     const isTeacher = roleLower.includes('prof') || roleLower.includes('teacher');
     const isStudent = ['aluno', 'student'].includes(roleLower);
     const isAdmin = roleLower === 'admin';
@@ -252,7 +264,7 @@ app.get('/verify-email', (req, res) => {
 });
 
 // ==========================================
-// ROTA DE LOGIN (COM SUPORTE A TEXTO PURO E BCRYPT)
+// ROTA DE LOGIN
 // ==========================================
 app.post('/login', (req, res) => {
   const { email, matricula, password } = req.body;
@@ -270,7 +282,6 @@ app.post('/login', (req, res) => {
 
     let passwordMatches = false;
 
-    // 1. Tenta validar via bcrypt se já for um hash
     try {
       if (row.password.startsWith('$2b$') || row.password.startsWith('$2a$')) {
         passwordMatches = await bcrypt.compare(password, row.password);
@@ -279,10 +290,9 @@ app.post('/login', (req, res) => {
       passwordMatches = false;
     }
 
-    // 2. Se falhar, checa se a senha antiga estava em texto puro (ex: AdminSAPE2026)
+    // Suporte para migração de senhas antigas em texto plano
     if (!passwordMatches && row.password === password) {
       passwordMatches = true;
-      // Converte e criptografa a senha no banco automaticamente no primeiro acesso!
       try {
         const newHash = await bcrypt.hash(password, 10);
         db.run('UPDATE user SET password = ? WHERE id = ?', [newHash, row.id]);
@@ -297,13 +307,12 @@ app.post('/login', (req, res) => {
 
     const roleLower = (row.role || '').toLowerCase();
 
-    // Trava de verificação apenas para professores/usuários comuns
     if (roleLower.includes('prof') || roleLower.includes('teacher')) {
       if (!row.emailVerified) {
         return res.status(403).json({ error: 'E-mail não verificado. Por favor, valide seu e-mail.' });
       }
       if (!row.approved) {
-        return res.status(403).json({ error: 'Sua conta ainda pendente de aprovação por um administrador.' });
+        return res.status(403).json({ error: 'Sua conta ainda está pendente de aprovação por um administrador.' });
       }
     }
 
@@ -379,6 +388,48 @@ app.get('/students', (req, res) => {
     }));
 
     res.json(studentsFormatted);
+  });
+});
+
+// ATUALIZAR PDI / ESTRATÉGIAS DO ALUNO
+app.put('/students/:id/pdi', (req, res) => {
+  const { id } = req.params;
+  const { objetivos, estrategias } = req.body;
+
+  const query = `UPDATE students SET hiperfocos = ?, estrategias = ? WHERE id = ?`;
+  
+  db.run(query, [objetivos, estrategias, id], function (err) {
+    if (err) return res.status(500).json({ error: 'Erro ao atualizar PDI: ' + err.message });
+    res.json({ message: 'PDI atualizado com sucesso!' });
+  });
+});
+
+// REGISTRAR EVOLUÇÃO / ATENDIMENTO NO DIÁRIO
+app.post('/students/:id/evolucao', (req, res) => {
+  const { id } = req.params;
+  const { data, relato } = req.body;
+
+  if (!data || !relato) {
+    return res.status(400).json({ error: 'Data e relato são obrigatórios.' });
+  }
+
+  const query = `INSERT INTO evolucoes (student_id, data, relato) VALUES (?, ?, ?)`;
+  
+  db.run(query, [id, data, relato], function (err) {
+    if (err) return res.status(500).json({ error: 'Erro ao registrar evolução: ' + err.message });
+    res.status(201).json({ message: 'Evolução registrada com sucesso!', id: this.lastID });
+  });
+});
+
+// BUSCAR HISTÓRICO DE EVOLUÇÕES DO ALUNO
+app.get('/students/:id/evolucoes', (req, res) => {
+  const { id } = req.params;
+
+  const query = `SELECT * FROM evolucoes WHERE student_id = ? ORDER BY data DESC`;
+  
+  db.all(query, [id], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar evoluções: ' + err.message });
+    res.json(rows);
   });
 });
 

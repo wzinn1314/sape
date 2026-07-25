@@ -27,16 +27,28 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStudents();
   if (reportList) fetchReports();
 
-  // Buscar alunos no Banco SQLite
+  // Buscar alunos (FILTRADO POR PROFESSOR SE FOR PROFESSOR, TODOS SE FOR ADMIN)
   async function loadStudents() {
     try {
-      const response = await fetch(`${API_URL}/students`);
+      // 1. Pegar quem está logado do localStorage (definido no login)
+      const userJSON = localStorage.getItem("sape_user");
+      let endpoint = `${API_URL}/students`; // Default: Traz todos
+
+      if (userJSON) {
+        const user = JSON.parse(userJSON);
+        // Se for um usuário comum/professor (role: user), busca SÓ os alunos vinculados a ele
+        if (user.role === 'user' && user.id) {
+          endpoint = `${API_URL}/users/${user.id}/students`;
+        }
+      }
+
+      const response = await fetch(endpoint);
       if (!response.ok) throw new Error('Erro ao carregar alunos');
       
       const students = await response.json();
       
       if (students.length === 0) {
-        studentSelect.innerHTML = '<option value="">Nenhum aluno cadastrado no sistema</option>';
+        studentSelect.innerHTML = '<option value="">Nenhum aluno vinculado a você ou cadastrado.</option>';
         return;
       }
 
@@ -60,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const studentId = studentSelect.value;
       const selectedOption = studentSelect.options[studentSelect.selectedIndex];
       const studentName = selectedOption.getAttribute('data-name');
-      const disability = selectedOption.getAttribute('data-disability');
       
       const type = reportType.value;
       const content = reportContent.value.trim();
@@ -74,6 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Recuperar nome do professor logado (ou usar genérico se falhar)
+      let professorName = 'Professor Responsável';
+      const userJSON = localStorage.getItem("sape_user");
+      if (userJSON) {
+        const user = JSON.parse(userJSON);
+        professorName = user.name || professorName;
+      }
+
       btnSubmit.disabled = true;
       btnSubmit.innerHTML = '<i class="ph ph-spinner"></i> Enviando Relatório...';
 
@@ -85,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'REF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
         titulo: type || 'Relatório de Acompanhamento',
         aluno: studentName,
-        professor: 'Professor Responsável',
+        professor: professorName, // Salva o nome real do professor!
         data: currentDate,
         status: 'Finalizado',
         conteudo: fullReportText
@@ -95,13 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
       relatoriosLocais.unshift(novoRelatorio);
       localStorage.setItem('relatoriosSAPE', JSON.stringify(relatoriosLocais));
 
-      // 3. Salvar no Backend SQLite
+      // 3. Salvar no Backend SQLite (incluindo o id do professor se disponível)
       try {
+        let professorId = null;
+        if(userJSON) professorId = JSON.parse(userJSON).id;
+
         await fetch(`${API_URL}/reports`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             studentId: studentId,
+            userId: professorId, // Agora o relatório fica salvo atrelado ao professor no DB!
             pdfContent: fullReportText,
             fileName: `Relatorio_${studentName.replace(/\s+/g, '_')}.pdf`
           })
@@ -110,10 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Erro ao salvar no banco backend, mas salvo localmente:', err);
       }
 
-      // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML (Sem baixar PDF)
-      // Ajuste o caminho de acordo com a localização do formulário:
-      // - Se o formulário está em uma subpasta (ex: /pages/): '../report/index.html'
-      // - Se o formulário está na raiz do projeto: 'report/index.html'
+      // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML
       window.location.href = '../report/index.html'; 
     });
   }
@@ -122,7 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchReports() {
     if (!reportList) return;
     try {
-      const response = await fetch(`${API_URL}/reports`);
+      // Filtrar relatórios do usuário logado se ele não for admin
+      const userJSON = localStorage.getItem("sape_user");
+      let endpoint = `${API_URL}/reports`;
+      
+      if (userJSON) {
+         const user = JSON.parse(userJSON);
+         if (user.role === 'user' && user.id) {
+             endpoint = `${API_URL}/users/${user.id}/reports`;
+         }
+      }
+
+      const response = await fetch(endpoint);
       const reports = await response.json();
 
       if (!reports || reports.length === 0) {
