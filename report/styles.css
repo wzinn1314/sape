@@ -250,7 +250,7 @@ body {
 /* ================= CARDS ================= */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -506,6 +506,7 @@ body {
     .select-group { flex-direction: column; }
     .custom-select { width: 100%; }
     .main { padding: 15px 10px; }
+    .stats-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -523,6 +524,7 @@ body {
     margin-left: 60px;
     width: calc(100% - 60px);
     max-width: calc(100% - 60px);
+    padding: 12px 8px;
   }
   
   .logo-text, .menu span, .profile-info {
@@ -531,6 +533,65 @@ body {
   
   .menu-toggle {
     display: block !important;
+  }
+
+  .header-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+
+  .header-titles h1 {
+    font-size: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1.2rem;
+  }
+
+  .stat-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .filters-container {
+    padding: 1rem;
+  }
+
+  .table-card {
+    border-radius: 8px;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar {
+    width: 50px;
+    padding: 8px 4px;
+  }
+
+  .main {
+    margin-left: 50px;
+    width: calc(100% - 50px);
+    padding: 10px 6px;
+  }
+
+  .header-titles h1 {
+    font-size: 1.3rem;
+  }
+
+  .btn-new {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .custom-select {
+    min-width: 100%;
+    padding: 0.6rem 0.8rem;
   }
 }
 
@@ -549,22 +610,6 @@ body {
 
 .menu-toggle:hover {
   background: #e5e7f0;
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 70px;
-    padding: 12px 8px;
-  }
-  
-  .main {
-    margin-left: 70px;
-    width: calc(100% - 70px);
-  }
-  
-  .logo-text, .menu span, .profile-info {
-    display: none;
-  }
 }
 
 /* ============ LOADING STATE ============ */

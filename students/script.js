@@ -372,6 +372,76 @@ function openStudentModal(studentId) {
   const type = getCourseType(student);
   const initials = getInitials(student.name || student.nome || "Aluno");
 
+  // Mapeamento completo de campos do formulário para exibição no modal
+  const fieldsMapping = {
+    // Dados Pessoais
+    'studentName': { label: 'Nome Completo', value: student.name || student.nome || "Não informado" },
+    'birthDate': { label: 'Data de Nascimento', value: student.birthDate || student.data_nascimento || "Não informado" },
+    'matricula': { label: 'Matrícula', value: student.registration_number || student.matricula || "Não informado" },
+    'cpf': { label: 'CPF', value: student.cpf || "Não informado" },
+    'turma': { label: 'Turma', value: student.turma || student.gradeValue || "Não informado" },
+    'curso': { label: 'Curso', value: student.curso || "Não informado" },
+    'anoLetivo': { label: 'Ano Letivo', value: student.anoLetivo || "Não informado" },
+    
+    // Saúde e Diagnóstico
+    'diagnostico': { label: 'Diagnóstico Formal (CID)', value: student.diagnostico || "Não informado" },
+    'suporte': { label: 'Nível de Suporte', value: student.suporte || "Não informado" },
+    'peiAtivo': { label: 'PEI Ativo', value: student.peiAtivo ? "Sim" : "Não" },
+    'obsMedicas': { label: 'Observações Médicas', value: student.obsMedicas || "Não informado" },
+    
+    // PEI/PDI
+    'peiInteresses': { label: 'Pontos Fortes & Interesses', value: student.peiInteresses || "Não informado" },
+    'peiObjetivos': { label: 'Objetivos Pedagógicos', value: student.peiObjetivos || "Não informado" },
+    'peiAdaptacoes': { label: 'Adaptações Curriculares', value: student.peiAdaptacoes || "Não informado" },
+    'pdiEstrategias': { label: 'Estratégias de AEE', value: student.pdiEstrategias || "Não informado" },
+    
+    // Responsável
+    'responsavelNome': { label: 'Nome do Responsável', value: student.responsavelNome || "Não informado" },
+    'parentesco': { label: 'Parentesco', value: student.parentesco || "Não informado" },
+    'telefone': { label: 'Telefone', value: student.telefone || "Não informado" },
+    'email': { label: 'Email', value: student.email || "Não informado" },
+    
+    // Campos adicionais específicos
+    'hiperfocos': { label: 'Hiperfocos', value: student.hiperfocos || "Não informado" },
+    'estrategias': { label: 'Estratégias Recomendadas', value: student.estrategias || "Não informado" },
+    'gatilhos': { label: 'Gatilhos', value: student.gatilhos || "Não informado" }
+  };
+
+  // Construir HTML completo das informações
+  const buildInfoHTML = () => {
+    let html = '';
+    
+    // Agrupar informações por categoria
+    const categories = {
+      'Dados Pessoais': ['studentName', 'birthDate', 'matricula', 'cpf', 'turma', 'curso', 'anoLetivo'],
+      'Diagnóstico e Saúde': ['diagnostico', 'suporte', 'peiAtivo', 'obsMedicas'],
+      'PEI/PDI': ['peiInteresses', 'peiObjetivos', 'peiAdaptacoes', 'pdiEstrategias'],
+      'Responsável': ['responsavelNome', 'parentesco', 'telefone', 'email'],
+      'Informações Adicionais': ['hiperfocos', 'estrategias', 'gatilhos']
+    };
+
+    for (const [category, fieldKeys] of Object.entries(categories)) {
+      let hasContent = false;
+      let categoryHTML = `<div class="info-card"><h4><i class="fas fa-info-circle"></i> ${category}</h4>`;
+      
+      for (const key of fieldKeys) {
+        const field = fieldsMapping[key];
+        if (field && field.value && field.value !== "Não informado") {
+          hasContent = true;
+          categoryHTML += `<p><strong>${field.label}:</strong> ${field.value}</p>`;
+        }
+      }
+      
+      categoryHTML += '</div>';
+      
+      if (hasContent) {
+        html += categoryHTML;
+      }
+    }
+    
+    return html || '<div class="info-card"><p>Nenhuma informação detalhada disponível.</p></div>';
+  };
+
   const modalHTML = `
     <div class="modal active" id="studentModal">
       <div class="modal-content professional-modal">
@@ -394,20 +464,9 @@ function openStudentModal(studentId) {
 
         <!-- Painel Principal de Informações -->
         <div class="pro-modal-body">
-          <!-- Coluna da Esquerda -->
+          <!-- Coluna da Esquerda - Informações Completas -->
           <aside class="pro-sidebar-info">
-            <div class="info-card">
-              <h4><i class="fas fa-notes-medical"></i> Laudo e Diagnóstico</h4>
-              <p><strong>Condição:</strong> ${student.diagnostico || "Não informado"}</p>
-              <p><strong>Suporte:</strong> ${student.suporte || "Não informado"}</p>
-              <hr>
-              <p class="small-text"><i class="fas fa-shield-alt"></i> Dados protegidos conforme regulamentação pedagógica do SAPE.</p>
-            </div>
-
-            <div class="info-card highlight-card">
-              <h4><i class="fas fa-star"></i> Hiperfocos</h4>
-              <p>${student.hiperfocos || "Não informados"}</p>
-            </div>
+            ${buildInfoHTML()}
           </aside>
 
           <!-- Coluna da Direita -->
@@ -417,7 +476,7 @@ function openStudentModal(studentId) {
               <div class="pdi-box">
                 <div class="pdi-field">
                   <label>Estratégias Recomendadas:</label>
-                  <p>${student.estrategias || "Não informadas"}</p>
+                  <p>${student.estrategias || student.pdiEstrategias || "Não informadas"}</p>
                 </div>
                 <div class="pdi-field">
                   <label>Gatilhos:</label>
@@ -441,7 +500,6 @@ function openStudentModal(studentId) {
             <button class="btn-pro secondary" onclick="window.print()"><i class="fas fa-print"></i> Imprimir PEI / PDI</button>
             <a href="../report generation/index.html?alunoId=${student.id}" class="btn-pro primary"><i class="fas fa-plus"></i> Novo Relatório</a>
           </div>
-          <button class="btn-pro close" onclick="closeStudentModal()">Fechar Prontuário</button>
         </footer>
       </div>
     </div>

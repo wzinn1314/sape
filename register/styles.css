@@ -297,21 +297,78 @@ body {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 400px) {
+  .register-page {
+    padding: 12px;
+  }
+
   .register-card {
-    padding: 24px 16px;
+    padding: 24px 18px;
+    border-radius: 20px;
   }
 
   .logo {
-    width: 80px;
-    height: 80px;
+    width: 85px;
+    height: 85px;
+  }
+
+  .register-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .register-header p {
+    font-size: 0.9rem;
+  }
+
+  .info-block {
+    padding: 14px 16px;
+  }
+
+  .info-block p {
+    font-size: 0.9rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
   }
 
   .form-group input {
     height: 48px;
+    padding: 0 12px;
+    font-size: 0.9rem;
   }
 
   .button-link {
     height: 52px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .register-card {
+    padding: 20px 16px;
+  }
+
+  .logo {
+    width: 75px;
+    height: 75px;
+  }
+
+  .register-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .form-group input {
+    height: 46px;
+    font-size: 0.85rem;
+  }
+
+  .button-link {
+    height: 50px;
+    font-size: 0.95rem;
+  }
+
+  .checkbox-group {
+    font-size: 0.8rem;
   }
 }

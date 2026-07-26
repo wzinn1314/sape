@@ -696,6 +696,14 @@ button:disabled {
   .main {
     padding: 15px 10px;
   }
+
+  .registration-form {
+    padding: 24px 20px 32px;
+  }
+
+  .section-card {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -713,6 +721,7 @@ button:disabled {
     margin-left: 60px;
     width: calc(100% - 60px);
     max-width: calc(100% - 60px);
+    padding: 12px 8px;
   }
   
   .logo-text, .menu span, .profile-info {
@@ -721,6 +730,81 @@ button:disabled {
   
   .menu-toggle {
     display: block !important;
+  }
+
+  .page-shell {
+    padding: 12px 8px;
+  }
+
+  .registration-panel {
+    border-radius: 20px;
+  }
+
+  .panel-header {
+    padding: 24px 20px 12px;
+  }
+
+  .registration-form {
+    padding: 20px 16px 28px;
+  }
+
+  .section-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    padding-top: 20px;
+  }
+
+  .buttons-row {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .buttons-row button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar {
+    width: 50px;
+    padding: 8px 4px;
+  }
+
+  .main {
+    margin-left: 50px;
+    width: calc(100% - 50px);
+    padding: 10px 6px;
+  }
+
+  .panel-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .section-card {
+    padding: 14px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
 }
 
@@ -739,20 +823,4 @@ button:disabled {
 
 .menu-toggle:hover {
   background: #e5e7f0;
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 70px;
-    padding: 12px 8px;
-  }
-  
-  .main {
-    margin-left: 70px;
-    width: calc(100% - 70px);
-  }
-  
-  .logo-text, .menu span, .profile-info {
-    display: none;
-  }
 }

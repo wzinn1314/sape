@@ -558,6 +558,20 @@ input:focus, select:focus, textarea:focus {
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .form-card {
+    padding: 1.2rem;
+  }
+
+  .header-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+
+  .header-titles h1 {
+    font-size: 1.3rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -575,6 +589,7 @@ input:focus, select:focus, textarea:focus {
     margin-left: 60px;
     width: calc(100% - 60px);
     max-width: calc(100% - 60px);
+    padding: 12px 8px;
   }
   
   .logo-text, .menu span, .profile-info {
@@ -583,6 +598,79 @@ input:focus, select:focus, textarea:focus {
   
   .menu-toggle {
     display: block !important;
+  }
+
+  .container {
+    gap: 1rem;
+  }
+
+  .form-card {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .meta-info-bar {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .input-group label {
+    font-size: 0.85rem;
+  }
+
+  .input-wrapper input,
+  .input-wrapper select {
+    padding: 0.6rem 1rem 0.6rem 2.4rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-submit {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .report-item {
+    padding: 0.8rem;
+  }
+
+  .student-name {
+    font-size: 0.9rem;
+  }
+
+  .report-body {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar {
+    width: 50px;
+    padding: 8px 4px;
+  }
+
+  .main {
+    margin-left: 50px;
+    width: calc(100% - 50px);
+    padding: 10px 6px;
+  }
+
+  .header-left {
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+
+  .header-titles h1 {
+    font-size: 1.1rem;
+  }
+
+  .header-titles p {
+    font-size: 0.85rem;
   }
 }
 
@@ -601,20 +689,4 @@ input:focus, select:focus, textarea:focus {
 
 .menu-toggle:hover {
   background: #e5e7f0;
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 70px;
-    padding: 12px 8px;
-  }
-  
-  .main {
-    margin-left: 70px;
-    width: calc(100% - 70px);
-  }
-  
-  .logo-text, .menu span, .profile-info {
-    display: none;
-  }
 }

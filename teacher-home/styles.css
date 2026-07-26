@@ -118,7 +118,7 @@ body {
 
 /* STATS CARDS */
 .stats-cards {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 24px; margin-bottom: 32px;
 }
 
@@ -421,10 +421,11 @@ body {
     transform: translateX(0);
   }
   .sidebar.collapsed { transform: translateX(-100%); }
-  .main { margin-left: 70px; width: calc(100% - 70px); }
+  .main { margin-left: 70px; width: calc(100% - 70px); padding: 24px 16px; }
   .stats-cards { grid-template-columns: 1fr; }
   .card { padding: 16px; }
   .header-greeting h1 { font-size: 1.5rem; }
+  .box { padding: 20px; }
 }
 
 @media (max-width: 480px) {
@@ -432,12 +433,26 @@ body {
     width: 60px; 
     padding: 10px 4px;
   }
-  .main { margin-left: 60px; width: calc(100% - 60px); }
+  .main { margin-left: 60px; width: calc(100% - 60px); padding: 20px 12px; }
   .top-header { flex-direction: column; align-items: flex-start; gap: 10px; }
   .header-date { font-size: 0.85rem; }
   .card { padding: 12px; }
   .card-number { font-size: 1.8rem; }
   .menu-toggle { display: block !important; }
+  .box { padding: 16px; }
+  .box-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .quick-actions { gap: 10px; }
+  .action-card { padding: 12px; }
+  .action-icon { width: 40px; height: 40px; font-size: 1rem; }
+}
+
+@media (max-width: 360px) {
+  .sidebar { width: 50px; padding: 8px 4px; }
+  .main { margin-left: 50px; width: calc(100% - 50px); padding: 16px 10px; }
+  .stats-cards { gap: 16px; }
+  .card { padding: 10px; }
+  .card-number { font-size: 1.5rem; }
+  .card-label { font-size: 0.75rem; }
 }
 
 /* Menu Toggle Button */
