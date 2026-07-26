@@ -5,80 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gerador de Relatórios - AEE / SAPE</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-  <div class="container">
-    <header class="header">
-      <i class="ph ph-note-pencil icon-header"></i>
-      <h1>Gerador de Relatórios Pedagógicos</h1>
-      <p>Preencha as observações do aluno com deficiência para gerar o PDF e registrar no sistema.</p>
+  <!-- SIDEBAR DE NAVEGAÇÃO (MANTIDA ORIGINAL) -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/foto.png" alt="Logo SAPE">
+      <div>
+        <span>SAPE</span>
+        <p>Suporte e Acolhimento</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="../teacher-home/index.html" id="menuHome" style="display: none;"><i class="fas fa-home"></i> <span>Início</span></a>
+      <a href="../deshboard/index.html" id="menuDashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
+      <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
+      <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+      <a class="active" href="../report generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
+      <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
+      <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
+        <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
+      </a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div>
+        <strong id="professorName">Prof. Amanda</strong>
+        <span id="userType">Professora</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="main">
+    <header class="top-header">
+      <button class="menu-toggle" id="menuToggle" style="display: none;">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="header-left">
+        <div class="header-icon">
+          <i class="ph ph-note-pencil"></i>
+        </div>
+        <div class="header-titles">
+          <h1>Gerador de Relatórios Pedagógicos</h1>
+          <p>Preencha as observações do aluno com deficiência para gerar o PDF e registrar no sistema.</p>
+        </div>
+      </div>
     </header>
 
-    <form id="reportForm" class="form-card">
-      
-      <!-- Cabeçalho Automático com Data e Hora -->
-      <div class="meta-info-bar">
-        <span><i class="ph ph-calendar"></i> Data: <strong id="currentDate">--/--/----</strong></span>
-        <span><i class="ph ph-clock"></i> Hora: <strong id="currentTime">--:--</strong></span>
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state" style="display: none;">
+        <div class="spinner"></div>
+        <span>Processando relatório...</span>
       </div>
 
-      <!-- Seleção do Aluno -->
-      <div class="input-group">
-        <label for="studentSelect">Aluno </label>
-        <div class="input-wrapper">
-          <i class="ph ph-user-focus"></i>
-          <select id="studentSelect" required>
-            <option value="">Carregando alunos do banco...</option>
-          </select>
+      <form id="reportForm" class="form-card">
+        
+        <!-- Cabeçalho Automático com Data e Hora -->
+        <div class="meta-info-bar">
+          <span><i class="ph ph-calendar"></i> Data: <strong id="currentDate">--/--/----</strong></span>
+          <span><i class="ph ph-clock"></i> Hora: <strong id="currentTime">--:--</strong></span>
         </div>
-      </div>
 
-      <!-- Tipo de Relatório -->
-      <div class="input-group">
-        <label for="reportType">Tipo de Relatório *</label>
-        <div class="input-wrapper">
-          <i class="ph ph-tag"></i>
-          <select id="reportType" required>
-            <option value="Acompanhamento AEE">Acompanhamento AEE</option>
-            <option value="Plano de Desenvolvimento Individual (PDI)">Plano de Desenvolvimento Individual (PDI)</option>
-            <option value="Avaliação Diagnóstica Inclusiva">Avaliação Diagnóstica Inclusiva</option>
-            <option value="Parecer Pedagógico Semestral">Parecer Pedagógico Semestral</option>
-          </select>
+        <!-- Seleção do Aluno -->
+        <div class="input-group">
+          <label for="studentSelect">Aluno *</label>
+          <div class="input-wrapper">
+            <i class="ph ph-user-focus"></i>
+            <select id="studentSelect" required>
+              <option value="">Carregando alunos do banco...</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <!-- Corpo do Relatório / Observações -->
-      <div class="input-group">
-        <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
-        <textarea 
-          id="reportContent" 
-          rows="6" 
-          placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
-          required
-        ></textarea>
-      </div>
+        <!-- Tipo de Relatório -->
+        <div class="input-group">
+          <label for="reportType">Tipo de Relatório *</label>
+          <div class="input-wrapper">
+            <i class="ph ph-tag"></i>
+            <select id="reportType" required>
+              <option value="Acompanhamento AEE">Acompanhamento AEE</option>
+              <option value="Plano de Desenvolvimento Individual (PDI)">Plano de Desenvolvimento Individual (PDI)</option>
+              <option value="Avaliação Diagnóstica Inclusiva">Avaliação Diagnóstica Inclusiva</option>
+              <option value="Parecer Pedagógico Semestral">Parecer Pedagógico Semestral</option>
+            </select>
+          </div>
+        </div>
 
-      <!-- Encaminhamentos / Recomendações -->
-      <div class="input-group">
-        <label for="reportRecommendations">Encaminhamentos e Recomendações (Opcional)</label>
-        <textarea 
-          id="reportRecommendations" 
-          rows="3" 
-          placeholder="Ex: Adaptação de material, encaminhamento para fonoaudiologia, adequação curricular..."
-        ></textarea>
-      </div>
+        <!-- Corpo do Relatório / Observações -->
+        <div class="input-group">
+          <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
+          <textarea 
+            id="reportContent" 
+            rows="6" 
+            placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
+            required
+          ></textarea>
+        </div>
 
-      <!-- Botão para Gerar PDF e Salvar -->
-      <button type="submit" id="btnSubmit" class="btn-submit">
-        <i class="ph ph-file-pdf"></i>
-        Salvar Relatório
-      </button>
-    </form>
+        <!-- Encaminhamentos / Recomendações -->
+        <div class="input-group">
+          <label for="reportRecommendations">Encaminhamentos e Recomendações (Opcional)</label>
+          <textarea 
+            id="reportRecommendations" 
+            rows="3" 
+            placeholder="Ex: Adaptação de material, encaminhamento para fonoaudiologia, adequação curricular..."
+          ></textarea>
+        </div>
 
+        <!-- Botão para Gerar PDF e Salvar -->
+        <button type="submit" id="btnSubmit" class="btn-submit">
+          <i class="ph ph-file-pdf"></i>
+          Salvar Relatório
+        </button>
+      </form>
+    </div>
 
-  <script src="script.js"></script>
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>

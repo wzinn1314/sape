@@ -1,5 +1,5 @@
 /**
- * SISTEMA SAPE - LÓGICA CORE DO DASHBOARD (REFATORADO COM JWT)
+ * SISTEMA SAPE - TELA DE INÍCIO DO PROFESSOR AEE
  */
 
 const SAPE_CONFIG = {
@@ -41,26 +41,6 @@ function validateAccess() {
   try {
     const user = JSON.parse(userJson);
     
-    // Lógica de Administrador - esconder itens de menu para professores
-    const abaAdmin = document.getElementById('abaAdminMenu');
-    const menuNovoAluno = document.querySelector('a[href="../new_students/index.html"]');
-    const menuDashboard = document.querySelector('a[href="../deshboard/index.html"]');
-    
-    if (abaAdmin) {
-      const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
-      abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
-    }
-    
-    // Esconder "Novo Aluno" para professores
-    if (menuNovoAluno) {
-      const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
-      menuNovoAluno.style.display = hasPrivileges ? 'flex' : 'none';
-    }
-
     // Identificar tipo de usuário para adaptar interface (sem redirecionamento)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
@@ -100,10 +80,10 @@ function setupUI(user) {
       date: document.getElementById('currentDate')
   };
 
-  if (elements.name) elements.name.textContent = user.nome || user.name || "Usuário";
+  if (elements.name) elements.name.textContent = user.nome || user.name || "Professor";
   if (elements.greeting) elements.greeting.textContent = (user.nome || user.name || "Colega").split(' ')[0];
-  if (elements.type) elements.type.textContent = user.role || "Docente";
-  if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "US");
+  if (elements.type) elements.type.textContent = user.role || "Professor AEE";
+  if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "PR");
 
   // Data por extenso
   if (elements.date) {
@@ -114,17 +94,17 @@ function setupUI(user) {
   animateEntry();
 }
 
-// --- CARREGAMENTO DE DADOS (DASHBOARD REAL) ---
+// --- CARREGAMENTO DE DADOS (DASHBOARD DO PROFESSOR) ---
 async function renderDashboardData() {
   try {
-    // Carregar dados reais do banco de dados
-    const [studentsResponse, reportsResponse, usersResponse] = await Promise.all([
-      fetch(`${SAPE_CONFIG.API_URL}/students`, { headers: getAuthHeaders() }),
-      fetch(`${SAPE_CONFIG.API_URL}/reports`, { headers: getAuthHeaders() }),
-      fetch(`${SAPE_CONFIG.API_URL}/users`, { headers: getAuthHeaders() })
-    ]);
+    const user = JSON.parse(localStorage.getItem(SAPE_CONFIG.STORAGE_KEY) || "{}");
+    
+    // Carregar alunos vinculados ao professor
+    const studentsResponse = await fetch(`${SAPE_CONFIG.API_URL}/users/${user.id}/students`, {
+      headers: getAuthHeaders()
+    });
 
-    if (studentsResponse.status === 401 || reportsResponse.status === 401 || usersResponse.status === 401) {
+    if (studentsResponse.status === 401) {
       showToast("Sessão expirada. Faça login novamente.", "error");
       setTimeout(() => {
         window.location.href = '../login/index.html';
@@ -132,56 +112,64 @@ async function renderDashboardData() {
       return;
     }
 
-    const students = await studentsResponse.json();
-    const reports = await reportsResponse.json();
-    const users = await usersResponse.json();
-
-    const studentsArray = Array.isArray(students) ? students : (students.data || []);
-    const reportsArray = Array.isArray(reports) ? reports : (reports.data || []);
-    const usersArray = Array.isArray(users) ? users : (users.data || []);
-
-    // Filtrar apenas professores de AEE
-    const teachers = usersArray.filter(u => {
-      const role = (u.role || '').toLowerCase();
-      return role.includes('prof') || role.includes('teacher') || role.includes('aee');
+    if (!studentsResponse.ok) throw new Error("Server Error");
+    
+    const linkedStudents = await studentsResponse.json();
+    
+    // Carregar relatórios do professor
+    const reportsResponse = await fetch(`${SAPE_CONFIG.API_URL}/users/${user.id}/reports`, {
+      headers: getAuthHeaders()
     });
 
-    const data = {
-      total: studentsArray.length,
-      recent: studentsArray.slice(-5).reverse(),
-      reports: reportsArray.length,
-      teachers: teachers.length,
-      students: studentsArray
+    if (reportsResponse.status === 401) {
+      showToast("Sessão expirada. Faça login novamente.", "error");
+      setTimeout(() => {
+        window.location.href = '../login/index.html';
+      }, 2000);
+      return;
+    }
+
+    const reports = reportsResponse.ok ? await reportsResponse.json() : [];
+    
+    // Montar dados do dashboard
+    const dashboardData = {
+      linkedStudents: linkedStudents,
+      reports: reports,
+      totalStudents: linkedStudents.length,
+      completedReports: reports.length
     };
     
-    updateStats(data);
-    renderRecentList(data.recent);
-    updateDiagnosisStats(data.students);
-    updateSystemStatus(true);
+    updateStats(dashboardData);
+    renderLinkedStudents(dashboardData.linkedStudents);
+    renderAttentionStudents(dashboardData.linkedStudents, dashboardData.reports);
+    renderRecentReports(dashboardData.reports);
 
   } catch (err) {
-    console.warn("SAPE Dashboard: Erro ao carregar dados da API.", err);
-    showToast("Erro ao carregar dados do dashboard. Verifique sua conexão.", "error");
-    updateSystemStatus(false);
+    console.warn("SAPE Dashboard: Erro ao carregar dados da API.");
+    showToast("Erro ao carregar dados. Verifique sua conexão.", "error");
   }
 }
 
 function updateStats(data) {
-  const totalEl = document.getElementById('totalStudents');
-  const reportsEl = document.getElementById('totalReports');
-  const teachersEl = document.getElementById('totalTeachers');
+  const totalStudentsEl = document.getElementById('totalStudents');
+  const completedReportsEl = document.getElementById('completedReports');
+  const pendingReportsEl = document.getElementById('pendingReports');
   
-  if (totalEl) totalEl.textContent = data.total || '0';
-  if (reportsEl) reportsEl.textContent = data.reports || '0';
-  if (teachersEl) teachersEl.textContent = data.teachers || '0';
+  if (totalStudentsEl) totalStudentsEl.textContent = data.totalStudents || '0';
+  if (completedReportsEl) completedReportsEl.textContent = data.completedReports || '0';
+  
+  // Calcular alunos sem relatório (alunos totais - alunos com relatório)
+  const studentsWithReports = new Set(data.reports.map(r => r.student_id)).size;
+  const pendingCount = data.totalStudents - studentsWithReports;
+  if (pendingReportsEl) pendingReportsEl.textContent = pendingCount > 0 ? pendingCount : '0';
 }
 
-function renderRecentList(students) {
-  const container = document.getElementById('recentStudentsList');
+function renderLinkedStudents(students) {
+  const container = document.getElementById('linkedStudentsList');
   if (!container) return;
 
   if (!students || students.length === 0) {
-      container.innerHTML = '<p class="text-muted text-center py-4">Nenhum registro encontrado.</p>';
+      container.innerHTML = '<p class="text-muted text-center py-4">Você não tem alunos vinculados ainda.</p>';
       return;
   }
 
@@ -191,74 +179,57 @@ function renderRecentList(students) {
               <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
               <div class="record-meta">${aluno.turma || 'Sem turma'} • ${aluno.curso || 'Sem curso'}</div>
           </div>
-          <div class="status-pill">${formatarDataRelativa(aluno.created_at)}</div>
+          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn">
+              <i class="fas fa-file-medical"></i>
+          </a>
       </div>
   `).join('');
 }
 
-function updateDiagnosisStats(students) {
-  const container = document.getElementById('diagnosisStats');
-  if (!container || !students || students.length === 0) {
-    if (container) container.innerHTML = '<div class="loading-state">Nenhum dado disponível</div>';
-    return;
-  }
-
-  // Contar diagnósticos
-  const diagnosisCount = {};
-  students.forEach(student => {
-    const diagnosis = (student.diagnostico || 'Não informado').toLowerCase();
-    diagnosisCount[diagnosis] = (diagnosisCount[diagnosis] || 0) + 1;
-  });
-
-  const total = students.length;
-  const sortedDiagnoses = Object.entries(diagnosisCount)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5); // Top 5 diagnósticos
-
-  if (sortedDiagnoses.length === 0) {
-    container.innerHTML = '<div class="loading-state">Nenhum diagnóstico registrado</div>';
-    return;
-  }
-
-  container.innerHTML = sortedDiagnoses.map(([diagnosis, count]) => {
-    const percentage = Math.round((count / total) * 100);
-    return `
-      <div class="analytics-item">
-        <div class="analytics-label-row">
-          <span>${diagnosis.charAt(0).toUpperCase() + diagnosis.slice(1)}</span>
-          <span>${count} (${percentage}%)</span>
-        </div>
-        <div class="analytics-bar">
-          <div class="analytics-progress" style="width: ${percentage}%"></div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function updateSystemStatus(isOnline) {
-  const container = document.getElementById('systemStatus');
+function renderAttentionStudents(students, reports) {
+  const container = document.getElementById('attentionStudentsList');
   if (!container) return;
 
-  if (isOnline) {
-    container.innerHTML = `
-      <div class="aviso-item aviso-green">
-        <div class="aviso-content">
-          <strong>Sistema Online</strong>
-          <p>Conexão com banco de dados estabelecida.</p>
-        </div>
-      </div>
-    `;
-  } else {
-    container.innerHTML = `
-      <div class="aviso-item aviso-red">
-        <div class="aviso-content">
-          <strong>Sistema Offline</strong>
-          <p>Não foi possível conectar ao banco de dados.</p>
-        </div>
-      </div>
-    `;
+  // Encontrar alunos sem relatório
+  const studentsWithReports = new Set(reports.map(r => r.student_id));
+  const studentsWithoutReports = students.filter(s => !studentsWithReports.has(s.id));
+
+  if (!studentsWithoutReports || studentsWithoutReports.length === 0) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Todos os alunos têm relatórios recentes.</p>';
+      return;
   }
+
+  container.innerHTML = studentsWithoutReports.slice(0, 5).map(aluno => `
+      <div class="record-item attention">
+          <div class="record-info">
+              <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
+              <div class="record-meta">Sem relatório recente</div>
+          </div>
+          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn urgent">
+              <i class="fas fa-exclamation-circle"></i>
+          </a>
+      </div>
+  `).join('');
+}
+
+function renderRecentReports(reports) {
+  const container = document.getElementById('recentReportsList');
+  if (!container) return;
+
+  if (!reports || reports.length === 0) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Nenhum relatório realizado ainda.</p>';
+      return;
+  }
+
+  container.innerHTML = reports.slice(0, 5).map(report => `
+      <div class="record-item">
+          <div class="record-info">
+              <div class="record-name">${report.titulo || 'Relatório'}</div>
+              <div class="record-meta">${report.aluno || 'Aluno'} • ${formatarDataRelativa(report.created_at)}</div>
+          </div>
+          <span class="status-pill success">Concluído</span>
+      </div>
+  `).join('');
 }
 
 // --- UTILITÁRIOS ---
@@ -291,11 +262,6 @@ function animateEntry() {
 }
 
 function setupEventListeners() {
-  // Listener de atalhos de teclado
-  document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.key === 'm') console.log("Atalho acionado");
-  });
-
   // Listener do botão de logout
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {

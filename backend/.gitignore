@@ -1,4 +1,6 @@
+node_modules/
 .env
 sapedb.sqlite
-query
-node_modules
+*.log
+.DS_Store
+.en
