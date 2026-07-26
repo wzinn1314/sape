@@ -124,6 +124,15 @@ async function loadReports() {
 
     const data = await response.json();
     allReports = Array.isArray(data) ? data : (data.data || []);
+    
+    // Também carregar relatórios do localStorage e combinar
+    const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+    
+    // Combinar relatórios do backend com locais, evitando duplicatas pelo ID
+    const existingIds = new Set(allReports.map(r => r.id));
+    const newLocalReports = localReports.filter(r => !existingIds.has(r.id));
+    
+    allReports = [...newLocalReports, ...allReports];
     filteredReports = [...allReports];
     
   } catch (error) {
@@ -307,13 +316,13 @@ function renderReports() {
           <i class="fa-solid fa-file-pdf"></i>
           <div>
             <strong>${report.titulo || 'Sem título'}</strong>
-            <span>${report.id || 'REF-' + report.id}</span>
+            <span>${report.id || 'REF-' + (report.id || 'unknown')}</span>
           </div>
         </div>
       </td>
-      <td>${report.aluno || 'Não informado'}</td>
-      <td>${report.professor || 'Não informado'}</td>
-      <td>${formatDate(report.created_at)}</td>
+      <td>${report.aluno || report.studentName || 'Não informado'}</td>
+      <td>${report.professor || report.professorName || 'Não informado'}</td>
+      <td>${formatDate(report.created_at || report.data)}</td>
       <td><span class="status-badge status-finalizado">${report.status || 'Finalizado'}</span></td>
       <td>
         <div class="report-buttons">
@@ -383,7 +392,7 @@ function updateStats() {
 }
 
 function formatDate(dateString) {
-  if (!DateString) return 'Não informado';
+  if (!dateString) return 'Não informado';
   const date = new Date(dateString);
   return date.toLocaleDateString('pt-BR');
 }
@@ -392,17 +401,60 @@ function formatDate(dateString) {
 function visualizarRelatorio(id) {
   const report = allReports.find(r => r.id == id);
   if (report) {
-    // Em um sistema real, isso abriria o PDF ou um modal
-    showToast(`Visualizando relatório: ${report.titulo}`, 'info');
-    // Aqui você pode implementar a lógica de visualização
+    // Criar modal simples para visualizar o conteúdo
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+      z-index: 10000;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white; padding: 30px; border-radius: 12px; max-width: 600px;
+      max-height: 80vh; overflow-y: auto; width: 90%;
+    `;
+    
+    modalContent.innerHTML = `
+      <h2 style="margin-bottom: 15px;">${report.titulo || 'Relatório'}</h2>
+      <p><strong>Aluno:</strong> ${report.aluno || report.studentName || 'Não informado'}</p>
+      <p><strong>Professor:</strong> ${report.professor || report.professorName || 'Não informado'}</p>
+      <p><strong>Data:</strong> ${formatDate(report.created_at || report.data)}</p>
+      <hr style="margin: 15px 0;">
+      <pre style="white-space: pre-wrap; font-family: inherit;">${report.conteudo || 'Sem conteúdo'}</pre>
+      <button onclick="this.closest('.modal').remove()" style="margin-top: 20px; padding: 10px 20px; background: #1b66d2; color: white; border: none; border-radius: 6px; cursor: pointer;">Fechar</button>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  } else {
+    showToast('Relatório não encontrado', 'error');
   }
 }
 
 function baixarRelatorio(id) {
   const report = allReports.find(r => r.id == id);
   if (report) {
+    // Criar arquivo texto para download
+    const content = report.conteudo || `${report.titulo}\n\nAluno: ${report.aluno || report.studentName}\nProfessor: ${report.professor || report.professorName}\nData: ${formatDate(report.created_at || report.data)}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Relatorio_${report.aluno || report.studentName || 'aluno'}_${formatDate(report.created_at || report.data)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
     showToast(`Baixando relatório: ${report.titulo}`, 'success');
-    // Aqui você pode implementar a lógica de download
+  } else {
+    showToast('Relatório não encontrado', 'error');
   }
 }
 
@@ -410,6 +462,7 @@ async function deletarRelatorio(id) {
   if (!confirm('Deseja realmente excluir este relatório?')) return;
 
   try {
+    // Tentar deletar do backend
     const response = await fetch(`${API_URL}/reports/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
@@ -423,17 +476,33 @@ async function deletarRelatorio(id) {
       return;
     }
 
+    // Deletar do localStorage independente da resposta do backend
+    const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+    const updatedLocalReports = localReports.filter(r => r.id !== id);
+    localStorage.setItem('relatoriosSAPE', JSON.stringify(updatedLocalReports));
+
     if (response.ok) {
       showToast('Relatório excluído com sucesso!', 'success');
-      await loadReports();
-      applyFilters();
-      updateStats();
     } else {
-      showToast('Erro ao excluir relatório.', 'error');
+      showToast('Relatório excluído localmente. Erro ao excluir do servidor.', 'warning');
     }
+    
+    await loadReports();
+    applyFilters();
+    updateStats();
   } catch (error) {
     console.error('Erro ao excluir relatório:', error);
-    showToast('Erro ao excluir relatório. Verifique sua conexão.', 'error');
+    
+    // Ainda tentar deletar do localStorage mesmo com erro
+    const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+    const updatedLocalReports = localReports.filter(r => r.id !== id);
+    localStorage.setItem('relatoriosSAPE', JSON.stringify(updatedLocalReports));
+    
+    await loadReports();
+    applyFilters();
+    updateStats();
+    
+    showToast('Relatório excluído localmente. Erro ao excluir do servidor.', 'warning');
   }
 }
 
@@ -584,4 +653,13 @@ function getToastIcon(type) {
     info: 'fas fa-info-circle'
   };
   return icons[type] || icons.info;
+}
+
+// Menu toggle para mobile
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+if (menuToggle && sidebar) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
 }

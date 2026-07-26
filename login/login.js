@@ -65,8 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok && data.success) {
           // Salva os dados do usuário logado e token JWT
-          localStorage.setItem('userLogado', JSON.stringify(data.data.user));
-          localStorage.setItem('user', JSON.stringify(data.data.user));
+          localStorage.setItem('sape_user', JSON.stringify(data.data.user));
           localStorage.setItem('sape_token', data.data.token);
 
           showToast('Login realizado com sucesso! Redirecionando...', 'success');

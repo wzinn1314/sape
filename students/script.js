@@ -587,6 +587,15 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+// Menu toggle para mobile
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+if (menuToggle && sidebar) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+}
+
 window.addEventListener("load", async () => {
   if (checkAuth()) {
     loadUserProfile();

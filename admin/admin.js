@@ -417,11 +417,14 @@ function renderTabelaVinculos() {
         }
       </td>
       <td>
-        ${
-          idsAlunos.length > 0
-            ? `<button class="btn-danger-small" onclick="desvincularProfessor(${prof.id}, [${idsAlunos.join(',')}])">Desvincular</button>`
-            : ''
-        }
+        <div class="action-buttons">
+          ${
+            idsAlunos.length > 0
+              ? `<button class="btn-danger-small" onclick="desvincularProfessor(${prof.id}, [${idsAlunos.join(',')}])">Desvincular</button>`
+              : ''
+          }
+          <button class="btn-danger-small" onclick="deletarProfessor(${prof.id})" style="margin-left: 5px;">Excluir</button>
+        </div>
       </td>
     `;
     tbody.appendChild(tr);
@@ -453,6 +456,69 @@ async function desvincularProfessor(profId, alunoIds) {
   } catch (error) {
     console.error('Erro ao desvincular professor:', error);
     showToast('Não foi possível remover o vínculo. Verifique a conexão com o servidor.', 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ==========================================
+// 7. DELETAR PROFESSOR
+// ==========================================
+async function deletarProfessor(profId) {
+  if (!confirm('Deseja realmente excluir este professor? Esta ação não pode ser desfeita.')) return;
+
+  setLoading(true);
+
+  try {
+    // Primeiro, remover todos os vínculos deste professor
+    const vinculosResponse = await fetch(`${API_URL}/vinculos`, {
+      headers: getAuthHeaders()
+    });
+
+    if (vinculosResponse.ok) {
+      const vinculos = await vinculosResponse.json();
+      const vinculosDoProfessor = vinculos.filter(v => Number(v.professor_id) === Number(profId));
+
+      if (vinculosDoProfessor.length > 0) {
+        await Promise.all(
+          vinculosDoProfessor.map(vinculo =>
+            fetch(`${API_URL}/vinculos/${vinculo.professor_id}/${vinculo.student_id}`, {
+              method: 'DELETE',
+              headers: getAuthHeaders()
+            })
+          )
+        );
+      }
+    }
+
+    // Depois, deletar o professor
+    const deleteResponse = await fetch(`${API_URL}/users/${profId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+
+    if (deleteResponse.status === 401) {
+      showToast("Sessão expirada. Faça login novamente.", "error");
+      setTimeout(() => {
+        window.location.href = "../login/index.html";
+      }, 2000);
+      return;
+    }
+
+    if (deleteResponse.ok) {
+      showToast('Professor excluído com sucesso!', 'success');
+      // Recarregar dados
+      await carregarUsuariosProfessores();
+      await carregarVinculosDoBanco();
+      renderTabelaVinculos();
+    } else {
+      const errorData = await deleteResponse.json();
+      showToast(errorData.error || 'Erro ao excluir professor.', 'error');
+    }
+
+  } catch (error) {
+    console.error('Erro ao excluir professor:', error);
+    showToast('Não foi possível excluir o professor. Verifique a conexão com o servidor.', 'error');
   } finally {
     setLoading(false);
   }
@@ -528,4 +594,13 @@ function getToastIcon(type) {
     info: 'fas fa-info-circle'
   };
   return icons[type] || icons.info;
+}
+
+// Menu toggle para mobile
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+if (menuToggle && sidebar) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
 }

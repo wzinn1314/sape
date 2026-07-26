@@ -399,4 +399,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     return icons[type] || icons.info;
   }
+  
+  // Menu toggle para mobile
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+  }
 });

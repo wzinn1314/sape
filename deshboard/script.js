@@ -4,7 +4,6 @@
 
 const SAPE_CONFIG = {
   API_URL: 'http://localhost:3000',
-  REFRESH_RATE: 30000,
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };
@@ -24,11 +23,6 @@ function initApp() {
     setLoading(false);
   });
   setupEventListeners();
-  
-  // Timer para atualizar dados
-  setInterval(() => {
-    renderDashboardData();
-  }, SAPE_CONFIG.REFRESH_RATE);
 }
 
 // --- AUTENTICAÇÃO E PERMISSÕES ---
@@ -123,12 +117,14 @@ function setupUI(user) {
 // --- CARREGAMENTO DE DADOS (DASHBOARD REAL) ---
 async function renderDashboardData() {
   try {
-    // Usar rota dedicada do dashboard
-    const response = await fetch(`${SAPE_CONFIG.API_URL}/students/dashboard`, {
-      headers: getAuthHeaders()
-    });
+    // Carregar dados reais do banco de dados
+    const [studentsResponse, reportsResponse, usersResponse] = await Promise.all([
+      fetch(`${SAPE_CONFIG.API_URL}/students`, { headers: getAuthHeaders() }),
+      fetch(`${SAPE_CONFIG.API_URL}/reports`, { headers: getAuthHeaders() }),
+      fetch(`${SAPE_CONFIG.API_URL}/users`, { headers: getAuthHeaders() })
+    ]);
 
-    if (response.status === 401) {
+    if (studentsResponse.status === 401 || reportsResponse.status === 401 || usersResponse.status === 401) {
       showToast("Sessão expirada. Faça login novamente.", "error");
       setTimeout(() => {
         window.location.href = '../login/index.html';
@@ -136,28 +132,48 @@ async function renderDashboardData() {
       return;
     }
 
-    if (!response.ok) throw new Error("Server Error");
-    
-    const result = await response.json();
-    const data = result.data || {
-      total: 0,
-      recent: [],
-      reports: 0
+    const students = await studentsResponse.json();
+    const reports = await reportsResponse.json();
+    const users = await usersResponse.json();
+
+    const studentsArray = Array.isArray(students) ? students : (students.data || []);
+    const reportsArray = Array.isArray(reports) ? reports : (reports.data || []);
+    const usersArray = Array.isArray(users) ? users : (users.data || []);
+
+    // Filtrar apenas professores de AEE
+    const teachers = usersArray.filter(u => {
+      const role = (u.role || '').toLowerCase();
+      return role.includes('prof') || role.includes('teacher') || role.includes('aee');
+    });
+
+    const data = {
+      total: studentsArray.length,
+      recent: studentsArray.slice(-5).reverse(),
+      reports: reportsArray.length,
+      teachers: teachers.length,
+      students: studentsArray
     };
     
     updateStats(data);
     renderRecentList(data.recent);
-    updateProgressBars(data);
+    updateDiagnosisStats(data.students);
+    updateSystemStatus(true);
 
   } catch (err) {
-    console.warn("SAPE Dashboard: Erro ao carregar dados da API.");
+    console.warn("SAPE Dashboard: Erro ao carregar dados da API.", err);
     showToast("Erro ao carregar dados do dashboard. Verifique sua conexão.", "error");
+    updateSystemStatus(false);
   }
 }
 
 function updateStats(data) {
   const totalEl = document.getElementById('totalStudents');
+  const reportsEl = document.getElementById('totalReports');
+  const teachersEl = document.getElementById('totalTeachers');
+  
   if (totalEl) totalEl.textContent = data.total || '0';
+  if (reportsEl) reportsEl.textContent = data.reports || '0';
+  if (teachersEl) teachersEl.textContent = data.teachers || '0';
 }
 
 function renderRecentList(students) {
@@ -180,31 +196,68 @@ function renderRecentList(students) {
   `).join('');
 }
 
-function updateProgressBars(data) {
-  // Calcular métricas reais baseadas nos dados
-  const totalStudents = data.total || 0;
-  const totalReports = data.reports || 0;
-  
-  // Porcentagem de alunos com relatórios
-  const reportsPercentage = totalStudents > 0 ? Math.round((totalReports / totalStudents) * 100) : 0;
-  
-  // Simular outras métricas (em um sistema real, viriam do backend)
-  const plansPercentage = totalStudents > 0 ? Math.round((totalStudents * 0.6) / totalStudents * 100) : 60;
-  const obsPercentage = totalStudents > 0 ? Math.round((totalStudents * 0.85) / totalStudents * 100) : 85;
-  
-  const progressBars = document.querySelectorAll('.analytics-progress');
-  if (progressBars.length >= 3) {
-    progressBars[0].style.width = `${obsPercentage}%`;
-    progressBars[1].style.width = `${plansPercentage}%`;
-    progressBars[2].style.width = `${reportsPercentage}%`;
-    
-    // Atualizar labels
-    const labels = document.querySelectorAll('.analytics-label-row span:last-child');
-    if (labels.length >= 3) {
-      labels[0].textContent = `${obsPercentage}%`;
-      labels[1].textContent = `${plansPercentage}%`;
-      labels[2].textContent = `${reportsPercentage}%`;
-    }
+function updateDiagnosisStats(students) {
+  const container = document.getElementById('diagnosisStats');
+  if (!container || !students || students.length === 0) {
+    if (container) container.innerHTML = '<div class="loading-state">Nenhum dado disponível</div>';
+    return;
+  }
+
+  // Contar diagnósticos
+  const diagnosisCount = {};
+  students.forEach(student => {
+    const diagnosis = (student.diagnostico || 'Não informado').toLowerCase();
+    diagnosisCount[diagnosis] = (diagnosisCount[diagnosis] || 0) + 1;
+  });
+
+  const total = students.length;
+  const sortedDiagnoses = Object.entries(diagnosisCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5); // Top 5 diagnósticos
+
+  if (sortedDiagnoses.length === 0) {
+    container.innerHTML = '<div class="loading-state">Nenhum diagnóstico registrado</div>';
+    return;
+  }
+
+  container.innerHTML = sortedDiagnoses.map(([diagnosis, count]) => {
+    const percentage = Math.round((count / total) * 100);
+    return `
+      <div class="analytics-item">
+        <div class="analytics-label-row">
+          <span>${diagnosis.charAt(0).toUpperCase() + diagnosis.slice(1)}</span>
+          <span>${count} (${percentage}%)</span>
+        </div>
+        <div class="analytics-bar">
+          <div class="analytics-progress" style="width: ${percentage}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateSystemStatus(isOnline) {
+  const container = document.getElementById('systemStatus');
+  if (!container) return;
+
+  if (isOnline) {
+    container.innerHTML = `
+      <div class="aviso-item aviso-green">
+        <div class="aviso-content">
+          <strong>Sistema Online</strong>
+          <p>Conexão com banco de dados estabelecida.</p>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="aviso-item aviso-red">
+        <div class="aviso-content">
+          <strong>Sistema Offline</strong>
+          <p>Não foi possível conectar ao banco de dados.</p>
+        </div>
+      </div>
+    `;
   }
 }
 
@@ -247,6 +300,15 @@ function setupEventListeners() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', logout);
+  }
+  
+  // Listener do botão de menu toggle (mobile)
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
   }
 }
 

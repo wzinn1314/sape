@@ -673,10 +673,68 @@ button, a {
     flex-direction: column;
   }
   
+  /* Sidebar responsivo */
+  .sidebar {
+    width: 60px;
+    padding: 10px 6px;
+    transform: translateX(0);
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+  
+  .main {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+  }
+  
+  .logo-text, .menu span, .profile-info {
+    display: none;
+  }
+  
+  .menu-toggle {
+    display: block !important;
+  }
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.menu-toggle:hover {
+  background: #e5e7f0;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    padding: 12px 8px;
+  }
+  
+  .main {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+  }
+  
+  .logo-text, .menu span, .profile-info {
+    display: none;
+  }
+}
+  
   .students-grid, .student-grid {
     grid-template-columns: 1fr; /* 1 card por linha em celulares muito pequenos */
   }
-}
+
 
 /* ============ LOADING STATE ============ */
 .loading-state {

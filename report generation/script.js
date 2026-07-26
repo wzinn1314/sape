@@ -131,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         titulo: type || 'Relatório de Acompanhamento',
         aluno: studentName,
         professor: professorName,
+        professorId: professorId,
+        studentId: studentId,
         data: currentDate,
+        created_at: new Date().toISOString(),
         status: 'Finalizado',
         conteudo: fullReportText
       };
@@ -266,6 +269,15 @@ function setLoading(isLoading) {
     formCard.style.opacity = isLoading ? '0.5' : '1';
     formCard.style.pointerEvents = isLoading ? 'none' : 'all';
   }
+}
+
+// Menu toggle para mobile
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+if (menuToggle && sidebar) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
 }
 
 // Toast notifications

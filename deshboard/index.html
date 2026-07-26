@@ -58,6 +58,9 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="main">
         <header class="top-header">
+            <button class="menu-toggle" id="menuToggle" style="display: none;">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="header-greeting">
                 <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
                 <p id="headerSubtitle">Painel de gerenciamento acadêmico e acolhimento.</p>
@@ -82,15 +85,15 @@
             </div>
 
             <div class="card card-purple">
-                <p class="card-label">Relatórios Pendentes</p>
-                <h3 class="card-number">07</h3>
-                <small class="text-muted">Ações para esta semana</small>
+                <p class="card-label">Total de Relatórios</p>
+                <h3 class="card-number" id="totalReports">--</h3>
+                <small class="text-muted">Relatórios registrados</small>
             </div>
 
             <div class="card card-yellow">
-                <p class="card-label">Alertas de Apoio</p>
-                <h3 class="card-number">03</h3>
-                <small class="text-muted">Planos com atraso</small>
+                <p class="card-label">Professores Ativos</p>
+                <h3 class="card-number" id="totalTeachers">--</h3>
+                <small class="text-muted">Professores de AEE</small>
             </div>
         </section>
 
@@ -113,61 +116,29 @@
                 <!-- QUADRO DE AVISOS -->
                 <div class="box">
                     <div class="box-header">
-                        <h3>Avisos Importantes</h3>
+                        <h3>Status do Sistema</h3>
                     </div>
-                    <div class="aviso-item aviso-red">
-                        <div class="aviso-content">
-                            <strong>Conselho de Classe</strong>
-                            <p>O prazo para digitação de notas encerra dia 15/06.</p>
-                        </div>
-                    </div>
-                    <div class="aviso-item aviso-blue">
-                        <div class="aviso-content">
-                            <strong>Manutenção do Sistema</strong>
-                            <p>Sábado às 22h o painel ficará indisponível.</p>
+                    <div id="systemStatus">
+                        <div class="aviso-item aviso-green">
+                            <div class="aviso-content">
+                                <strong>Sistema Online</strong>
+                                <p>Conexão com banco de dados estabelecida.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="right-column">
-                <!-- ANALYTICS / MÉTRICAS -->
+                <!-- DISTRIBUIÇÃO POR DIAGNÓSTICO -->
                 <div class="box">
                     <div class="box-header">
-                        <h3>Métricas de Desempenho</h3>
-                        <span class="status-pill">Este mês</span>
+                        <h3>Distribuição por Diagnóstico</h3>
+                        <span class="status-pill">Dados reais</span>
                     </div>
 
-                    <div class="analytics">
-                        <div class="analytics-item">
-                            <div class="analytics-label-row">
-                                <span>Observações Preenchidas</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="analytics-bar">
-                                <div class="analytics-progress" style="width: 85%"></div>
-                            </div>
-                        </div>
-
-                        <div class="analytics-item">
-                            <div class="analytics-label-row">
-                                <span>Planos Adaptados</span>
-                                <span>62%</span>
-                            </div>
-                            <div class="analytics-bar">
-                                <div class="analytics-progress" style="width: 62%"></div>
-                            </div>
-                        </div>
-
-                        <div class="analytics-item">
-                            <div class="analytics-label-row">
-                                <span>Acompanhamento Parental</span>
-                                <span>33%</span>
-                            </div>
-                            <div class="analytics-bar">
-                                <div class="analytics-progress" style="width: 33%"></div>
-                            </div>
-                        </div>
+                    <div class="analytics" id="diagnosisStats">
+                        <div class="loading-state">Carregando estatísticas...</div>
                     </div>
                 </div>
 
@@ -178,10 +149,10 @@
                     </div>
                     <div class="quick-links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <a href="../report generation/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
-                            <i class="fas fa-file-medical"></i><br>Laudos
+                            <i class="fas fa-file-medical"></i><br>Novo Relatório
                         </a>
                         <a href="../report/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
-                            <i class="fas fa-print"></i><br>Exportar
+                            <i class="fas fa-print"></i><br>Ver Relatórios
                         </a>
                     </div>
                 </div>

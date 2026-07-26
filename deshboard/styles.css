@@ -151,6 +151,7 @@ body {
 .aviso-red { background: #fef2f2; border-left-color: var(--danger); }
 .aviso-yellow { background: #fffbeb; border-left-color: var(--warning); }
 .aviso-blue { background: #eff6ff; border-left-color: var(--info); }
+.aviso-green { background: #f0fdf4; border-left-color: var(--success); }
 
 .record-item {
   display: flex; justify-content: space-between; align-items: center;
@@ -175,6 +176,49 @@ body {
   .sidebar { width: 80px; padding: 16px 8px; }
   .logo-text, .menu span, .profile-info { display: none; }
   .main { margin-left: 80px; width: calc(100% - 80px); }
+}
+
+@media (max-width: 768px) {
+  .sidebar { 
+    width: 70px; 
+    padding: 12px 6px;
+    transform: translateX(0);
+  }
+  .sidebar.collapsed { transform: translateX(-100%); }
+  .main { margin-left: 70px; width: calc(100% - 70px); }
+  .stats-cards { grid-template-columns: 1fr; }
+  .card { padding: 16px; }
+  .header-greeting h1 { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .sidebar { 
+    width: 60px; 
+    padding: 10px 4px;
+  }
+  .main { margin-left: 60px; width: calc(100% - 60px); }
+  .top-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .header-date { font-size: 0.85rem; }
+  .card { padding: 12px; }
+  .card-number { font-size: 1.8rem; }
+  .menu-toggle { display: block !important; }
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.menu-toggle:hover {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 /* ============ LOADING STATE ============ */

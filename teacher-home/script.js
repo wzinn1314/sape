@@ -4,7 +4,6 @@
 
 const SAPE_CONFIG = {
   API_URL: 'http://localhost:3000',
-  REFRESH_RATE: 30000,
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };
@@ -24,11 +23,6 @@ function initApp() {
     setLoading(false);
   });
   setupEventListeners();
-  
-  // Timer para atualizar dados
-  setInterval(() => {
-    renderDashboardData();
-  }, SAPE_CONFIG.REFRESH_RATE);
 }
 
 // --- AUTENTICAÇÃO E PERMISSÕES ---
@@ -272,6 +266,15 @@ function setupEventListeners() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', logout);
+  }
+  
+  // Listener do botão de menu toggle (mobile)
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.querySelector('.sidebar');
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
   }
 }
 
