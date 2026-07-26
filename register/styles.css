@@ -64,6 +64,22 @@ body {
   line-height: 1.5;
 }
 
+/* NOVO: bloco informativo (substitui o formulário) */
+.info-block {
+  background: #f8faff;
+  border: 2px solid #d5dce8;
+  border-radius: 15px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.info-block p {
+  color: #063b7a;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 .form-group {
   margin-bottom: 18px;
 }

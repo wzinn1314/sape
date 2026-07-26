@@ -117,6 +117,17 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
       )`);
 
+      // 6. Tabela de Vínculo Professor <-> Aluno (NOVO)
+      db.run(`CREATE TABLE IF NOT EXISTS professor_aluno (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        professor_id INTEGER NOT NULL,
+        student_id INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(professor_id, student_id),
+        FOREIGN KEY (professor_id) REFERENCES user (id),
+        FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+      )`);
+
       // ==========================================
       // SEMEADURA AUTOMÁTICA DO ADMINISTRADOR
       // ==========================================
@@ -155,6 +166,48 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
 });
 
 // ==========================================
+// HELPERS DE VÍNCULO / CONTROLE DE ACESSO (NOVO)
+// ==========================================
+
+// Verifica no banco se um professor tem vínculo ativo com um aluno
+function professorTemAcesso(professorId, studentId, callback) {
+  db.get(
+    'SELECT 1 FROM professor_aluno WHERE professor_id = ? AND student_id = ?',
+    [professorId, studentId],
+    (err, row) => callback(err, !!row)
+  );
+}
+
+// Middleware: protege rotas que expõem/alteram dados de UM aluno específico (/students/:id/...)
+// Espera receber requesterId e requesterRole (via query string ou body) informando quem está pedindo.
+// - Admin: acesso liberado
+// - Professor: só passa se existir vínculo com o aluno da rota
+// - Qualquer outro caso: bloqueado
+function verificarAcessoAluno(req, res, next) {
+  const studentId = req.params.id;
+  const requesterId = req.body.requesterId || req.query.requesterId;
+  const requesterRole = (req.body.requesterRole || req.query.requesterRole || '').toLowerCase();
+
+  if (requesterRole === 'admin') {
+    return next();
+  }
+
+  if (!requesterRole.includes('prof')) {
+    return res.status(403).json({ error: 'Acesso não permitido.' });
+  }
+
+  if (!requesterId) {
+    return res.status(400).json({ error: 'Identificação do professor (requesterId) não informada.' });
+  }
+
+  professorTemAcesso(requesterId, studentId, (err, temAcesso) => {
+    if (err) return res.status(500).json({ error: 'Erro ao verificar vínculo: ' + err.message });
+    if (!temAcesso) return res.status(403).json({ error: 'Você não tem vínculo com este aluno.' });
+    next();
+  });
+}
+
+// ==========================================
 // ROTAS DE CONFIGURAÇÃO E USUÁRIOS
 // ==========================================
 app.get('/config', (req, res) => {
@@ -173,6 +226,18 @@ app.get('/users/pending', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
+});
+
+// Lista somente professores (usado no select do painel de vínculos)
+app.get('/professores', (req, res) => {
+  db.all(
+    "SELECT id, name, email, cpf AS matricula FROM user WHERE LOWER(role) LIKE '%prof%' OR LOWER(role) LIKE '%teacher%' ORDER BY name ASC",
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
 });
 
 app.put('/users/:id/approve', (req, res) => {
@@ -195,8 +260,18 @@ app.put('/users/:id/approve', (req, res) => {
   );
 });
 
+// NOTA IMPORTANTE: o autocadastro público foi removido do sistema — só a
+// administração da escola cria contas (professor, aluno, responsável).
+// Por isso esta rota agora exige requesterRole = 'admin', enviado pelo
+// próprio painel administrativo. Sem isso, qualquer chamada direta à API
+// poderia criar uma conta de professor sem passar por ninguém — é a mesma
+// brecha que identificamos antes, agora fechada.
 app.post('/register', async (req, res) => {
-  const { name, email, cpf, password, role } = req.body;
+  const { name, email, cpf, password, role, requesterRole } = req.body;
+
+  if ((requesterRole || '').toLowerCase() !== 'admin') {
+    return res.status(403).json({ error: 'Somente a administração pode cadastrar novos usuários.' });
+  }
 
   if (!name || !email || !cpf || !password) {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
@@ -212,15 +287,11 @@ app.post('/register', async (req, res) => {
     
     const hashedPassword = await bcrypt.hash(password, 10);
     const roleNormalized = (role || 'Aluno').trim();
-    const roleLower = roleNormalized.toLowerCase();
 
-    const isTeacher = roleLower.includes('prof') || roleLower.includes('teacher');
-    const isStudent = ['aluno', 'student'].includes(roleLower);
-    const isAdmin = roleLower === 'admin';
-
-    const autoApprove = isTeacher || isStudent || isAdmin;
-    const emailVerified = autoApprove ? 1 : 0;
-    const approved = autoApprove ? 1 : 0;
+    // Como a conta só existe se um admin a criou, ela já nasce aprovada —
+    // não faz sentido colocar na fila de aprovação pendente.
+    const emailVerified = 1;
+    const approved = 1;
 
     db.run(
       'INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) VALUES (?, ?, ?, ?, ?, ?, ?)', 
@@ -332,6 +403,62 @@ app.post('/login', (req, res) => {
 });
 
 // ==========================================
+// ROTAS DE VÍNCULO PROFESSOR <-> ALUNO (NOVO)
+// ==========================================
+
+// Salva o vínculo entre um professor e uma lista de alunos
+app.post('/vinculos', (req, res) => {
+  const { professorId, studentIds } = req.body;
+
+  if (!professorId || !Array.isArray(studentIds) || studentIds.length === 0) {
+    return res.status(400).json({ error: 'Professor e ao menos um aluno são obrigatórios.' });
+  }
+
+  db.serialize(() => {
+    const stmt = db.prepare('INSERT OR IGNORE INTO professor_aluno (professor_id, student_id) VALUES (?, ?)');
+    studentIds.forEach((studentId) => stmt.run(professorId, studentId));
+    stmt.finalize((err) => {
+      if (err) return res.status(500).json({ error: 'Erro ao salvar vínculo: ' + err.message });
+      res.status(201).json({ message: 'Vínculo(s) salvo(s) com sucesso!' });
+    });
+  });
+});
+
+// Lista todos os vínculos existentes, agrupados por professor (para a tabela do admin)
+app.get('/vinculos', (req, res) => {
+  const query = `
+    SELECT 
+      u.id AS professor_id, 
+      u.name AS professor_nome, 
+      u.cpf AS matricula, 
+      GROUP_CONCAT(s.name, ', ') AS alunos_nomes,
+      GROUP_CONCAT(s.id) AS alunos_ids
+    FROM professor_aluno pa
+    INNER JOIN user u ON u.id = pa.professor_id
+    INNER JOIN students s ON s.id = pa.student_id
+    GROUP BY u.id
+    ORDER BY u.name ASC
+  `;
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Remove o vínculo entre um professor específico e um aluno específico
+app.delete('/vinculos/:professorId/:studentId', (req, res) => {
+  const { professorId, studentId } = req.params;
+  db.run(
+    'DELETE FROM professor_aluno WHERE professor_id = ? AND student_id = ?',
+    [professorId, studentId],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Vínculo removido com sucesso!' });
+    }
+  );
+});
+
+// ==========================================
 // ROTAS DE ALUNOS
 // ==========================================
 app.post('/students', (req, res) => {
@@ -373,8 +500,23 @@ app.post('/students', (req, res) => {
   });
 });
 
+// Lista alunos. Se professorId + role=professor forem enviados, retorna SÓ os alunos vinculados a ele.
+// Admin (ou nenhum filtro enviado) continua vendo todos.
 app.get('/students', (req, res) => {
-  db.all('SELECT * FROM students ORDER BY name ASC', [], (err, rows) => {
+  const { professorId, role } = req.query;
+  const isProfessor = (role || '').toLowerCase().includes('prof');
+
+  let query = 'SELECT s.* FROM students s';
+  const params = [];
+
+  if (isProfessor && professorId) {
+    query += ' INNER JOIN professor_aluno pa ON pa.student_id = s.id AND pa.professor_id = ?';
+    params.push(professorId);
+  }
+
+  query += ' ORDER BY s.name ASC';
+
+  db.all(query, params, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
 
     const studentsFormatted = rows.map((student) => ({
@@ -391,8 +533,26 @@ app.get('/students', (req, res) => {
   });
 });
 
-// ATUALIZAR PDI / ESTRATÉGIAS DO ALUNO
-app.put('/students/:id/pdi', (req, res) => {
+// Busca UM aluno específico — protegida pelo vínculo (NOVO)
+app.get('/students/:id', verificarAcessoAluno, (req, res) => {
+  db.get('SELECT * FROM students WHERE id = ?', [req.params.id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'Aluno não encontrado.' });
+
+    res.json({
+      ...row,
+      nome: row.name,
+      matricula: row.registration_number,
+      nascimento: row.birth_date,
+      responsavel: row.responsavel_nome,
+      anoLetivo: row.ano_letivo,
+      gradeValue: row.grade_value
+    });
+  });
+});
+
+// ATUALIZAR PDI / ESTRATÉGIAS DO ALUNO — agora protegida pelo vínculo
+app.put('/students/:id/pdi', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
   const { objetivos, estrategias } = req.body;
 
@@ -404,8 +564,8 @@ app.put('/students/:id/pdi', (req, res) => {
   });
 });
 
-// REGISTRAR EVOLUÇÃO / ATENDIMENTO NO DIÁRIO
-app.post('/students/:id/evolucao', (req, res) => {
+// REGISTRAR EVOLUÇÃO / ATENDIMENTO NO DIÁRIO — agora protegida pelo vínculo
+app.post('/students/:id/evolucao', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
   const { data, relato } = req.body;
 
@@ -421,8 +581,8 @@ app.post('/students/:id/evolucao', (req, res) => {
   });
 });
 
-// BUSCAR HISTÓRICO DE EVOLUÇÕES DO ALUNO
-app.get('/students/:id/evolucoes', (req, res) => {
+// BUSCAR HISTÓRICO DE EVOLUÇÕES DO ALUNO — agora protegida pelo vínculo
+app.get('/students/:id/evolucoes', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
 
   const query = `SELECT * FROM evolucoes WHERE student_id = ? ORDER BY data DESC`;

@@ -3,75 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SAPE — Sistema de Suporte à Atenção Psicopedagógica Estudantil. Acompanhamento, escuta e inclusão para estudantes neurodivergentes.">
 
   <link rel="icon" href="assets/foto.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <title>SAPE</title>
+  <title>SAPE — Suporte à Atenção Psicopedagógica Estudantil</title>
 </head>
 <body>
 
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
   <header class="hero">
     <nav class="navbar">
-     
+      <a href="index.html" class="brand">
+        <img src="assets/logo.png" alt="SAPE" class="logo">
+      </a>
+
+      <div class="nav-links">
+        <a href="#sobre">Sobre</a>
+        <a href="#neurodivergencia">Neurodivergência</a>
+        <a href="#como-funciona">Como funciona</a>
+      </div>
 
       <div class="nav-buttons">
-        <a href="login/index.html">Login</a>
-        <a href="register/index.html" class="primary">Cadastre-se</a>
+        <a href="login/index.html" class="primary">Entrar</a>
       </div>
     </nav>
 
-    <section class="hero-content">
-      <span class="badge">Neurodiversidade e acolhimento</span>
+    <section class="hero-content" id="conteudo">
+      <span class="badge">
+        <span class="spectrum-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        Neurodiversidade e acolhimento
+      </span>
 
-
-      <img src="assets/logo.png" alt="Logo SAPE" class="hero-logo">
-
-
-      <h2>Sistema de Suporte à Atenção Psicopedagógica Estudantil</h2>
+      <h1>Cada mente aprende<br>do seu próprio jeito.</h1>
 
       <p>
-        Uma plataforma pensada para apoiar estudantes, famílias e profissionais
-        da educação no acompanhamento psicopedagógico, promovendo inclusão,
-        respeito e cuidado.
+        O SAPE ajuda escolas a acompanhar de perto cada estudante neurodivergente —
+        organizando diagnósticos, planos de apoio e evolução em um só lugar, para que
+        professores, coordenação e famílias caminhem juntos.
       </p>
 
-      
+      <div class="hero-actions">
+        <a href="login/index.html" class="btn-primary">Acessar o sistema</a>
+        <a href="#sobre" class="btn-secondary">Conhecer o sistema</a>
+      </div>
     </section>
   </header>
 
   <main>
 
     <section class="about" id="sobre">
-      <span class="section-tag">Sobre o Sape</span>
+      <span class="section-tag">Sobre o SAPE</span>
+      <h2>Um ponto de encontro entre escola e família</h2>
+      <p>
+        O SAPE organiza o acompanhamento psicopedagógico estudantil em um sistema único:
+        cada aluno tem seu histórico, seu plano de desenvolvimento individual e seu diário
+        de evolução, acessíveis apenas por quem realmente cuida dele.
+      </p>
 
-      <h2>O que é o SAPE?</h2>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="feature-dot" style="--dot-color: var(--blue)"></span>
+          <h3>Acompanhamento individual</h3>
+          <p>Cada professor de AEE vê e atualiza apenas os alunos sob sua responsabilidade.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-dot" style="--dot-color: var(--green)"></span>
+          <h3>Planos de apoio vivos</h3>
+          <p>Estratégias e objetivos ficam registrados e evoluem junto com o aluno.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-dot" style="--dot-color: var(--yellow)"></span>
+          <h3>Relatórios em poucos cliques</h3>
+          <p>Histórico e evolução geram relatórios claros para reuniões e famílias.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="section-divider" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <section class="info" id="neurodivergencia">
+      <span class="section-tag">Entenda melhor</span>
+      <h2>O que é ser neurodivergente?</h2>
+      <p>
+        Ser neurodivergente significa ter um funcionamento neurológico diferente do
+        considerado típico. Essas diferenças fazem parte da diversidade humana e devem
+        ser respeitadas, compreendidas e acolhidas no ambiente escolar — não corrigidas.
+      </p>
+
+      <div class="chip-row">
+        <span class="chip" style="--chip-color: var(--blue)">Autismo</span>
+        <span class="chip" style="--chip-color: var(--green)">TDAH</span>
+        <span class="chip" style="--chip-color: var(--yellow)">Dislexia</span>
+        <span class="chip" style="--chip-color: var(--coral)">Discalculia</span>
+      </div>
 
       <p>
-        O SAPE é um sistema desenvolvido para auxiliar no suporte à atenção
-        psicopedagógica estudantil. Ele busca organizar informações, facilitar
-        o acompanhamento dos estudantes e contribuir para um ambiente escolar
-        mais inclusivo e acolhedor.
+        Cada cor representa um jeito diferente de pensar — nenhum mais correto que o
+        outro. O papel da escola é reconhecer essas diferenças e adaptar o cuidado a
+        cada estudante.
       </p>
     </section>
 
-    
-    <section class="info">
-      <div>
-        <span class="section-tag">Entenda melhor</span>
-        <h2>O que é ser neurodivergente?</h2>
-        <p>
-          Ser neurodivergente significa possuir um funcionamento neurológico
-          diferente do considerado típico. Isso pode incluir autismo, TDAH,
-          dislexia e outras condições.
-        </p>
-        <p>
-          Essas diferenças fazem parte da diversidade humana e devem ser
-          respeitadas, compreendidas e acolhidas no ambiente escolar.
-        </p>
+    <section class="how-it-works" id="como-funciona">
+      <span class="section-tag">Como funciona</span>
+      <h2>Feito para quem faz parte do cuidado todos os dias</h2>
+
+      <div class="role-grid">
+        <article class="role-card">
+          <h3>Professor de AEE</h3>
+          <p>Acompanha o plano de desenvolvimento, registra evoluções e gera relatórios — apenas dos alunos vinculados a ele.</p>
+        </article>
+        <article class="role-card">
+          <h3>Coordenação</h3>
+          <p>Cadastra professores, vincula alunos e acompanha o panorama geral do suporte oferecido pela escola.</p>
+        </article>
+        <article class="role-card">
+          <h3>Família</h3>
+          <p>Acompanha o desenvolvimento do estudante e mantém contato direto com quem cuida dele na escola.</p>
+        </article>
       </div>
+    </section>
+
+    <section class="cta-band">
+      <h2>Sua escola já usa o SAPE?</h2>
+      <p class="cta-band-text">
+        As contas de professores, famílias e alunos são criadas pela coordenação
+        da escola. Se você já recebeu um acesso, é só entrar.
+      </p>
+      <a href="login/index.html" class="btn-primary">Fazer login</a>
     </section>
 
   </main>
 
+  <footer class="site-footer">
+    <img src="assets/logo.png" alt="SAPE" class="footer-logo">
+    <p>SAPE — Sistema de Suporte à Atenção Psicopedagógica Estudantil.</p>
+  </footer>
+
+  <script>
+    // Revela as seções suavemente ao rolar, respeitando quem prefere menos movimento
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const reveal = document.querySelectorAll('.about, .info, .how-it-works, .cta-band');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      reveal.forEach((el) => observer.observe(el));
+    } else {
+      document.querySelectorAll('.about, .info, .how-it-works, .cta-band')
+        .forEach((el) => el.classList.add('is-visible'));
+    }
+  </script>
 </body>
 </html>

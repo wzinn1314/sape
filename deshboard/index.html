@@ -1,204 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - SAPE</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="../../assets/foto.png" type="image/png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAPE - Dashboard Profissional</title>
+    <!-- CSS e Icones -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../../assets/foto.png" type="image/png">
 </head>
 <body>
 
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="../../assets/foto.png" alt="Logo SAPE">
-      <div class="logo-text">
-        <span>SAPE</span>
-        <p>Suporte e Acolhimento</p>
-      </div>
-    </div>
-
-    <nav class="menu">
-      <a class="active" href="../deshboard/index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
-      <a href="../new_students/index.html"><i class="fas fa-user"></i> <span>Novo Aluno</span></a>
-      <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatorios</span></a>
-      <a href="../report generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatorio</span></a>
-      <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
-      <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
-        <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
-      </a>
-    </nav>
-
-    <div class="profile">
-      <div class="avatar" id="avatarProfile">A</div>
-      <div class="profile-info">
-        <strong id="professorName">Usuário</strong>
-        <span id="userType">Professor(a)</span>
-      </div>
-      <button class="logout-btn" onclick="logout()" title="Sair">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="top-header">
-      <div class="header-content">
-        <div class="header-greeting">
-          <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
-          <p id="headerSubtitle">Painel de controle e gerenciamento de alunos</p>
-        </div>
-        <div class="header-right">
-          <div class="header-date">
-            <i class="fas fa-calendar-alt"></i>
-            <span id="currentDate"></span>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- CARDS DE ESTATÍSTICAS -->
-    <section class="stats-cards">
-      <div class="card card-purple">
-        <div class="card-info">
-          <p class="card-label">Total de Alunos</p>
-          <h3 class="card-number" id="totalStudents">—</h3>
-          <small>Cadastrados no sistema</small>
-        </div>
-        <a href="../students/index.html" class="card-link">Ver todos →</a>
-      </div>
-
-      <div class="card card-yellow">
-        <div class="card-info">
-          <p class="card-label">Questionários Pendentes</p>
-          <h3 class="card-number">7</h3>
-          <small>Aguardando preenchimento</small>
-        </div>
-        <a href="#" class="card-link">Ver todos →</a>
-      </div>
-    </section>
-
-    <!-- SEÇÃO PRINCIPAL -->
-    <section class="dashboard-grid">
-      
-      <!-- COLUNA ESQUERDA -->
-      <div class="left-column">
-
-        <!-- QUADRO DE AVISOS -->
-        <div class="box">
-          <div class="box-header">
-            <h3>Avisos e Lembretes</h3>
-            <a href="#" class="link-small">Ver todos</a>
-          </div>
-
-          <div class="aviso-item aviso-red">
-            <div class="aviso-content">
-              <strong>Entrega de Relatórios:</strong>
-              <p>Prazo final: 30 de maio de 2024</p>
+    <!-- SIDEBAR (Estrutura original preservada conforme pedido) -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../../assets/foto.png" alt="Logo SAPE">
+            <div class="logo-text">
+                <span>SAPE</span>
+                <p>Suporte e Acolhimento</p>
             </div>
-          </div>
-
-          <div class="aviso-item aviso-yellow">
-            <div class="aviso-content">
-              <strong>Reunião com Responsáveis:</strong>
-              <p>Data: 25/05 às 14h - Sala de Reuniões</p>
-            </div>
-          </div>
-
-          <div class="aviso-item aviso-blue">
-            <div class="aviso-content">
-              <strong>Atualizar Planos de Apoio:</strong>
-              <p>Verifique planos com mais de 30 dias</p>
-            </div>
-          </div>
         </div>
 
-        <!-- LISTA DOS ÚLTIMOS ALUNOS REGISTRADOS -->
-        <div class="box">
-          <div class="box-header">
-            <h3>Últimos Alunos Registrados</h3>
-            <a href="../students/index.html" class="link-small">Ver todos</a>
-          </div>
+        <nav class="menu">
+            <a class="active" href="../deshboard/index.html">
+                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+            </a>
+            <a href="../students/index.html">
+                <i class="fas fa-graduation-cap"></i> <span>Alunos</span>
+            </a>
+            <a href="../new_students/index.html">
+                <i class="fas fa-user-plus"></i> <span>Novo Aluno</span>
+            </a>
+            <a href="../report/index.html">
+                <i class="fas fa-file-invoice"></i> <span>Relatórios</span>
+            </a>
+            <a href="../report generation/index.html">
+                <i class="fas fa-plus-circle"></i> <span>Novo Relatório</span>
+            </a>
+            <!-- Aba Admin: Gerenciada via script.js -->
+            <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
+                <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
+            </a>
+        </nav>
 
-          <div class="record-list" id="recentStudentsList">
-            <p class="record-empty" id="recentStudentsEmpty">Carregando registros...</p>
-          </div>
+        <div class="profile">
+            <div class="avatar" id="avatarProfile">U</div>
+            <div class="profile-info">
+                <strong id="professorName">Usuário</strong>
+                <span id="userType">Carregando...</span>
+            </div>
+            <button class="logout-btn" onclick="logout()" title="Encerrar Sessão">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
+    </aside>
 
-      </div>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main">
+        <header class="top-header">
+            <div class="header-greeting">
+                <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
+                <p id="headerSubtitle">Painel de gerenciamento acadêmico e acolhimento.</p>
+            </div>
+            <div class="header-date" id="currentDate">
+                <i class="fas fa-calendar-alt"></i> <span>-- de --</span>
+            </div>
+        </header>
 
-      <!-- COLUNA DIREITA -->
-      <div class="right-column">
-
-        <!-- GRÁFICO / ANÁLISE RÁPIDA -->
-        <div class="box">
-          <div class="box-header">
-            <h3>Análise Rápida</h3>
-            <span class="badge-secondary">Este mês</span>
-          </div>
-
-          <div class="analytics">
-            <div class="analytics-item">
-              <div class="analytics-label">Observações Registradas</div>
-              <div class="analytics-value">0</div>
-              <div class="analytics-bar">
-                <div class="analytics-progress" style="width: 85%"></div>
-              </div>
+        <!-- CARDS DE ESTATÍSTICAS (KPIs) -->
+        <section class="stats-cards">
+            <div class="card">
+                <p class="card-label">Total de Alunos</p>
+                <h3 class="card-number" id="totalStudents">--</h3>
+                <a href="../students/index.html" class="card-link">Gerenciar Base <i class="fas fa-arrow-right"></i></a>
             </div>
 
-            <div class="analytics-item">
-              <div class="analytics-label">Planos de Aula Adaptados</div>
-              <div class="analytics-value">15</div>
-              <div class="analytics-bar">
-                <div class="analytics-progress" style="width: 70%"></div>
-              </div>
+            <div class="card card-purple">
+                <p class="card-label">Relatórios Pendentes</p>
+                <h3 class="card-number">07</h3>
+                <small class="text-muted">Ações para esta semana</small>
             </div>
 
-            <div class="analytics-item">
-              <div class="analytics-label">Metas em Andamento</div>
-              <div class="analytics-value">22</div>
-              <div class="analytics-bar">
-                <div class="analytics-progress" style="width: 33%"></div>
-              </div>
+            <div class="card card-yellow">
+                <p class="card-label">Alertas de Apoio</p>
+                <h3 class="card-number">03</h3>
+                <small class="text-muted">Planos com atraso</small>
             </div>
-          </div>
-        </div>
+        </section>
 
-        <!-- ALUNOS EM FOCO -->
-        <div class="box">
-          <div class="box-header">
-            <h3>Alunos em Foco</h3>
-            <a href="../students/index.html" class="link-small">Ver todos</a>
-          </div>
+        <!-- GRID DE CONTEÚDO -->
+        <section class="dashboard-grid">
+            
+            <div class="left-column">
+                <!-- ÚLTIMOS REGISTROS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Alunos Registrados Recentemente</h3>
+                        <a href="../students/index.html" class="card-link">Ver histórico</a>
+                    </div>
+                    <div id="recentStudentsList">
+                        <!-- Gerado via JavaScript para ser dinâmico -->
+                        <div class="loading-state">Aguardando dados...</div>
+                    </div>
+                </div>
 
-          <div class="students-focus" id="studentsFocusList">
-            <p class="record-empty" id="studentsFocusEmpty">Carregando...</p>
-          </div>
-        </div>
+                <!-- QUADRO DE AVISOS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Avisos Importantes</h3>
+                    </div>
+                    <div class="aviso-item aviso-red">
+                        <div class="aviso-content">
+                            <strong>Conselho de Classe</strong>
+                            <p>O prazo para digitação de notas encerra dia 15/06.</p>
+                        </div>
+                    </div>
+                    <div class="aviso-item aviso-blue">
+                        <div class="aviso-content">
+                            <strong>Manutenção do Sistema</strong>
+                            <p>Sábado às 22h o painel ficará indisponível.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- ATALHOS RÁPIDOS -->
-      
-      </div>
+            <div class="right-column">
+                <!-- ANALYTICS / MÉTRICAS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Métricas de Desempenho</h3>
+                        <span class="status-pill">Este mês</span>
+                    </div>
 
-    </section>
+                    <div class="analytics">
+                        <div class="analytics-item">
+                            <div class="analytics-label-row">
+                                <span>Observações Preenchidas</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="analytics-bar">
+                                <div class="analytics-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
 
-  </main>
+                        <div class="analytics-item">
+                            <div class="analytics-label-row">
+                                <span>Planos Adaptados</span>
+                                <span>62%</span>
+                            </div>
+                            <div class="analytics-bar">
+                                <div class="analytics-progress" style="width: 62%"></div>
+                            </div>
+                        </div>
 
-  <script src="script.js"></script>
-  
+                        <div class="analytics-item">
+                            <div class="analytics-label-row">
+                                <span>Acompanhamento Parental</span>
+                                <span>33%</span>
+                            </div>
+                            <div class="analytics-bar">
+                                <div class="analytics-progress" style="width: 33%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const userLogado = JSON.parse(localStorage.getItem('userLogado'));
-      const abaAdmin = document.getElementById('abaAdminMenu');
+                <!-- ATALHOS RÁPIDOS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Acesso Rápido</h3>
+                    </div>
+                    <div class="quick-links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <a href="../report generation/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
+                            <i class="fas fa-file-medical"></i><br>Laudos
+                        </a>
+                        <a href="../report/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
+                            <i class="fas fa-print"></i><br>Exportar
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-      // Exibe a aba se a role for Admin e a matrícula for ADM2026
-      if (userLogado && (userLogado.role === 'Admin' || userLogado.matricula === 'ADM2026')) {
-        if (abaAdmin) abaAdmin.style.display = 'flex';
-      }
-    });
-  </script>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
 </body>
 </html>

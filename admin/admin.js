@@ -4,6 +4,7 @@ const API_URL = 'http://localhost:3000';
 // Armazena em memória os dados vindos do backend
 let listaProfessores = [];
 let listaAlunos = [];
+let listaVinculos = []; // NOVO: vínculos reais vindos do backend (GET /vinculos)
 
 // ==========================================
 // INICIALIZAÇÃO AO CARREGAR A PÁGINA
@@ -11,6 +12,7 @@ let listaAlunos = [];
 document.addEventListener('DOMContentLoaded', async () => {
   await carregarUsuariosProfessores();
   await carregarAlunosDoBanco();
+  await carregarVinculosDoBanco(); // NOVO: busca vínculos reais antes de renderizar
   renderTabelaVinculos();
 
   // Escutador do Formulário 1: Cadastro de Professor
@@ -102,6 +104,23 @@ async function carregarAlunosDoBanco() {
 }
 
 // ==========================================
+// 2.1 CARREGAR VÍNCULOS REAIS DO BANCO (GET /vinculos) — NOVO
+// ==========================================
+async function carregarVinculosDoBanco() {
+  try {
+    const response = await fetch(`${API_URL}/vinculos`);
+    if (!response.ok) throw new Error('Erro ao buscar vínculos');
+
+    // Cada item vem como:
+    // { professor_id, professor_nome, matricula, alunos_nomes: "A, B, C", alunos_ids: "1,2,3" }
+    listaVinculos = await response.json();
+  } catch (error) {
+    console.error('Erro ao carregar vínculos:', error);
+    listaVinculos = [];
+  }
+}
+
+// ==========================================
 // 3. CADASTRAR NOVO PROFESSOR
 // ==========================================
 async function cadastrarProfessor(event) {
@@ -125,13 +144,16 @@ async function cadastrarProfessor(event) {
   }
 
   // Objeto enviado para o backend
+  // requesterRole: 'admin' é obrigatório — o backend só cadastra usuários
+  // quando a chamada vem do painel administrativo (autocadastro foi removido)
   const payload = {
     name,
     email,
     matricula,
     password,
     specialization,
-    role: 'Professor'
+    role: 'Professor',
+    requesterRole: 'admin'
   };
 
   try {
@@ -174,7 +196,7 @@ async function cadastrarProfessor(event) {
 }
 
 // ==========================================
-// 4. VINCULAR PROFESSOR AOS ALUNOS SELECIONADOS
+// 4. VINCULAR PROFESSOR AOS ALUNOS SELECIONADOS (AGORA PERSISTE NO BANCO)
 // ==========================================
 async function salvarVinculo(event) {
   event.preventDefault();
@@ -193,19 +215,38 @@ async function salvarVinculo(event) {
     return;
   }
 
-  // Atualiza localmente a referência do registered_by para renderização imediata
-  listaAlunos.forEach(aluno => {
-    if (alunosSelecionadosIds.includes(aluno.id)) {
-      aluno.registered_by = parseInt(profId);
-    }
-  });
+  try {
+    const response = await fetch(`${API_URL}/vinculos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        professorId: parseInt(profId),
+        studentIds: alunosSelecionadosIds
+      })
+    });
 
-  alert('Vínculo realizado com sucesso!');
-  renderTabelaVinculos();
+    const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.error || 'Erro ao salvar vínculo.');
+      return;
+    }
+
+    alert('Vínculo realizado com sucesso!');
+
+    // Desmarca os checkboxes e recarrega os vínculos reais do banco
+    checkboxes.forEach(cb => (cb.checked = false));
+    await carregarVinculosDoBanco();
+    renderTabelaVinculos();
+
+  } catch (error) {
+    console.error('Erro ao salvar vínculo:', error);
+    alert('Não foi possível conectar com o servidor Node.js.');
+  }
 }
 
 // ==========================================
-// 5. RENDERIZAR TABELA DE VÍNCULOS NA TELA
+// 5. RENDERIZAR TABELA DE VÍNCULOS NA TELA (AGORA USA DADOS REAIS DO BANCO)
 // ==========================================
 function renderTabelaVinculos() {
   const tbody = document.getElementById('tabelaVinculos');
@@ -219,8 +260,10 @@ function renderTabelaVinculos() {
   }
 
   listaProfessores.forEach(prof => {
-    // Procura na lista de alunos quais pertencem a este professor
-    const alunosDoProfessor = listaAlunos.filter(a => Number(a.registered_by) === Number(prof.id));
+    // Busca o vínculo real desse professor (vindo de GET /vinculos)
+    const vinculo = listaVinculos.find(v => Number(v.professor_id) === Number(prof.id));
+    const nomesAlunos = vinculo ? vinculo.alunos_nomes.split(', ') : [];
+    const idsAlunos = vinculo ? vinculo.alunos_ids.split(',') : [];
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -232,13 +275,17 @@ function renderTabelaVinculos() {
       <td><span class="badge" style="background:#e3f2fd; color:#0d47a1; padding:4px 8px; border-radius:4px;">${prof.role}</span></td>
       <td>
         ${
-          alunosDoProfessor.length > 0 
-            ? `<ul style="margin:0; padding-left:18px;">${alunosDoProfessor.map(a => `<li>${a.nome || a.name} (Turma: ${a.turma || 'N/I'})</li>`).join('')}</ul>`
+          nomesAlunos.length > 0
+            ? `<ul style="margin:0; padding-left:18px;">${nomesAlunos.map(nome => `<li>${nome}</li>`).join('')}</ul>`
             : '<em style="color:#999">Nenhum aluno vinculado</em>'
         }
       </td>
       <td>
-        <button class="btn-danger-small" onclick="desvincularProfessor(${prof.id})">Desvincular</button>
+        ${
+          idsAlunos.length > 0
+            ? `<button class="btn-danger-small" onclick="desvincularProfessor(${prof.id}, [${idsAlunos.join(',')}])">Desvincular</button>`
+            : ''
+        }
       </td>
     `;
     tbody.appendChild(tr);
@@ -246,15 +293,24 @@ function renderTabelaVinculos() {
 }
 
 // ==========================================
-// 6. DESVINCULAR PROFESSOR DOS ALUNOS
+// 6. DESVINCULAR PROFESSOR DOS ALUNOS (AGORA REMOVE NO BANCO)
 // ==========================================
-function desvincularProfessor(profId) {
-  if (confirm('Deseja remover o vínculo de todos os alunos deste professor?')) {
-    listaAlunos.forEach(aluno => {
-      if (Number(aluno.registered_by) === Number(profId)) {
-        aluno.registered_by = null;
-      }
-    });
+async function desvincularProfessor(profId, alunoIds) {
+  if (!confirm('Deseja remover o vínculo de todos os alunos deste professor?')) return;
+
+  try {
+    // O backend remove vínculo por par (professor, aluno) — removemos um por um
+    await Promise.all(
+      alunoIds.map(studentId =>
+        fetch(`${API_URL}/vinculos/${profId}/${studentId}`, { method: 'DELETE' })
+      )
+    );
+
+    await carregarVinculosDoBanco();
     renderTabelaVinculos();
+
+  } catch (error) {
+    console.error('Erro ao desvincular professor:', error);
+    alert('Não foi possível remover o vínculo. Verifique a conexão com o servidor.');
   }
 }

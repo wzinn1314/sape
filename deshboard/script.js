@@ -1,271 +1,163 @@
-const API_URL = 'http://localhost:3000';
-const REFRESH_INTERVAL_MS = 8000;
+/**
+ * SISTEMA SAPE - LÓGICA CORE DO DASHBOARD
+ */
 
-function updateDate() {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const today = new Date();
-  const userLogado = JSON.parse(localStorage.getItem('userLogado'));
-  const dateEl = document.getElementById('currentDate');
-  if (dateEl) {
-    dateEl.textContent = today.toLocaleDateString('pt-BR', options);
-  }
-}
+const SAPE_CONFIG = {
+  API_URL: 'http://localhost:3000',
+  REFRESH_RATE: 15000,
+  STORAGE_KEY: 'userLogado'
+};
 
-if (userLogado) {
-  const abaAdmin = document.getElementById('abaAdminMenu'); // ID da sua aba no HTML
+// --- CONTROLE DE INICIALIZAÇÃO ---
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+});
+
+function initApp() {
+  const user = validateAccess();
+  if (!user) return;
+
+  setupUI(user);
+  renderDashboardData();
+  setupEventListeners();
   
-  if (abaAdmin) {
-    if (userLogado.role === 'Admin' && userLogado.matricula === 'ADM2026') {
-      abaAdmin.style.display = 'block';
-    } else {
-      abaAdmin.style.display = 'none';
-    }
-  }
+  // Timer para atualizar dados
+  setInterval(renderDashboardData, SAPE_CONFIG.REFRESH_RATE);
 }
 
-function loadProfessorData() {
-  const userStr = localStorage.getItem('user');
-  if (!userStr) return;
+// --- AUTENTICAÇÃO E PERMISSÕES ---
+function validateAccess() {
+  const userJson = localStorage.getItem(SAPE_CONFIG.STORAGE_KEY);
+  
+  if (!userJson) {
+      window.location.href = '../login/index.html';
+      return null;
+  }
 
   try {
-    const user = JSON.parse(userStr);
-    const userName = user.name || 'Usuário';
-    const userRole = user.role || 'Professor(a)';
+      const user = JSON.parse(userJson);
+      
+      // Lógica de Administrador (Obrigatória no seu pedido)
+      const abaAdmin = document.getElementById('abaAdminMenu');
+      if (abaAdmin) {
+          const hasPrivileges = user.role === 'Admin' || user.matricula === 'ADM2026';
+          abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
+      }
 
-    const greetingEl = document.getElementById('professorGreeting');
-    const nameEl = document.getElementById('professorName');
-    const typeEl = document.getElementById('userType');
-    const avatarEl = document.getElementById('avatarProfile');
-
-    if (greetingEl) greetingEl.textContent = userName;
-    if (nameEl) nameEl.textContent = userName;
-    if (typeEl) typeEl.textContent = userRole;
-    if (avatarEl) avatarEl.textContent = userName.charAt(0).toUpperCase();
-
-    const subtitleEl = document.getElementById('headerSubtitle');
-    if (subtitleEl) {
-      const isStudent = userRole.toLowerCase().includes('aluno');
-      subtitleEl.textContent = isStudent
-        ? 'Acompanhe seu desempenho e evolução'
-        : 'Painel de controle e gerenciamento de alunos';
-    }
-  } catch (error) {
-    console.error('Erro ao carregar dados do usuário:', error);
+      return user;
+  } catch (e) {
+      console.error("SAPE Erro: Falha ao ler dados da sessão.");
+      return null;
   }
 }
 
-function checkAuth() {
-  if (!localStorage.getItem('user')) {
-    window.location.href = '../login/index.html';
+// --- INTERFACE ---
+function setupUI(user) {
+  // Iniciais para o Avatar
+  const getInitials = (name) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  
+  const elements = {
+      name: document.getElementById('professorName'),
+      greeting: document.getElementById('professorGreeting'),
+      type: document.getElementById('userType'),
+      avatar: document.getElementById('avatarProfile'),
+      date: document.getElementById('currentDate')
+  };
+
+  if (elements.name) elements.name.textContent = user.nome || user.name || "Usuário";
+  if (elements.greeting) elements.greeting.textContent = (user.nome || user.name || "Colega").split(' ')[0];
+  if (elements.type) elements.type.textContent = user.role || "Docente";
+  if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "US");
+
+  // Data por extenso
+  if (elements.date) {
+      const agora = new Date();
+      elements.date.innerHTML = `<i class="fas fa-calendar-day mr-2"></i> ${agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+  }
+
+  animateEntry();
+}
+
+// --- CARREGAMENTO DE DADOS (DASHBOARD REAL) ---
+async function renderDashboardData() {
+  try {
+      const response = await fetch(`${SAPE_CONFIG.API_URL}/students/dashboard`);
+      if (!response.ok) throw new Error("Server Error");
+      
+      const data = await response.json();
+      
+      updateStats(data);
+      renderRecentList(data.recent);
+      updateProgressBars(data.total);
+
+  } catch (err) {
+      console.warn("SAPE Dashboard: Rodando em modo offline ou erro na API.");
+      // Opcional: preencher com zeros para não ficar vazio
   }
 }
 
-function animateCards() {
-  document.querySelectorAll('.card, .box').forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    setTimeout(() => {
-      card.style.transition = 'all 0.5s ease';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, index * 50);
+function updateStats(data) {
+  const totalEl = document.getElementById('totalStudents');
+  if (totalEl) totalEl.textContent = data.total || '0';
+}
+
+function renderRecentList(students) {
+  const container = document.getElementById('recentStudentsList');
+  if (!container) return;
+
+  if (!students || students.length === 0) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Nenhum registro encontrado.</p>';
+      return;
+  }
+
+  container.innerHTML = students.slice(0, 5).map(aluno => `
+      <div class="record-item">
+          <div class="record-info">
+              <div class="record-name">${aluno.nome}</div>
+              <div class="record-meta">${aluno.turma} • ${aluno.curso}</div>
+          </div>
+          <div class="status-pill">${formatarDataRelativa(aluno.createdAt)}</div>
+      </div>
+  `).join('');
+}
+
+function updateProgressBars(total) {
+  // Exemplo de meta fictícia de 50 alunos para preencher a barra
+  const metas = { obs: 85, planos: 70, metas: 33 };
+  
+  document.querySelectorAll('.analytics-progress').forEach(bar => {
+      const width = bar.getAttribute('data-value') || "70%";
+      bar.style.width = width;
   });
+}
+
+// --- UTILITÁRIOS ---
+function formatarDataRelativa(dateStr) {
+  const data = new Date(dateStr);
+  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 }
 
 function logout() {
-  localStorage.removeItem('user');
+  localStorage.removeItem(SAPE_CONFIG.STORAGE_KEY);
   window.location.href = '../login/index.html';
 }
 
-function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part.charAt(0).toUpperCase())
-    .join('');
-}
-
-function formatRelativeDate(isoDate) {
-  if (!isoDate) return 'Data não informada';
-
-  const date = new Date(isoDate);
-  if (isNaN(date.getTime())) return 'Data inválida';
-
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMinutes < 1) return 'Agora mesmo';
-  if (diffMinutes < 60) return `Há ${diffMinutes} min`;
-  if (diffHours < 24 && date.toDateString() === now.toDateString()) {
-    return `Hoje às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-  }
-  if (diffDays === 1) {
-    return `Ontem às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-  }
-
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+function animateEntry() {
+  const cards = document.querySelectorAll('.card, .box');
+  cards.forEach((c, i) => {
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+          c.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+          c.style.opacity = '1';
+          c.style.transform = 'translateY(0)';
+      }, i * 100);
   });
 }
 
-function formatTurmaText(turma, curso) {
-  if (turma && curso) return `${turma} • ${curso}`;
-  return turma || curso || 'Turma não informada';
-}
-
-/* RENDERIZA OS ÚLTIMOS ALUNOS REGISTRADOS */
-function renderRecentStudents(students) {
-  const listEl = document.getElementById('recentStudentsList');
-  const emptyEl = document.getElementById('recentStudentsEmpty');
-  if (!listEl) return;
-
-  listEl.querySelectorAll('.record-item').forEach(item => item.remove());
-
-  if (!students || !students.length) {
-    if (emptyEl) {
-      emptyEl.textContent = 'Nenhum aluno cadastrado ainda.';
-      emptyEl.style.display = 'block';
-    }
-    return;
-  }
-
-  if (emptyEl) emptyEl.style.display = 'none';
-
-  students.forEach(student => {
-    const item = document.createElement('div');
-    item.className = 'record-item';
-    
-    const studentName = student.nome || student.name || 'Aluno sem nome';
-    const registeredBy = student.registeredByName || student.createdBy || 'Usuário';
-
-    item.innerHTML = `
-      <div class="record-info">
-        <div class="record-name">${studentName}</div>
-        <div class="record-meta">
-          ${formatTurmaText(student.turma, student.curso)}
-          • Cadastrado por ${registeredBy}
-        </div>
-      </div>
-      <div class="record-date">${formatRelativeDate(student.createdAt)}</div>
-    `;
-    listEl.appendChild(item);
+function setupEventListeners() {
+  // Listener de atalhos de teclado (ex: CTRL+M para abrir Menu)
+  document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'm') console.log("Atalho acionado");
   });
 }
-
-/* RENDERIZA OS ALUNOS EM FOCO */
-function renderStudentsFocus(students) {
-  const listEl = document.getElementById('studentsFocusList');
-  const emptyEl = document.getElementById('studentsFocusEmpty');
-  if (!listEl) return;
-
-  listEl.querySelectorAll('.student-focus-item').forEach(item => item.remove());
-
-  const focusStudents = (students || []).slice(0, 3);
-
-  if (!focusStudents.length) {
-    if (emptyEl) {
-      emptyEl.textContent = 'Nenhum aluno cadastrado ainda.';
-      emptyEl.style.display = 'block';
-    }
-    return;
-  }
-
-  if (emptyEl) emptyEl.style.display = 'none';
-
-  focusStudents.forEach(student => {
-    const item = document.createElement('div');
-    item.className = 'student-focus-item';
-    const studentName = student.nome || student.name || 'Aluno sem nome';
-
-    item.innerHTML = `
-      <div class="student-focus-avatar">${getInitials(studentName)}</div>
-      <div class="student-focus-content">
-        <strong>${studentName}</strong>
-        <span>${formatTurmaText(student.turma, student.curso)} • ${student.diagnostico || 'Inclusão'}</span>
-      </div>
-      <div class="student-focus-status green">Novo</div>
-    `;
-    listEl.appendChild(item);
-  });
-}
-
-/* CARREGA DADOS DO DASHBOARD VIA API */
-async function loadDashboardData() {
-  const totalEl = document.getElementById('totalStudents');
-
-  try {
-    const response = await fetch(`${API_URL}/students/dashboard`);
-    if (!response.ok) throw new Error('Falha ao buscar dados');
-
-    const data = await response.json();
-
-    if (totalEl) {
-      totalEl.textContent = data.total ?? (data.recent ? data.recent.length : 0);
-    }
-
-    renderRecentStudents(data.recent || []);
-    renderStudentsFocus(data.recent || []);
-  } catch (error) {
-    console.error('Erro ao carregar dashboard:', error);
-    if (totalEl) totalEl.textContent = '—';
-
-    const recentEmpty = document.getElementById('recentStudentsEmpty');
-    const focusEmpty = document.getElementById('studentsFocusEmpty');
-
-    if (recentEmpty) {
-      recentEmpty.textContent = 'Não foi possível conectar ao servidor.';
-      recentEmpty.style.display = 'block';
-    }
-    if (focusEmpty) {
-      focusEmpty.textContent = 'Não foi possível conectar ao servidor.';
-      focusEmpty.style.display = 'block';
-    }
-  }
-}
-
-function animateProgressBars() {
-  document.querySelectorAll('.analytics-progress').forEach(bar => {
-    const width = bar.style.width;
-    bar.style.width = '0';
-    setTimeout(() => {
-      bar.style.transition = 'width 1s ease';
-      bar.style.width = width;
-    }, 100);
-  });
-}
-
-window.addEventListener('load', function () {
-  checkAuth();
-  loadProfessorData();
-  updateDate();
-  animateCards();
-  loadDashboardData();
-  animateProgressBars();
-
-  setInterval(loadDashboardData, REFRESH_INTERVAL_MS);
-});
-
-setInterval(updateDate, 60000);
-
-document.querySelectorAll('.menu a').forEach(link => {
-  link.addEventListener('click', function (e) {
-    if (this.getAttribute('href') === '#') e.preventDefault();
-  });
-});
-
-document.querySelectorAll('.aviso-item').forEach(item => {
-  item.addEventListener('mouseenter', function () {
-    this.style.transform = 'translateX(8px)';
-  });
-  item.addEventListener('mouseleave', function () {
-    this.style.transform = 'translateX(0)';
-  });
-});
