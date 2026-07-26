@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE_URL = 'http://localhost:3000';
 
-  // Verificar se já está logado
-  checkExistingSession();
+  // Verificar se já está logado - DESATIVADO para permitir acesso à tela de login
+  // checkExistingSession();
 
   // 1. Mostrar / Ocultar Senha
   if (togglePassword && passwordInput) {

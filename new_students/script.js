@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isAdmin) {
         showToast("Apenas administradores podem criar novos alunos.", "error");
         setTimeout(() => {
-          window.location.href = "../teacher-home/index.html";
+          window.location.href = "../login/index.html";
         }, 2000);
         return false;
       }
@@ -299,6 +299,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (role.includes("admin") || matricula === "ADM2026") {
           adminMenu.style.display = "flex";
         }
+      }
+      
+      // Esconder ou mostrar itens do menu baseado no tipo de usuário
+      const menuDashboard = document.querySelector('a[href="../deshboard/index.html"]');
+      const menuNovoAluno = document.querySelector('a[href="../new_students/index.html"]');
+      
+      if (menuDashboard || menuNovoAluno) {
+        const role = (user.role || "").toLowerCase();
+        const matricula = (user.matricula || "").toUpperCase();
+        const isAdmin = role.includes("admin") || matricula === "ADM2026";
+        
+        if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
+        if (menuNovoAluno) menuNovoAluno.style.display = isAdmin ? "flex" : "none";
       }
     } catch (error) {
       console.error("Erro ao carregar perfil:", error);

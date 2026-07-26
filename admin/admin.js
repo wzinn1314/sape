@@ -61,7 +61,7 @@ function checkAdminAccess() {
     if (!role.includes("admin") && matricula !== "ADM2026") {
       showToast("Acesso negado. Apenas administradores podem acessar esta página.", "error");
       setTimeout(() => {
-        window.location.href = "../deshboard/index.html";
+        window.location.href = "../login/index.html";
       }, 2000);
       return false;
     }

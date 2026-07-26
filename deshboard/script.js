@@ -47,27 +47,33 @@ function validateAccess() {
   try {
     const user = JSON.parse(userJson);
     
-    // Lógica de Administrador
+    // Lógica de Administrador - esconder itens de menu para professores
     const abaAdmin = document.getElementById('abaAdminMenu');
+    const menuNovoAluno = document.querySelector('a[href="../new_students/index.html"]');
+    const menuDashboard = document.querySelector('a[href="../deshboard/index.html"]');
+    
     if (abaAdmin) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
       const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
       abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
     }
+    
+    // Esconder "Novo Aluno" para professores
+    if (menuNovoAluno) {
+      const role = (user.role || "").toLowerCase();
+      const matricula = (user.matricula || "").toUpperCase();
+      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
+      menuNovoAluno.style.display = hasPrivileges ? 'flex' : 'none';
+    }
 
-    // Validar se é professor comum - redirecionar para tela específica
+    // Identificar tipo de usuário para adaptar interface (sem redirecionamento)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
     const isAdmin = role.includes("admin") || matricula === "ADM2026";
     
-    if (!isAdmin) {
-      showToast("Professores devem acessar a tela de início específica.", "warning");
-      setTimeout(() => {
-        window.location.href = '../teacher-home/index.html';
-      }, 2000);
-      return null;
-    }
+    // Apenas log para debug - não expulsa usuário
+    console.log("Tipo de usuário:", isAdmin ? "Admin" : "Professor");
 
     return user;
   } catch (e) {

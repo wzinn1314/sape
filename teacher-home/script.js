@@ -47,18 +47,13 @@ function validateAccess() {
   try {
     const user = JSON.parse(userJson);
     
-    // Validar se é professor (não admin)
+    // Identificar tipo de usuário para adaptar interface (sem redirecionamento)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
     const isAdmin = role.includes("admin") || matricula === "ADM2026";
     
-    if (isAdmin) {
-      showToast("Administradores devem acessar o Dashboard.", "warning");
-      setTimeout(() => {
-        window.location.href = '../deshboard/index.html';
-      }, 2000);
-      return null;
-    }
+    // Apenas log para debug - não expulsa usuário
+    console.log("Tipo de usuário:", isAdmin ? "Admin" : "Professor");
 
     return user;
   } catch (e) {

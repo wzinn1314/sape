@@ -84,6 +84,15 @@ function loadUserProfile() {
         if (menuNewStudent) menuNewStudent.style.display = "none";
         if (menuHome) menuHome.style.display = "flex";
       }
+    } else {
+      // Se não tiver adminMenu, aplica a lógica nos outros menus
+      const role = (user.role || "").toLowerCase();
+      const matricula = (user.matricula || "").toUpperCase();
+      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      
+      if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
+      if (menuNewStudent) menuNewStudent.style.display = isAdmin ? "flex" : "none";
+      if (menuHome) menuHome.style.display = isAdmin ? "none" : "flex";
     }
   } catch (error) {
     console.error("Erro ao carregar perfil:", error);
