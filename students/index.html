@@ -22,9 +22,10 @@
     </div>
 
     <nav class="menu">
-      <a href="../deshboard/index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../teacher-home/index.html" id="menuHome" style="display: none;"><i class="fas fa-home"></i> <span>Início</span></a>
+      <a href="../deshboard/index.html" id="menuDashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
       <a class="active" href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
-      <a href="../new_students/index.html"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
+      <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
       <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
       <a href="../report generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
       <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
@@ -73,6 +74,12 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state" style="display: none;">
+      <div class="spinner"></div>
+      <span>Carregando alunos...</span>
+    </div>
+
     <!-- GRID DE CARDS DOS ALUNOS -->
     <div class="students-grid" id="studentsGrid">
       
@@ -81,166 +88,25 @@
         <p>Nenhum aluno encontrado com esses filtros.</p>
       </div>
 
-      <!-- CARD 1 -->
-      <div class="student-card" onclick="openModal('aluno1')">
-        <div class="card-header">
-          <div class="avatar-circle">LS</div>
-          <div>
-            <h3>Lucas Silva</h3>
-            <p><i class="fas fa-id-card"></i> 2024001 • 1º Ano LOG</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <span class="badge autismo"><i class="fas fa-brain"></i> Autismo Leve</span>
-          <span class="btn-link">Ver Prontuário <i class="fas fa-arrow-right"></i></span>
-        </div>
-      </div>
+    </div>
 
-      <!-- CARD 2 -->
-      <div class="student-card" onclick="openModal('aluno2')">
-        <div class="card-header">
-          <div class="avatar-circle">MS</div>
-          <div>
-            <h3>Maria Santos</h3>
-            <p><i class="fas fa-id-card"></i> 2024002 • 2º Ano TDS "A"</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <span class="badge tdah"><i class="fas fa-bolt"></i> TDAH</span>
-          <span class="btn-link">Ver Prontuário <i class="fas fa-arrow-right"></i></span>
-        </div>
-      </div>
-
-      <!-- CARD 3 -->
-      <div class="student-card" onclick="openModal('aluno3')">
-        <div class="card-header">
-          <div class="avatar-circle">PO</div>
-          <div>
-            <h3>Pedro Oliveira</h3>
-            <p><i class="fas fa-id-card"></i> 2024003 • 1º Ano LOG</p>
-          </div>
-        </div>
-        <div class="card-footer">
-          <span class="badge dislexia"><i class="fas fa-book-open"></i> Dislexia</span>
-          <span class="btn-link">Ver Prontuário <i class="fas fa-arrow-right"></i></span>
-        </div>
-      </div>
-
+    <!-- Paginação -->
+    <div class="pagination" id="pagination" style="display: none;">
+      <button id="prevPage" class="pagination-btn" disabled>
+        <i class="fas fa-chevron-left"></i> Anterior
+      </button>
+      <span id="pageInfo">Página 1 de 1</span>
+      <button id="nextPage" class="pagination-btn">
+        Próximo <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </main>
 
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
 
-  <!-- ================= MODAL DE DETALHES PROFISSIONAL ================= -->
-
-  <div id="modalAluno1" class="modal">
-    <div class="modal-content professional-modal">
-      
-      <!-- Cabeçalho do Prontuário -->
-      <header class="modal-pro-header">
-        <div class="aluno-identity">
-          <div class="avatar-large">LS</div>
-          <div>
-            <h2>Lucas Silva <span class="badge autismo">Autismo Leve</span></h2>
-            <div class="meta-info">
-              <span><i class="fas fa-id-card"></i> Matrícula: <strong>2024001</strong></span>
-              <span><i class="fas fa-graduation-cap"></i> 1º Ano - Logística (LOG)</span>
-              <span><i class="fas fa-calendar-alt"></i> Cadastrado em: 15/02/2024</span>
-            </div>
-          </div>
-        </div>
-        <button class="close-btn" onclick="closeModal('aluno1')" title="Fechar Modal">✕</button>
-      </header>
-
-      <!-- Painel Principal de Informações em Bloco -->
-      <div class="pro-modal-body">
-
-        <!-- Coluna da Esquerda: Diagnóstico & Diretrizes Rápidas -->
-        <aside class="pro-sidebar-info">
-          <div class="info-card">
-            <h4><i class="fas fa-notes-medical"></i> Laudo e Diagnóstico</h4>
-            <p><strong>Condição:</strong> Transtorno do Espectro Autista (TEA)</p>
-            <p><strong>Grau de Suporte:</strong> Nível 1 (Leve)</p>
-            <p><strong>CID-11:</strong> 6A02.0</p>
-            <hr>
-            <p class="small-text"><i class="fas fa-shield-alt"></i> Dados protegidos conforme regulamentação pedagógica do SAPE.</p>
-          </div>
-
-          <div class="info-card highlight-card">
-            <h4><i class="fas fa-star"></i> Ponto Forte em Destaque</h4>
-            <p>Excelente raciocínio lógico-matemático e grande facilidade com rotinas estruturadas.</p>
-          </div>
-        </aside>
-
-        <!-- Coluna da Direita: Conteúdo Detalhado -->
-        <section class="pro-content-area">
-
-          <!-- Abas / Blocos de Navegação do Aluno -->
-          <div class="pro-section">
-            <h3><i class="fas fa-bullseye"></i> Plano de Desenvolvimento Individual (PDI)</h3>
-            <div class="pdi-box">
-              <div class="pdi-field">
-                <label>Hiperfocos e Interesses Rápidos:</label>
-                <p>Programação em Python, lógica de jogos e estatística aplicada.</p>
-              </div>
-              <div class="pdi-field">
-                <label>Estratégias Didáticas Recomendadas:</label>
-                <ul>
-                  <li>Fornecer comandos curtos e diretos, sem redundância ou metáforas.</li>
-                  <li>Antecipar alterações no cronograma de aulas com pelo menos 1 dia de antecedência.</li>
-                  <li>Permitir o uso de abafadores de ruído durante momentos de explicação longa.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="pro-section">
-            <h3><i class="fas fa-file-signature"></i> Adaptações para Avaliações e Provas</h3>
-            <div class="adaptations-grid">
-              <div class="adapt-card allow">
-                <span class="status-tag"><i class="fas fa-check-circle"></i> Permitido / Recomendado</span>
-                <ul>
-                  <li>Tempo adicional de +50% no horário regular de prova.</li>
-                  <li>Realização de avaliações em ambiente silencioso (Sala AEE).</li>
-                  <li>Enunciados divididos em passos numerados.</li>
-                </ul>
-              </div>
-              <div class="adapt-card avoid">
-                <span class="status-tag avoid-tag"><i class="fas fa-times-circle"></i> Evitar / Não Recomendado</span>
-                <ul>
-                  <li>Avaliações orais não preparadas previamente.</li>
-                  <li>Trabalhos em grupos superiores a 3 integrantes sem mediação.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="pro-section">
-            <h3><i class="fas fa-history"></i> Registros de Evolução do AEE</h3>
-            <div class="timeline-logs">
-              <div class="log-item">
-                <span class="log-date">20/05/2024</span>
-                <div class="log-body">
-                  <strong>Atendimento Individualizado</strong>
-                  <p>Lucas concluiu a atividade de matrizes com 100% de precisão. Demonstrou boa autorregulação durante o intervalo.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </section>
-      </div>
-
-      <!-- Barra Inferior de Ações -->
-      <footer class="modal-pro-footer">
-        <div class="left-actions">
-          <button class="btn-pro secondary" onclick="window.print()"><i class="fas fa-print"></i> Imprimir PEI / PDI</button>
-          <a href="../report generation/index.html?alunoId=2024001" class="btn-pro primary"><i class="fas fa-plus"></i> Novo Relatório deste Aluno</a>
-        </div>
-        <button class="btn-pro close" onclick="closeModal('aluno1')">Fechar Prontuário</button>
-      </footer>
-
-    </div>
-  </div>
+  <!-- Modal Dinâmico será criado via JavaScript -->
+  <div id="dynamicModalContainer"></div>
 
 </body>
 </html>

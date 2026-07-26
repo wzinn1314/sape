@@ -49,7 +49,7 @@
                 <strong id="professorName">Usuário</strong>
                 <span id="userType">Carregando...</span>
             </div>
-            <button class="logout-btn" onclick="logout()" title="Encerrar Sessão">
+            <button class="logout-btn" id="logoutBtn" title="Encerrar Sessão">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
         </div>
@@ -66,6 +66,12 @@
                 <i class="fas fa-calendar-alt"></i> <span>-- de --</span>
             </div>
         </header>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state" style="display: none;">
+            <div class="spinner"></div>
+            <span>Carregando dados...</span>
+        </div>
 
         <!-- CARDS DE ESTATÍSTICAS (KPIs) -->
         <section class="stats-cards">
@@ -183,6 +189,9 @@
 
         </section>
     </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
 
     <!-- Scripts -->
     <script src="script.js"></script>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início - Professor AEE | SAPE</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../assets/foto.png" type="image/png">
+</head>
+<body>
+
+    <!-- SIDEBAR DE NAVEGAÇÃO (MANTIDA ORIGINAL) -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../assets/foto.png" alt="Logo SAPE">
+            <div class="logo-text">
+                <span>SAPE</span>
+                <p>Suporte e Acolhimento</p>
+            </div>
+        </div>
+
+        <nav class="menu">
+            <a class="active" href="../teacher-home/index.html">
+                <i class="fas fa-home"></i> <span>Início</span>
+            </a>
+            <a href="../students/index.html">
+                <i class="fas fa-graduation-cap"></i> <span>Meus Alunos</span>
+            </a>
+            <a href="../report generation/index.html">
+                <i class="fas fa-file-medical"></i> <span>Criar Relatório</span>
+            </a>
+            <a href="../report/index.html">
+                <i class="fas fa-file-invoice"></i> <span>Meus Relatórios</span>
+            </a>
+        </nav>
+
+        <div class="profile">
+            <div class="avatar" id="avatarProfile">P</div>
+            <div class="profile-info">
+                <strong id="professorName">Professor</strong>
+                <span id="userType">Professor AEE</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn" title="Encerrar Sessão">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main">
+        <header class="top-header">
+            <div class="header-greeting">
+                <h1>Bem-vindo(a), <span id="professorGreeting">Professor</span>!</h1>
+                <p>Gerencie seus alunos vinculados e relatórios pedagógicos.</p>
+            </div>
+            <div class="header-date" id="currentDate">
+                <i class="fas fa-calendar-alt"></i> <span>-- de --</span>
+            </div>
+        </header>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state" style="display: none;">
+            <div class="spinner"></div>
+            <span>Carregando dados...</span>
+        </div>
+
+        <!-- CARDS DE ESTATÍSTICAS -->
+        <section class="stats-cards">
+            <div class="card">
+                <p class="card-label">Meus Alunos</p>
+                <h3 class="card-number" id="totalStudents">--</h3>
+                <a href="../students/index.html" class="card-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="card card-purple">
+                <p class="card-label">Relatórios Pendentes</p>
+                <h3 class="card-number" id="pendingReports">--</h3>
+                <small class="text-muted">Alunos sem relatório recente</small>
+            </div>
+
+            <div class="card card-green">
+                <p class="card-label">Relatórios Realizados</p>
+                <h3 class="card-number" id="completedReports">--</h3>
+                <small class="text-muted">Total de relatórios</small>
+            </div>
+        </section>
+
+        <!-- GRID DE CONTEÚDO -->
+        <section class="dashboard-grid">
+            
+            <div class="left-column">
+                <!-- MEUS ALUNOS VINCULADOS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Meus Alunos Vinculados</h3>
+                        <a href="../students/index.html" class="card-link">Ver todos</a>
+                    </div>
+                    <div id="linkedStudentsList">
+                        <!-- Gerado via JavaScript -->
+                        <div class="loading-state">Aguardando dados...</div>
+                    </div>
+                </div>
+
+                <!-- ALUNOS SEM RELATÓRIO RECENTE -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Atenção Necessária</h3>
+                        <span class="status-pill">Alunos sem relatório</span>
+                    </div>
+                    <div id="attentionStudentsList">
+                        <!-- Gerado via JavaScript -->
+                        <div class="loading-state">Aguardando dados...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <!-- AÇÕES RÁPIDAS -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Ações Rápidas</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="../report generation/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Criar Relatório</strong>
+                                <p>Novo relatório pedagógico</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+
+                        <a href="../students/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Meus Alunos</strong>
+                                <p>Gerenciar alunos vinculados</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+
+                        <a href="../report/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Histórico</strong>
+                                <p>Ver relatórios anteriores</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- RELATÓRIOS RECENTES -->
+                <div class="box">
+                    <div class="box-header">
+                        <h3>Meus Últimos Relatórios</h3>
+                        <a href="../report/index.html" class="card-link">Ver todos</a>
+                    </div>
+                    <div id="recentReportsList">
+                        <!-- Gerado via JavaScript -->
+                        <div class="loading-state">Aguardando dados...</div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

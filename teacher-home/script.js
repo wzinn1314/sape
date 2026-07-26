@@ -1,5 +1,5 @@
 /**
- * SISTEMA SAPE - LÓGICA CORE DO DASHBOARD (REFATORADO COM JWT)
+ * SISTEMA SAPE - TELA DE INÍCIO DO PROFESSOR AEE
  */
 
 const SAPE_CONFIG = {
@@ -47,24 +47,15 @@ function validateAccess() {
   try {
     const user = JSON.parse(userJson);
     
-    // Lógica de Administrador
-    const abaAdmin = document.getElementById('abaAdminMenu');
-    if (abaAdmin) {
-      const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
-      abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
-    }
-
-    // Validar se é professor comum - redirecionar para tela específica
+    // Validar se é professor (não admin)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
     const isAdmin = role.includes("admin") || matricula === "ADM2026";
     
-    if (!isAdmin) {
-      showToast("Professores devem acessar a tela de início específica.", "warning");
+    if (isAdmin) {
+      showToast("Administradores devem acessar o Dashboard.", "warning");
       setTimeout(() => {
-        window.location.href = '../teacher-home/index.html';
+        window.location.href = '../deshboard/index.html';
       }, 2000);
       return null;
     }
@@ -100,10 +91,10 @@ function setupUI(user) {
       date: document.getElementById('currentDate')
   };
 
-  if (elements.name) elements.name.textContent = user.nome || user.name || "Usuário";
+  if (elements.name) elements.name.textContent = user.nome || user.name || "Professor";
   if (elements.greeting) elements.greeting.textContent = (user.nome || user.name || "Colega").split(' ')[0];
-  if (elements.type) elements.type.textContent = user.role || "Docente";
-  if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "US");
+  if (elements.type) elements.type.textContent = user.role || "Professor AEE";
+  if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "PR");
 
   // Data por extenso
   if (elements.date) {
@@ -114,15 +105,17 @@ function setupUI(user) {
   animateEntry();
 }
 
-// --- CARREGAMENTO DE DADOS (DASHBOARD REAL) ---
+// --- CARREGAMENTO DE DADOS (DASHBOARD DO PROFESSOR) ---
 async function renderDashboardData() {
   try {
-    // Usar rota dedicada do dashboard
-    const response = await fetch(`${SAPE_CONFIG.API_URL}/students/dashboard`, {
+    const user = JSON.parse(localStorage.getItem(SAPE_CONFIG.STORAGE_KEY) || "{}");
+    
+    // Carregar alunos vinculados ao professor
+    const studentsResponse = await fetch(`${SAPE_CONFIG.API_URL}/users/${user.id}/students`, {
       headers: getAuthHeaders()
     });
 
-    if (response.status === 401) {
+    if (studentsResponse.status === 401) {
       showToast("Sessão expirada. Faça login novamente.", "error");
       setTimeout(() => {
         window.location.href = '../login/index.html';
@@ -130,36 +123,64 @@ async function renderDashboardData() {
       return;
     }
 
-    if (!response.ok) throw new Error("Server Error");
+    if (!studentsResponse.ok) throw new Error("Server Error");
     
-    const result = await response.json();
-    const data = result.data || {
-      total: 0,
-      recent: [],
-      reports: 0
+    const linkedStudents = await studentsResponse.json();
+    
+    // Carregar relatórios do professor
+    const reportsResponse = await fetch(`${SAPE_CONFIG.API_URL}/users/${user.id}/reports`, {
+      headers: getAuthHeaders()
+    });
+
+    if (reportsResponse.status === 401) {
+      showToast("Sessão expirada. Faça login novamente.", "error");
+      setTimeout(() => {
+        window.location.href = '../login/index.html';
+      }, 2000);
+      return;
+    }
+
+    const reports = reportsResponse.ok ? await reportsResponse.json() : [];
+    
+    // Montar dados do dashboard
+    const dashboardData = {
+      linkedStudents: linkedStudents,
+      reports: reports,
+      totalStudents: linkedStudents.length,
+      completedReports: reports.length
     };
     
-    updateStats(data);
-    renderRecentList(data.recent);
-    updateProgressBars(data);
+    updateStats(dashboardData);
+    renderLinkedStudents(dashboardData.linkedStudents);
+    renderAttentionStudents(dashboardData.linkedStudents, dashboardData.reports);
+    renderRecentReports(dashboardData.reports);
 
   } catch (err) {
     console.warn("SAPE Dashboard: Erro ao carregar dados da API.");
-    showToast("Erro ao carregar dados do dashboard. Verifique sua conexão.", "error");
+    showToast("Erro ao carregar dados. Verifique sua conexão.", "error");
   }
 }
 
 function updateStats(data) {
-  const totalEl = document.getElementById('totalStudents');
-  if (totalEl) totalEl.textContent = data.total || '0';
+  const totalStudentsEl = document.getElementById('totalStudents');
+  const completedReportsEl = document.getElementById('completedReports');
+  const pendingReportsEl = document.getElementById('pendingReports');
+  
+  if (totalStudentsEl) totalStudentsEl.textContent = data.totalStudents || '0';
+  if (completedReportsEl) completedReportsEl.textContent = data.completedReports || '0';
+  
+  // Calcular alunos sem relatório (alunos totais - alunos com relatório)
+  const studentsWithReports = new Set(data.reports.map(r => r.student_id)).size;
+  const pendingCount = data.totalStudents - studentsWithReports;
+  if (pendingReportsEl) pendingReportsEl.textContent = pendingCount > 0 ? pendingCount : '0';
 }
 
-function renderRecentList(students) {
-  const container = document.getElementById('recentStudentsList');
+function renderLinkedStudents(students) {
+  const container = document.getElementById('linkedStudentsList');
   if (!container) return;
 
   if (!students || students.length === 0) {
-      container.innerHTML = '<p class="text-muted text-center py-4">Nenhum registro encontrado.</p>';
+      container.innerHTML = '<p class="text-muted text-center py-4">Você não tem alunos vinculados ainda.</p>';
       return;
   }
 
@@ -169,37 +190,57 @@ function renderRecentList(students) {
               <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
               <div class="record-meta">${aluno.turma || 'Sem turma'} • ${aluno.curso || 'Sem curso'}</div>
           </div>
-          <div class="status-pill">${formatarDataRelativa(aluno.created_at)}</div>
+          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn">
+              <i class="fas fa-file-medical"></i>
+          </a>
       </div>
   `).join('');
 }
 
-function updateProgressBars(data) {
-  // Calcular métricas reais baseadas nos dados
-  const totalStudents = data.total || 0;
-  const totalReports = data.reports || 0;
-  
-  // Porcentagem de alunos com relatórios
-  const reportsPercentage = totalStudents > 0 ? Math.round((totalReports / totalStudents) * 100) : 0;
-  
-  // Simular outras métricas (em um sistema real, viriam do backend)
-  const plansPercentage = totalStudents > 0 ? Math.round((totalStudents * 0.6) / totalStudents * 100) : 60;
-  const obsPercentage = totalStudents > 0 ? Math.round((totalStudents * 0.85) / totalStudents * 100) : 85;
-  
-  const progressBars = document.querySelectorAll('.analytics-progress');
-  if (progressBars.length >= 3) {
-    progressBars[0].style.width = `${obsPercentage}%`;
-    progressBars[1].style.width = `${plansPercentage}%`;
-    progressBars[2].style.width = `${reportsPercentage}%`;
-    
-    // Atualizar labels
-    const labels = document.querySelectorAll('.analytics-label-row span:last-child');
-    if (labels.length >= 3) {
-      labels[0].textContent = `${obsPercentage}%`;
-      labels[1].textContent = `${plansPercentage}%`;
-      labels[2].textContent = `${reportsPercentage}%`;
-    }
+function renderAttentionStudents(students, reports) {
+  const container = document.getElementById('attentionStudentsList');
+  if (!container) return;
+
+  // Encontrar alunos sem relatório
+  const studentsWithReports = new Set(reports.map(r => r.student_id));
+  const studentsWithoutReports = students.filter(s => !studentsWithReports.has(s.id));
+
+  if (!studentsWithoutReports || studentsWithoutReports.length === 0) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Todos os alunos têm relatórios recentes.</p>';
+      return;
   }
+
+  container.innerHTML = studentsWithoutReports.slice(0, 5).map(aluno => `
+      <div class="record-item attention">
+          <div class="record-info">
+              <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
+              <div class="record-meta">Sem relatório recente</div>
+          </div>
+          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn urgent">
+              <i class="fas fa-exclamation-circle"></i>
+          </a>
+      </div>
+  `).join('');
+}
+
+function renderRecentReports(reports) {
+  const container = document.getElementById('recentReportsList');
+  if (!container) return;
+
+  if (!reports || reports.length === 0) {
+      container.innerHTML = '<p class="text-muted text-center py-4">Nenhum relatório realizado ainda.</p>';
+      return;
+  }
+
+  container.innerHTML = reports.slice(0, 5).map(report => `
+      <div class="record-item">
+          <div class="record-info">
+              <div class="record-name">${report.titulo || 'Relatório'}</div>
+              <div class="record-meta">${report.aluno || 'Aluno'} • ${formatarDataRelativa(report.created_at)}</div>
+          </div>
+          <span class="status-pill success">Concluído</span>
+      </div>
+  `).join('');
 }
 
 // --- UTILITÁRIOS ---
@@ -232,11 +273,6 @@ function animateEntry() {
 }
 
 function setupEventListeners() {
-  // Listener de atalhos de teclado
-  document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.key === 'm') console.log("Atalho acionado");
-  });
-
   // Listener do botão de logout
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {

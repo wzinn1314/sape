@@ -1,13 +1,17 @@
 const API_URL = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Verificar autenticação
+  if (!checkAuth()) return;
+
+  // Carregar perfil do usuário
+  loadUserProfile();
+
   const studentSelect = document.getElementById('studentSelect');
   const reportType = document.getElementById('reportType');
   const reportContent = document.getElementById('reportContent');
   const reportRecommendations = document.getElementById('reportRecommendations');
   const reportForm = document.getElementById('reportForm');
-  const reportList = document.getElementById('reportList');
-  const btnRefresh = document.getElementById('btnRefresh');
   const btnSubmit = document.getElementById('btnSubmit');
 
   // Atualizar Data e Hora no Topo do Formulário
@@ -23,26 +27,38 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timeEl) timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  // Carregar Alunos e Histórico
+  // Carregar Alunos
   loadStudents();
-  if (reportList) fetchReports();
 
   // Buscar alunos (FILTRADO POR PROFESSOR SE FOR PROFESSOR, TODOS SE FOR ADMIN)
   async function loadStudents() {
     try {
-      // 1. Pegar quem está logado do localStorage (definido no login)
       const userJSON = localStorage.getItem("sape_user");
-      let endpoint = `${API_URL}/students`; // Default: Traz todos
+      let endpoint = `${API_URL}/students`;
 
       if (userJSON) {
         const user = JSON.parse(userJSON);
-        // Se for um usuário comum/professor (role: user), busca SÓ os alunos vinculados a ele
-        if (user.role === 'user' && user.id) {
+        const role = (user.role || "").toLowerCase();
+        const matricula = (user.matricula || "").toUpperCase();
+        
+        // Se não for admin, busca apenas alunos vinculados
+        if (!role.includes("admin") && matricula !== "ADM2026" && user.id) {
           endpoint = `${API_URL}/users/${user.id}/students`;
         }
       }
 
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        headers: getAuthHeaders()
+      });
+
+      if (response.status === 401) {
+        showToast("Sessão expirada. Faça login novamente.", "error");
+        setTimeout(() => {
+          window.location.href = "../login/index.html";
+        }, 2000);
+        return;
+      }
+
       if (!response.ok) throw new Error('Erro ao carregar alunos');
       
       const students = await response.json();
@@ -54,13 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       studentSelect.innerHTML = '<option value="">-- Selecione o Aluno --</option>' + 
         students.map(s => `
-          <option value="${s.id}" data-name="${s.name}" data-disability="${s.disability_type || ''}">
-            ${s.name} ${s.disability_type ? `(${s.disability_type})` : ''}
+          <option value="${s.id}" data-name="${s.name || s.nome}" data-disability="${s.disability_type || ''}">
+            ${s.name || s.nome} ${s.disability_type ? `(${s.disability_type})` : ''}
           </option>
         `).join('');
     } catch (error) {
       console.error(error);
       studentSelect.innerHTML = '<option value="">Erro ao conectar com o banco de dados</option>';
+      showToast('Erro ao carregar alunos. Verifique sua conexão.', 'error');
     }
   }
 
@@ -80,19 +97,28 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentTime = document.getElementById('currentTime')?.textContent || new Date().toLocaleTimeString('pt-BR');
       const nowFormatted = `${currentDate} às ${currentTime}`;
 
+      // Validação
       if (!studentId) {
-        alert('Selecione um aluno cadastrado.');
+        showToast('Selecione um aluno cadastrado.', 'error');
         return;
       }
 
-      // Recuperar nome do professor logado (ou usar genérico se falhar)
+      if (!content || content.length < 10) {
+        showToast('O relatório deve ter pelo menos 10 caracteres.', 'error');
+        return;
+      }
+
+      // Recuperar nome do professor logado
       let professorName = 'Professor Responsável';
+      let professorId = null;
       const userJSON = localStorage.getItem("sape_user");
       if (userJSON) {
         const user = JSON.parse(userJSON);
         professorName = user.name || professorName;
+        professorId = user.id;
       }
 
+      setLoading(true);
       btnSubmit.disabled = true;
       btnSubmit.innerHTML = '<i class="ph ph-spinner"></i> Enviando Relatório...';
 
@@ -104,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         id: 'REF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
         titulo: type || 'Relatório de Acompanhamento',
         aluno: studentName,
-        professor: professorName, // Salva o nome real do professor!
+        professor: professorName,
         data: currentDate,
         status: 'Finalizado',
         conteudo: fullReportText
@@ -114,68 +140,174 @@ document.addEventListener('DOMContentLoaded', () => {
       relatoriosLocais.unshift(novoRelatorio);
       localStorage.setItem('relatoriosSAPE', JSON.stringify(relatoriosLocais));
 
-      // 3. Salvar no Backend SQLite (incluindo o id do professor se disponível)
+      // 3. Salvar no Backend SQLite
       try {
-        let professorId = null;
-        if(userJSON) professorId = JSON.parse(userJSON).id;
-
         await fetch(`${API_URL}/reports`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({
             studentId: studentId,
-            userId: professorId, // Agora o relatório fica salvo atrelado ao professor no DB!
+            userId: professorId,
             pdfContent: fullReportText,
             fileName: `Relatorio_${studentName.replace(/\s+/g, '_')}.pdf`
           })
         });
+
+        showToast('Relatório salvo com sucesso!', 'success');
+
+        // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML
+        setTimeout(() => {
+          window.location.href = '../report/index.html';
+        }, 1500);
+
       } catch (err) {
         console.warn('Erro ao salvar no banco backend, mas salvo localmente:', err);
+        showToast('Relatório salvo localmente. Erro ao salvar no servidor.', 'warning');
+        
+        // Ainda redireciona pois foi salvo localmente
+        setTimeout(() => {
+          window.location.href = '../report/index.html';
+        }, 1500);
+      } finally {
+        setLoading(false);
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="ph ph-file-pdf"></i> Salvar Relatório';
       }
-
-      // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML
-      window.location.href = '../report/index.html'; 
     });
   }
-
-  // Listar Histórico de Relatórios (se houver essa lista na tela)
-  async function fetchReports() {
-    if (!reportList) return;
-    try {
-      // Filtrar relatórios do usuário logado se ele não for admin
-      const userJSON = localStorage.getItem("sape_user");
-      let endpoint = `${API_URL}/reports`;
-      
-      if (userJSON) {
-         const user = JSON.parse(userJSON);
-         if (user.role === 'user' && user.id) {
-             endpoint = `${API_URL}/users/${user.id}/reports`;
-         }
-      }
-
-      const response = await fetch(endpoint);
-      const reports = await response.json();
-
-      if (!reports || reports.length === 0) {
-        reportList.innerHTML = '<li class="empty-state">Nenhum relatório cadastrado ainda.</li>';
-        return;
-      }
-
-      reportList.innerHTML = reports.map(r => `
-        <li class="report-item">
-          <div class="report-header-info">
-            <span class="student-name"><i class="ph ph-user"></i> ${r.student_name}</span>
-            <span class="report-badge">${new Date(r.created_at).toLocaleString('pt-BR')}</span>
-          </div>
-          <div class="report-body">${r.pdf_content}</div>
-        </li>
-      `).join('');
-    } catch (err) {
-      reportList.innerHTML = '<li class="empty-state">Erro ao buscar histórico.</li>';
-    }
-  }
-
-  if (btnRefresh) {
-    btnRefresh.addEventListener('click', fetchReports);
-  }
 });
+
+// Funções de autenticação
+function checkAuth() {
+  const token = localStorage.getItem("sape_token");
+  const user = localStorage.getItem("sape_user");
+  
+  if (!token || !user) {
+    showToast("Sessão expirada. Faça login novamente.", "error");
+    setTimeout(() => {
+      window.location.href = "../login/index.html";
+    }, 2000);
+    return false;
+  }
+  
+  return true;
+}
+
+function getAuthHeaders() {
+  const token = localStorage.getItem("sape_token");
+  const user = JSON.parse(localStorage.getItem("sape_user") || "{}");
+  
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    'X-User-Id': user.id,
+    'X-User-Role': user.role
+  };
+}
+
+function loadUserProfile() {
+  const userString = localStorage.getItem("sape_user");
+  if (!userString) return;
+
+  try {
+    const user = JSON.parse(userString);
+    const nameElem = document.getElementById("professorName");
+    const roleElem = document.getElementById("userType");
+    const avatarElem = document.getElementById("avatarProfile");
+    const adminMenu = document.getElementById("abaAdminMenu");
+    const menuHome = document.getElementById("menuHome");
+    const menuDashboard = document.getElementById("menuDashboard");
+    const menuNewStudent = document.getElementById("menuNewStudent");
+
+    if (nameElem) nameElem.textContent = user.name || "Professor(a)";
+    if (roleElem) roleElem.textContent = user.role || "Professor(a) AEE";
+    if (avatarElem) avatarElem.textContent = (user.name || "P").charAt(0).toUpperCase();
+    
+    // Mostrar menu admin se for admin
+    if (adminMenu) {
+      const role = (user.role || "").toLowerCase();
+      const matricula = (user.matricula || "").toUpperCase();
+      if (role.includes("admin") || matricula === "ADM2026") {
+        adminMenu.style.display = "flex";
+        // Se for admin, mostra Dashboard e Novo Aluno, esconde Início
+        if (menuDashboard) menuDashboard.style.display = "flex";
+        if (menuNewStudent) menuNewStudent.style.display = "flex";
+        if (menuHome) menuHome.style.display = "none";
+      } else {
+        // Se for professor, mostra Início, esconde Dashboard e Novo Aluno
+        if (menuDashboard) menuDashboard.style.display = "none";
+        if (menuNewStudent) menuNewStudent.style.display = "none";
+        if (menuHome) menuHome.style.display = "flex";
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao carregar perfil:", error);
+  }
+}
+
+function setLoading(isLoading) {
+  const loadingState = document.getElementById('loadingState');
+  const formCard = document.querySelector('.form-card');
+
+  if (loadingState) {
+    loadingState.style.display = isLoading ? 'flex' : 'none';
+  }
+
+  if (formCard) {
+    formCard.style.opacity = isLoading ? '0.5' : '1';
+    formCard.style.pointerEvents = isLoading ? 'none' : 'all';
+  }
+}
+
+// Toast notifications
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const existingToast = container.querySelector('.toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const icon = getToastIcon(type);
+  
+  toast.innerHTML = `
+    <div class="toast-icon">
+      <i class="${icon}"></i>
+    </div>
+    <div class="toast-content">
+      <p class="toast-message">${message}</p>
+    </div>
+    <button class="toast-close" aria-label="Fechar notificação">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+
+  const closeBtn = toast.querySelector('.toast-close');
+  closeBtn.addEventListener('click', () => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  });
+
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function getToastIcon(type) {
+  const icons = {
+    success: 'fas fa-check-circle',
+    error: 'fas fa-exclamation-circle',
+    warning: 'fas fa-exclamation-triangle',
+    info: 'fas fa-info-circle'
+  };
+  return icons[type] || icons.info;
+}

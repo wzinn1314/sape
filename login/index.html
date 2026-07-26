@@ -61,11 +61,12 @@
           <i class="fa-regular fa-eye" id="togglePassword" style="cursor: pointer;"></i>
         </div>
       
-        <p id="loading" style="display: none; color: #1b66d2; font-weight: 600; margin-top: 10px;">
-          Verificando dados...
-        </p>
+        <div id="loading" class="loading-indicator" style="display: none;">
+          <div class="spinner"></div>
+          <span>Verificando credenciais...</span>
+        </div>
       
-        <p id="message" style="margin-top: 10px; font-size: 0.9rem; font-weight: 600;"></p>
+        <p id="message" class="message"></p>
       
         <button type="submit" id="btnEntrar">Entrar</button>
       
@@ -79,6 +80,9 @@
       <div class="wave green-wave"></div>
     </div>
   </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
 
   <!-- O JS deve ser carregado no FINAL do body para que os elementos HTML já existam -->
   <script src="login.js"></script>

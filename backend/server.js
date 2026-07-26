@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -17,6 +18,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS 
   ? process.env.ALLOWED_EMAIL_DOMAINS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) 
   : null;
+
+// JWT Configuration
+const JWT_SECRET = process.env.JWT_SECRET || 'sape-super-secret-jwt-key-2024';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // ==========================================
 // CONEXÃO E INICIALIZAÇÃO DO BANCO DE DADOS
@@ -88,6 +93,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         hiperfocos TEXT,
         gatilhos TEXT,
         estrategias TEXT,
+        adaptacoes TEXT,
         responsavel_nome TEXT,
         parentesco TEXT,
         telefone TEXT,
@@ -97,15 +103,39 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
 
+      // Adicionar coluna adaptacoes se não existir (migração)
+      db.run(`ALTER TABLE students ADD COLUMN adaptacoes TEXT`, (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+          console.log('Migração de adaptacoes:', err.message);
+        }
+      });
+
       // 4. Tabela de Relatórios do AEE
       db.run(`CREATE TABLE IF NOT EXISTS reports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
+        user_id INTEGER,
         pdf_content TEXT NOT NULL,
         file_name TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students (id)
+        FOREIGN KEY (student_id) REFERENCES students (id),
+        FOREIGN KEY (user_id) REFERENCES user (id)
       )`);
+
+      // MIGRAÇÃO: Adicionar coluna user_id se não existir
+      db.all("PRAGMA table_info(reports)", (err, columns) => {
+        if (err) {
+          console.error("Erro ao verificar estrutura da tabela reports:", err);
+          return;
+        }
+        
+        const hasUserId = columns.some((col) => col.name === "user_id");
+        if (!hasUserId) {
+          db.run("ALTER TABLE reports ADD COLUMN user_id INTEGER", (alterErr) => {
+            if (alterErr) console.error("Erro ao adicionar coluna user_id:", alterErr.message);
+          });
+        }
+      });
 
       // 5. Tabela de Diário de Evolução / Atendimentos
       db.run(`CREATE TABLE IF NOT EXISTS evolucoes (
@@ -166,6 +196,72 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
 });
 
 // ==========================================
+// JWT HELPER FUNCTIONS
+// ==========================================
+
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      matricula: user.cpf
+    },
+    JWT_SECRET,
+    {
+      expiresIn: JWT_EXPIRES_IN,
+      issuer: 'sape-system',
+      audience: 'sape-users'
+    }
+  );
+};
+
+const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, JWT_SECRET, {
+      issuer: 'sape-system',
+      audience: 'sape-users'
+    });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw new Error('Token expirado');
+    } else if (error.name === 'JsonWebTokenError') {
+      throw new Error('Token inválido');
+    } else {
+      throw new Error('Erro na verificação do token');
+    }
+  }
+};
+
+const authenticateMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ 
+      success: false,
+      status: 'error',
+      message: 'Token não fornecido. Faça login para continuar.',
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    const decoded = verifyToken(token);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ 
+      success: false,
+      status: 'error',
+      message: error.message || 'Token inválido',
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+// ==========================================
 // HELPERS DE VÍNCULO / CONTROLE DE ACESSO (NOVO)
 // ==========================================
 
@@ -179,32 +275,70 @@ function professorTemAcesso(professorId, studentId, callback) {
 }
 
 // Middleware: protege rotas que expõem/alteram dados de UM aluno específico (/students/:id/...)
-// Espera receber requesterId e requesterRole (via query string ou body) informando quem está pedindo.
+// Usa JWT token para identificar o usuário
 // - Admin: acesso liberado
 // - Professor: só passa se existir vínculo com o aluno da rota
 // - Qualquer outro caso: bloqueado
 function verificarAcessoAluno(req, res, next) {
   const studentId = req.params.id;
-  const requesterId = req.body.requesterId || req.query.requesterId;
-  const requesterRole = (req.body.requesterRole || req.query.requesterRole || '').toLowerCase();
-
-  if (requesterRole === 'admin') {
-    return next();
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ 
+      success: false,
+      status: 'error',
+      message: 'Token não fornecido',
+      timestamp: new Date().toISOString()
+    });
   }
 
-  if (!requesterRole.includes('prof')) {
-    return res.status(403).json({ error: 'Acesso não permitido.' });
-  }
+  const token = authHeader.substring(7);
 
-  if (!requesterId) {
-    return res.status(400).json({ error: 'Identificação do professor (requesterId) não informada.' });
-  }
+  try {
+    const decoded = verifyToken(token);
+    const requesterRole = (decoded.role || '').toLowerCase();
+    const requesterId = decoded.id;
 
-  professorTemAcesso(requesterId, studentId, (err, temAcesso) => {
-    if (err) return res.status(500).json({ error: 'Erro ao verificar vínculo: ' + err.message });
-    if (!temAcesso) return res.status(403).json({ error: 'Você não tem vínculo com este aluno.' });
-    next();
-  });
+    // Admin tem acesso total
+    if (requesterRole.includes('admin')) {
+      req.user = decoded;
+      return next();
+    }
+
+    // Professor precisa ter vínculo
+    if (requesterRole.includes('prof')) {
+      professorTemAcesso(requesterId, studentId, (err, temAcesso) => {
+        if (err) return res.status(500).json({ 
+          success: false,
+          status: 'error',
+          message: 'Erro ao verificar vínculo: ' + err.message,
+          timestamp: new Date().toISOString()
+        });
+        if (!temAcesso) return res.status(403).json({ 
+          success: false,
+          status: 'error',
+          message: 'Você não tem vínculo com este aluno.',
+          timestamp: new Date().toISOString()
+        });
+        req.user = decoded;
+        next();
+      });
+    } else {
+      return res.status(403).json({ 
+        success: false,
+        status: 'error',
+        message: 'Acesso não permitido.',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    return res.status(401).json({ 
+      success: false,
+      status: 'error',
+      message: 'Token inválido',
+      timestamp: new Date().toISOString()
+    });
+  }
 }
 
 // ==========================================
@@ -335,21 +469,36 @@ app.get('/verify-email', (req, res) => {
 });
 
 // ==========================================
-// ROTA DE LOGIN
+// ROTA DE LOGIN COM JWT
 // ==========================================
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, matricula, password } = req.body;
   const loginIdentifier = (email || matricula || '').trim();
 
   if (!loginIdentifier || !password) {
-    return res.status(400).json({ error: 'Informe a identificação (e-mail/matrícula) e a senha.' });
+    return res.status(400).json({ 
+      success: false,
+      status: 'error',
+      message: 'Informe a identificação (e-mail/matrícula) e a senha.',
+      timestamp: new Date().toISOString()
+    });
   }
 
   const query = 'SELECT * FROM user WHERE LOWER(email) = LOWER(?) OR LOWER(cpf) = LOWER(?)';
 
   db.get(query, [loginIdentifier, loginIdentifier], async (err, row) => {
-    if (err) return res.status(500).json({ error: 'Erro de banco de dados: ' + err.message });
-    if (!row) return res.status(401).json({ error: 'Credenciais inválidas.' });
+    if (err) return res.status(500).json({ 
+      success: false,
+      status: 'error',
+      message: 'Erro de banco de dados: ' + err.message,
+      timestamp: new Date().toISOString()
+    });
+    if (!row) return res.status(401).json({ 
+      success: false,
+      status: 'error',
+      message: 'Credenciais inválidas.',
+      timestamp: new Date().toISOString()
+    });
 
     let passwordMatches = false;
 
@@ -373,31 +522,81 @@ app.post('/login', (req, res) => {
     }
 
     if (!passwordMatches) {
-      return res.status(401).json({ error: 'Credenciais inválidas.' });
+      return res.status(401).json({ 
+        success: false,
+        status: 'error',
+        message: 'Credenciais inválidas.',
+        timestamp: new Date().toISOString()
+      });
     }
 
     const roleLower = (row.role || '').toLowerCase();
 
     if (roleLower.includes('prof') || roleLower.includes('teacher')) {
       if (!row.emailVerified) {
-        return res.status(403).json({ error: 'E-mail não verificado. Por favor, valide seu e-mail.' });
+        return res.status(403).json({ 
+          success: false,
+          status: 'error',
+          message: 'E-mail não verificado. Por favor, valide seu e-mail.',
+          timestamp: new Date().toISOString()
+        });
       }
       if (!row.approved) {
-        return res.status(403).json({ error: 'Sua conta ainda está pendente de aprovação por um administrador.' });
+        return res.status(403).json({ 
+          success: false,
+          status: 'error',
+          message: 'Sua conta ainda está pendente de aprovação por um administrador.',
+          timestamp: new Date().toISOString()
+        });
       }
     }
 
+    // Gerar JWT token
+    const token = generateToken(row);
+
     res.json({
+      success: true,
+      status: 'success',
       message: 'Login bem-sucedido',
-      user: { 
-        id: row.id, 
-        name: row.name, 
-        email: row.email, 
-        matricula: row.cpf, 
-        role: row.role || 'Admin', 
-        emailVerified: !!row.emailVerified, 
-        approved: !!row.approved 
+      timestamp: new Date().toISOString(),
+      data: {
+        user: { 
+          id: row.id, 
+          name: row.name, 
+          email: row.email, 
+          matricula: row.cpf, 
+          role: row.role || 'Admin', 
+          emailVerified: !!row.emailVerified, 
+          approved: !!row.approved 
+        },
+        token
       }
+    });
+  });
+});
+
+// Rota para verificar token e obter dados do usuário atual
+app.get('/me', authenticateMiddleware, (req, res) => {
+  db.get('SELECT id, name, email, cpf AS matricula, role, emailVerified, approved FROM user WHERE id = ?', [req.user.id], (err, row) => {
+    if (err) return res.status(500).json({ 
+      success: false,
+      status: 'error',
+      message: err.message,
+      timestamp: new Date().toISOString()
+    });
+    if (!row) return res.status(404).json({ 
+      success: false,
+      status: 'error',
+      message: 'Usuário não encontrado',
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      status: 'success',
+      message: 'Dados do usuário recuperados com sucesso',
+      timestamp: new Date().toISOString(),
+      data: row
     });
   });
 });
@@ -464,39 +663,60 @@ app.delete('/vinculos/:professorId/:studentId', (req, res) => {
 app.post('/students', (req, res) => {
   const {
     nome, nascimento, matricula, cpf, turma, curso, anoLetivo,
-    diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias,
+    diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias, adaptacoes,
     responsavel, parentesco, telefone, email, gradeValue, registeredBy
   } = req.body;
 
   if (!nome || nome.trim() === '') {
-    return res.status(400).json({ error: 'O nome do aluno é obrigatório.' });
+    return res.status(400).json({ 
+      success: false,
+      status: 'error',
+      message: 'O nome do aluno é obrigatório.',
+      timestamp: new Date().toISOString()
+    });
   }
 
   const query = `
     INSERT INTO students (
       name, birth_date, registration_number, cpf, turma, curso, ano_letivo,
-      diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias,
+      diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias, adaptacoes,
       responsavel_nome, parentesco, telefone, email, grade_value, registered_by
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
     nome.trim(), nascimento || null, matricula ? matricula.trim() : null,
     cpf ? cpf.trim() : null, turma || null, curso || null, anoLetivo || null,
     diagnostico || null, pei ? 1 : 0, suporte || null, hiperfocos || null,
-    gatilhos || null, estrategias || null, responsavel || null, parentesco || null,
-    telefone || null, email || null, gradeValue || null, registeredBy || null
+    gatilhos || null, estrategias || null, adaptacoes || null, responsavel || null, 
+    parentesco || null, telefone || null, email || null, gradeValue || null, registeredBy || null
   ];
 
   db.run(query, params, function (err) {
     if (err) {
       if (err.message.includes('UNIQUE constraint failed')) {
-        return res.status(409).json({ error: 'Já existe um aluno cadastrado com esta Matrícula.' });
+        return res.status(409).json({ 
+          success: false,
+          status: 'error',
+          message: 'Já existe um aluno cadastrado com esta Matrícula.',
+          timestamp: new Date().toISOString()
+        });
       }
-      return res.status(500).json({ error: 'Erro ao salvar no banco de dados: ' + err.message });
+      return res.status(500).json({ 
+        success: false,
+        status: 'error',
+        message: 'Erro ao salvar no banco de dados: ' + err.message,
+        timestamp: new Date().toISOString()
+      });
     }
 
-    res.status(201).json({ message: 'Aluno cadastrado com sucesso!', studentId: this.lastID });
+    res.status(201).json({ 
+      success: true,
+      status: 'success',
+      message: 'Aluno cadastrado com sucesso!',
+      timestamp: new Date().toISOString(),
+      studentId: this.lastID 
+    });
   });
 });
 
@@ -593,20 +813,179 @@ app.get('/students/:id/evolucoes', verificarAcessoAluno, (req, res) => {
   });
 });
 
+// DELETAR ALUNO — protegida pelo vínculo
+app.delete('/students/:id', verificarAcessoAluno, (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM students WHERE id = ?', [id], function (err) {
+    if (err) return res.status(500).json({ error: 'Erro ao deletar aluno: ' + err.message });
+    
+    res.json({
+      success: true,
+      status: 'success',
+      message: 'Aluno deletado com sucesso!',
+      timestamp: new Date().toISOString()
+    });
+  });
+});
+
+// ==========================================
+// ROTAS PARA PROFESSORES (ALUNOS VINCULADOS)
+// ==========================================
+
+// Buscar alunos vinculados a um professor específico
+app.get('/users/:userId/students', (req, res) => {
+  const { userId } = req.params;
+
+  const query = `
+    SELECT s.*
+    FROM students s
+    INNER JOIN professor_aluno pa ON s.id = pa.student_id
+    WHERE pa.professor_id = ?
+    ORDER BY s.created_at DESC
+  `;
+
+  db.all(query, [userId], (err, rows) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        status: 'error',
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    res.json(rows);
+  });
+});
+
+// Buscar relatórios de um professor específico
+app.get('/users/:userId/reports', (req, res) => {
+  const { userId } = req.params;
+
+  const query = `
+    SELECT 
+      r.id, 
+      r.student_id,
+      s.name AS student_name, 
+      s.name as aluno,
+      r.pdf_content, 
+      r.file_name, 
+      r.created_at
+    FROM reports r
+    LEFT JOIN students s ON r.student_id = s.id
+    WHERE r.user_id = ?
+    ORDER BY r.created_at DESC
+  `;
+
+  db.all(query, [userId], (err, rows) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        status: 'error',
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Formatar resposta com status
+    const formattedRows = rows.map(row => ({
+      ...row,
+      status: 'Finalizado',
+      titulo: row.file_name || 'Relatório AEE'
+    }));
+
+    res.json(formattedRows);
+  });
+});
+
+// ==========================================
+// ROTA DO DASHBOARD
+// ==========================================
+app.get('/students/dashboard', (req, res) => {
+  // Contar total de alunos
+  db.get('SELECT COUNT(*) as total FROM students', (err, countResult) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        status: 'error',
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const totalStudents = countResult.total;
+
+    // Buscar alunos recentes (últimos 5)
+    db.all('SELECT * FROM students ORDER BY created_at DESC LIMIT 5', (err, recentStudents) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          status: 'error',
+          error: err.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Contar total de relatórios
+      db.get('SELECT COUNT(*) as total FROM reports', (err, reportsResult) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            status: 'error',
+            error: err.message,
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        const totalReports = reportsResult.total;
+
+        res.json({
+          success: true,
+          status: 'success',
+          data: {
+            total: totalStudents,
+            recent: recentStudents,
+            reports: totalReports
+          },
+          timestamp: new Date().toISOString()
+        });
+      });
+    });
+  });
+});
+
 // ==========================================
 // ROTAS DE RELATÓRIOS
 // ==========================================
 app.post('/reports', (req, res) => {
-  const { studentId, pdfContent, fileName } = req.body;
+  const { studentId, userId, pdfContent, fileName } = req.body;
 
   if (!studentId || !pdfContent) {
-    return res.status(400).json({ error: 'Selecione um aluno válido e envie o relatório.' });
+    return res.status(400).json({ 
+      success: false,
+      status: 'error',
+      error: 'Selecione um aluno válido e envie o relatório.',
+      timestamp: new Date().toISOString()
+    });
   }
 
-  const query = 'INSERT INTO reports (student_id, pdf_content, file_name) VALUES (?, ?, ?)';
-  db.run(query, [studentId, pdfContent, fileName || 'relatorio.pdf'], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ message: 'Relatório salvo com sucesso!', reportId: this.lastID });
+  const query = 'INSERT INTO reports (student_id, user_id, pdf_content, file_name) VALUES (?, ?, ?, ?)';
+  db.run(query, [studentId, userId || null, pdfContent, fileName || 'relatorio.pdf'], function (err) {
+    if (err) return res.status(500).json({ 
+      success: false,
+      status: 'error',
+      error: err.message,
+      timestamp: new Date().toISOString()
+    });
+    
+    res.status(201).json({ 
+      success: true,
+      status: 'success',
+      message: 'Relatório salvo com sucesso!', 
+      reportId: this.lastID,
+      timestamp: new Date().toISOString()
+    });
   });
 });
 
@@ -614,18 +993,52 @@ app.get('/reports', (req, res) => {
   const query = `
     SELECT 
       r.id, 
+      r.student_id,
+      r.user_id,
       s.name AS student_name, 
+      s.name as aluno,
+      u.name as professor,
       s.diagnostico,
       r.pdf_content, 
       r.file_name, 
-      r.created_at 
+      r.created_at
     FROM reports r
-    INNER JOIN students s ON r.student_id = s.id
+    LEFT JOIN students s ON r.student_id = s.id
+    LEFT JOIN user u ON r.user_id = u.id
     ORDER BY r.created_at DESC
   `;
+  
   db.all(query, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    if (err) return res.status(500).json({ 
+      success: false,
+      status: 'error',
+      error: err.message,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Formatar resposta com status
+    const formattedRows = rows.map(row => ({
+      ...row,
+      status: 'Finalizado',
+      titulo: row.file_name || 'Relatório AEE'
+    }));
+    
+    res.json(formattedRows);
+  });
+});
+
+app.delete('/reports/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM reports WHERE id = ?', [id], function (err) {
+    if (err) return res.status(500).json({ error: 'Erro ao deletar relatório: ' + err.message });
+    
+    res.json({
+      success: true,
+      status: 'success',
+      message: 'Relatório deletado com sucesso!',
+      timestamp: new Date().toISOString()
+    });
   });
 });
 

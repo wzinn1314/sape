@@ -5,21 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assets/foto.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="script.js" defer></script>
     <title>Cadastro do Aluno - SAPE</title>
 </head>
 <body>
-   
 
-    <main class="page-shell">
+    <!-- SIDEBAR DE NAVEGAÇÃO (MANTIDA ORIGINAL) -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../assets/foto.png" alt="Logo SAPE">
+            <div>
+                <span>SAPE</span>
+                <p>Suporte e Acolhimento</p>
+            </div>
+        </div>
+
+        <nav class="menu">
+            <a href="../deshboard/index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
+            <a class="active" href="../new_students/index.html"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
+            <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+            <a href="../report generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
+            <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
+            <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
+                <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
+            </a>
+        </nav>
+
+        <div class="profile">
+            <div class="avatar" id="avatarProfile">A</div>
+            <div>
+                <strong id="professorName">Prof. Amanda</strong>
+                <span id="userType">Professora</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main">
+        <header class="top-header">
+            <div>
+                <h2>Cadastro de Novo Aluno</h2>
+                <p>Preencha a ficha de inclusão com informações pedagógicas e de saúde</p>
+            </div>
+        </header>
+
         <section class="registration-panel">
-            <header class="panel-header">
-                <div>
-                    <span class="eyebrow">SAPE • Atendimento Educacional Especializado</span>
-                    <h1>Ficha de Inclusão do Aluno</h1>
-                </div>
-            </header>
-
             <!-- Menu de Abas para Navegação -->
             <nav class="tabs-nav" aria-label="Seções do Formulário">
                 <button type="button" class="tab-btn active" data-tab="tab-pessoais">1. Dados Pessoais</button>
@@ -27,6 +59,12 @@
                 <button type="button" class="tab-btn" data-tab="tab-pei">3. PEI / PDI</button>
                 <button type="button" class="tab-btn" data-tab="tab-responsavel">4. Responsável</button>
             </nav>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state" style="display: none;">
+                <div class="spinner"></div>
+                <span>Processando cadastro...</span>
+            </div>
 
             <form id="studentForm" class="registration-form">
 
@@ -219,5 +257,9 @@
             </form>
         </section>
     </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+
 </body>
 </html>
