@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const sqlite3 = require('sqlite3').verbose();
 const express = require('express');
@@ -19,9 +20,17 @@ const allowedDomains = process.env.ALLOWED_EMAIL_DOMAINS
   ? process.env.ALLOWED_EMAIL_DOMAINS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) 
   : null;
 
-// JWT Configuration
-const JWT_SECRET = process.env.JWT_SECRET || 'sape-super-secret-jwt-key-2024';
+// JWT Configuration - Sem fallbacks hardcoded no código
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+// Validação em produção
+if (process.env.NODE_ENV === 'production') {
+  if (!JWT_SECRET || !process.env.ADMIN_PASSWORD) {
+    console.error('❌ ERRO CRÍTICO DE SEGURANÇA: JWT_SECRET e ADMIN_PASSWORD devem estar definidas no arquivo .env em produção!');
+    process.exit(1);
+  }
+}
 
 // ==========================================
 // CONEXÃO E INICIALIZAÇÃO DO BANCO DE DADOS
@@ -147,7 +156,7 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
         FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
       )`);
 
-      // 6. Tabela de Vínculo Professor <-> Aluno (NOVO)
+      // 6. Tabela de Vínculo Professor <-> Aluno
       db.run(`CREATE TABLE IF NOT EXISTS professor_aluno (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         professor_id INTEGER NOT NULL,
@@ -163,43 +172,50 @@ const db = new sqlite3.Database('./sapedb.sqlite', (err) => {
       // ==========================================
       const adminEmail = process.env.ADMIN_EMAIL || 'admin@escola.edu.br';
       const adminMatricula = process.env.ADMIN_MATRICULA || 'ADM2026';
-      const adminPassword = process.env.ADMIN_PASSWORD || 'AdminSAPE2026';
+      const adminPassword = process.env.ADMIN_PASSWORD;
 
-      db.get('SELECT * FROM user WHERE LOWER(email) = LOWER(?) OR LOWER(cpf) = LOWER(?)', [adminEmail, adminMatricula], async (err, row) => {
-        if (err) {
-          console.error('Erro ao verificar usuário Admin:', err.message);
-          return;
-        }
-
-        if (!row) {
-          try {
-            const hashedPassword = await bcrypt.hash(adminPassword, 10);
-            const queryAdmin = `
-              INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) 
-              VALUES (?, ?, ?, ?, ?, 1, 1)
-            `;
-
-            db.run(queryAdmin, ['Administrador SAPE', adminEmail.toLowerCase(), hashedPassword, adminMatricula, 'Admin'], function (insertErr) {
-              if (insertErr) {
-                console.error('Erro ao criar usuário Admin padrão:', insertErr.message);
-              } else {
-                console.log(`✅ Usuário Administrador padrão pronto! Matrícula/CPF: ${adminMatricula}`);
-              }
-            });
-          } catch (hashError) {
-            console.error('Erro ao gerar hash para o Admin padrão:', hashError);
+      if (adminPassword) {
+        db.get('SELECT * FROM user WHERE LOWER(email) = LOWER(?) OR LOWER(cpf) = LOWER(?)', [adminEmail, adminMatricula], async (err, row) => {
+          if (err) {
+            console.error('Erro ao verificar usuário Admin:', err.message);
+            return;
           }
-        }
-      });
+
+          if (!row) {
+            try {
+              const hashedPassword = await bcrypt.hash(adminPassword, 10);
+              const queryAdmin = `
+                INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) 
+                VALUES (?, ?, ?, ?, ?, 1, 1)
+              `;
+
+              db.run(queryAdmin, ['Administrador SAPE', adminEmail.toLowerCase(), hashedPassword, adminMatricula, 'Admin'], function (insertErr) {
+                if (insertErr) {
+                  console.error('Erro ao criar usuário Admin padrão:', insertErr.message);
+                } else {
+                  console.log(`✅ Usuário Administrador padrão pronto! Matrícula/CPF: ${adminMatricula}`);
+                }
+              });
+            } catch (hashError) {
+              console.error('Erro ao gerar hash para o Admin padrão:', hashError);
+            }
+          }
+        });
+      } else {
+        console.warn('⚠️ ATENÇÃO: ADMIN_PASSWORD não definida no .env. Admin automático não semeado.');
+      }
     });
   }
 });
 
 // ==========================================
-// JWT HELPER FUNCTIONS
+// JWT HELPER FUNCTIONS & MIDDLEWARES
 // ==========================================
 
 const generateToken = (user) => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET não está configurada no servidor.');
+  }
   return jwt.sign(
     {
       id: user.id,
@@ -217,6 +233,9 @@ const generateToken = (user) => {
 };
 
 const verifyToken = (token) => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET não está configurada no servidor.');
+  }
   try {
     return jwt.verify(token, JWT_SECRET, {
       issuer: 'sape-system',
@@ -261,11 +280,27 @@ const authenticateMiddleware = (req, res, next) => {
   }
 };
 
+// Middleware para verificar se o usuário autenticado é Admin
+const requireAdmin = (req, res, next) => {
+  const role = (req.user && req.user.role ? req.user.role : '').toLowerCase();
+  const matricula = (req.user && req.user.matricula ? req.user.matricula : '').toUpperCase();
+
+  if (role.includes('admin') || matricula === 'ADM2026') {
+    return next();
+  }
+
+  return res.status(403).json({
+    success: false,
+    status: 'error',
+    message: 'Acesso negado. Apenas administradores têm permissão para esta ação.',
+    timestamp: new Date().toISOString()
+  });
+};
+
 // ==========================================
-// HELPERS DE VÍNCULO / CONTROLE DE ACESSO (NOVO)
+// HELPERS DE VÍNCULO / CONTROLE DE ACESSO
 // ==========================================
 
-// Verifica no banco se um professor tem vínculo ativo com um aluno
 function professorTemAcesso(professorId, studentId, callback) {
   db.get(
     'SELECT 1 FROM professor_aluno WHERE professor_id = ? AND student_id = ?',
@@ -275,10 +310,6 @@ function professorTemAcesso(professorId, studentId, callback) {
 }
 
 // Middleware: protege rotas que expõem/alteram dados de UM aluno específico (/students/:id/...)
-// Usa JWT token para identificar o usuário
-// - Admin: acesso liberado
-// - Professor: só passa se existir vínculo com o aluno da rota
-// - Qualquer outro caso: bloqueado
 function verificarAcessoAluno(req, res, next) {
   const studentId = req.params.id;
   const authHeader = req.headers.authorization;
@@ -297,16 +328,17 @@ function verificarAcessoAluno(req, res, next) {
   try {
     const decoded = verifyToken(token);
     const requesterRole = (decoded.role || '').toLowerCase();
+    const requesterMatricula = (decoded.matricula || '').toUpperCase();
     const requesterId = decoded.id;
 
     // Admin tem acesso total
-    if (requesterRole.includes('admin')) {
+    if (requesterRole.includes('admin') || requesterMatricula === 'ADM2026') {
       req.user = decoded;
       return next();
     }
 
     // Professor precisa ter vínculo
-    if (requesterRole.includes('prof')) {
+    if (requesterRole.includes('prof') || requesterRole.includes('teacher') || requesterRole.includes('aee')) {
       professorTemAcesso(requesterId, studentId, (err, temAcesso) => {
         if (err) return res.status(500).json({ 
           success: false,
@@ -348,24 +380,26 @@ app.get('/config', (req, res) => {
   res.json({ allowedDomains });
 });
 
-app.get('/users', (req, res) => {
+// GET /users - Protegido por JWT e restrito a Admin
+app.get('/users', authenticateMiddleware, requireAdmin, (req, res) => {
   db.all('SELECT id, name, email, cpf AS matricula, role, emailVerified, approved FROM user', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-app.get('/users/pending', (req, res) => {
+// GET /users/pending - Protegido por JWT e restrito a Admin
+app.get('/users/pending', authenticateMiddleware, requireAdmin, (req, res) => {
   db.all('SELECT id, name, email, cpf AS matricula, role FROM user WHERE approved = 0', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-// Lista somente professores (usado no select do painel de vínculos)
-app.get('/professores', (req, res) => {
+// GET /professores - Lista somente professores (usado no select do painel de vínculos). Protegido por JWT.
+app.get('/professores', authenticateMiddleware, (req, res) => {
   db.all(
-    "SELECT id, name, email, cpf AS matricula FROM user WHERE LOWER(role) LIKE '%prof%' OR LOWER(role) LIKE '%teacher%' ORDER BY name ASC",
+    "SELECT id, name, email, cpf AS matricula FROM user WHERE LOWER(role) LIKE '%prof%' OR LOWER(role) LIKE '%teacher%' OR LOWER(role) LIKE '%aee%' ORDER BY name ASC",
     [],
     (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -374,7 +408,8 @@ app.get('/professores', (req, res) => {
   );
 });
 
-app.put('/users/:id/approve', (req, res) => {
+// PUT /users/:id/approve - Aprovar usuário. Protegido por JWT e restrito a Admin.
+app.put('/users/:id/approve', authenticateMiddleware, requireAdmin, (req, res) => {
   const { id } = req.params;
   const { approved, role } = req.body;
 
@@ -394,18 +429,50 @@ app.put('/users/:id/approve', (req, res) => {
   );
 });
 
-// NOTA IMPORTANTE: o autocadastro público foi removido do sistema — só a
-// administração da escola cria contas (professor, aluno, responsável).
-// Por isso esta rota agora exige requesterRole = 'admin', enviado pelo
-// próprio painel administrativo. Sem isso, qualquer chamada direta à API
-// poderia criar uma conta de professor sem passar por ninguém — é a mesma
-// brecha que identificamos antes, agora fechada.
-app.post('/register', async (req, res) => {
-  const { name, email, cpf, password, role, requesterRole } = req.body;
+// DELETE /users/:id - Excluir usuário. Protegido por JWT e restrito a Admin.
+app.delete('/users/:id', authenticateMiddleware, requireAdmin, (req, res) => {
+  const { id } = req.params;
 
-  if ((requesterRole || '').toLowerCase() !== 'admin') {
-    return res.status(403).json({ error: 'Somente a administração pode cadastrar novos usuários.' });
-  }
+  db.serialize(() => {
+    // 1. Remover vínculos do professor
+    db.run('DELETE FROM professor_aluno WHERE professor_id = ?', [id], (err) => {
+      if (err) console.error('Erro ao desvincular usuário:', err.message);
+    });
+
+    // 2. Excluir o usuário
+    db.run('DELETE FROM user WHERE id = ?', [id], function (err) {
+      if (err) {
+        return res.status(500).json({ 
+          success: false,
+          status: 'error',
+          error: 'Erro ao excluir usuário: ' + err.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          success: false,
+          status: 'error',
+          error: 'Usuário não encontrado.',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      res.json({
+        success: true,
+        status: 'success',
+        message: 'Usuário excluído com sucesso!',
+        timestamp: new Date().toISOString()
+      });
+    });
+  });
+});
+
+// POST /register - Cadastro de novos usuários. Protegido por JWT + check req.user.role (Admin).
+// NÃO confia em requesterRole no body!
+app.post('/register', authenticateMiddleware, requireAdmin, async (req, res) => {
+  const { name, email, cpf, password, role } = req.body;
 
   if (!name || !email || !cpf || !password) {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
@@ -420,10 +487,8 @@ app.post('/register', async (req, res) => {
     }
     
     const hashedPassword = await bcrypt.hash(password, 10);
-    const roleNormalized = (role || 'Aluno').trim();
+    const roleNormalized = (role || 'Professor').trim();
 
-    // Como a conta só existe se um admin a criou, ela já nasce aprovada —
-    // não faz sentido colocar na fila de aprovação pendente.
     const emailVerified = 1;
     const approved = 1;
 
@@ -444,6 +509,38 @@ app.post('/register', async (req, res) => {
     );
   } catch (error) {
     res.status(500).json({ error: 'Erro ao processar requisição de cadastro' });
+  }
+});
+
+// Rota auxiliar de criação de usuário admin (alias para /register)
+app.post('/admin/create-user', authenticateMiddleware, requireAdmin, async (req, res) => {
+  const { name, email, matricula, password, role } = req.body;
+  const cpf = matricula || req.body.cpf;
+
+  if (!name || !email || !cpf || !password) {
+    return res.status(400).json({ error: 'Campos nome, email, matrícula/cpf e senha são obrigatórios' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const roleNormalized = (role || 'Professor').trim();
+
+    db.run(
+      'INSERT INTO user (name, email, password, cpf, role, emailVerified, approved) VALUES (?, ?, ?, ?, ?, 1, 1)',
+      [name.trim(), email.toLowerCase().trim(), hashedPassword, cpf.trim(), roleNormalized],
+      function (err) {
+        if (err) {
+          if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(409).json({ error: 'Email ou Matrícula já cadastrados' });
+          }
+          return res.status(500).json({ error: err.message });
+        }
+
+        return res.status(201).json({ message: 'Professor cadastrado com sucesso!', id: this.lastID });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao cadastrar professor' });
   }
 });
 
@@ -602,11 +699,11 @@ app.get('/me', authenticateMiddleware, (req, res) => {
 });
 
 // ==========================================
-// ROTAS DE VÍNCULO PROFESSOR <-> ALUNO (NOVO)
+// ROTAS DE VÍNCULO PROFESSOR <-> ALUNO
 // ==========================================
 
-// Salva o vínculo entre um professor e uma lista de alunos
-app.post('/vinculos', (req, res) => {
+// POST /vinculos - Protegido por JWT e restrito a Admin
+app.post('/vinculos', authenticateMiddleware, requireAdmin, (req, res) => {
   const { professorId, studentIds } = req.body;
 
   if (!professorId || !Array.isArray(studentIds) || studentIds.length === 0) {
@@ -623,9 +720,13 @@ app.post('/vinculos', (req, res) => {
   });
 });
 
-// Lista todos os vínculos existentes, agrupados por professor (para a tabela do admin)
-app.get('/vinculos', (req, res) => {
-  const query = `
+// GET /vinculos - Protegido por JWT
+app.get('/vinculos', authenticateMiddleware, (req, res) => {
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  let query = `
     SELECT 
       u.id AS professor_id, 
       u.name AS professor_nome, 
@@ -635,17 +736,24 @@ app.get('/vinculos', (req, res) => {
     FROM professor_aluno pa
     INNER JOIN user u ON u.id = pa.professor_id
     INNER JOIN students s ON s.id = pa.student_id
-    GROUP BY u.id
-    ORDER BY u.name ASC
   `;
-  db.all(query, [], (err, rows) => {
+
+  const params = [];
+  if (!isAdmin) {
+    query += ' WHERE pa.professor_id = ?';
+    params.push(req.user.id);
+  }
+
+  query += ' GROUP BY u.id ORDER BY u.name ASC';
+
+  db.all(query, params, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-// Remove o vínculo entre um professor específico e um aluno específico
-app.delete('/vinculos/:professorId/:studentId', (req, res) => {
+// DELETE /vinculos/:professorId/:studentId - Protegido por JWT e restrito a Admin
+app.delete('/vinculos/:professorId/:studentId', authenticateMiddleware, requireAdmin, (req, res) => {
   const { professorId, studentId } = req.params;
   db.run(
     'DELETE FROM professor_aluno WHERE professor_id = ? AND student_id = ?',
@@ -660,7 +768,9 @@ app.delete('/vinculos/:professorId/:studentId', (req, res) => {
 // ==========================================
 // ROTAS DE ALUNOS
 // ==========================================
-app.post('/students', (req, res) => {
+
+// POST /students - Cadastrar aluno. Protegido por JWT.
+app.post('/students', authenticateMiddleware, (req, res) => {
   const {
     nome, nascimento, matricula, cpf, turma, curso, anoLetivo,
     diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias, adaptacoes,
@@ -676,6 +786,10 @@ app.post('/students', (req, res) => {
     });
   }
 
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
   const query = `
     INSERT INTO students (
       name, birth_date, registration_number, cpf, turma, curso, ano_letivo,
@@ -684,12 +798,14 @@ app.post('/students', (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
+  const creatorId = req.user.id || registeredBy || null;
+
   const params = [
     nome.trim(), nascimento || null, matricula ? matricula.trim() : null,
     cpf ? cpf.trim() : null, turma || null, curso || null, anoLetivo || null,
     diagnostico || null, pei ? 1 : 0, suporte || null, hiperfocos || null,
     gatilhos || null, estrategias || null, adaptacoes || null, responsavel || null, 
-    parentesco || null, telefone || null, email || null, gradeValue || null, registeredBy || null
+    parentesco || null, telefone || null, email || null, gradeValue || null, creatorId
   ];
 
   db.run(query, params, function (err) {
@@ -710,28 +826,47 @@ app.post('/students', (req, res) => {
       });
     }
 
+    const newStudentId = this.lastID;
+
+    // Se criado por um professor, cria vínculo automático em professor_aluno
+    if (!isAdmin && creatorId) {
+      db.run(
+        'INSERT OR IGNORE INTO professor_aluno (professor_id, student_id) VALUES (?, ?)',
+        [creatorId, newStudentId],
+        (linkErr) => {
+          if (linkErr) console.error('Erro ao criar vínculo automático:', linkErr.message);
+        }
+      );
+    }
+
     res.status(201).json({ 
       success: true,
       status: 'success',
       message: 'Aluno cadastrado com sucesso!',
       timestamp: new Date().toISOString(),
-      studentId: this.lastID 
+      studentId: newStudentId
     });
   });
 });
 
-// Lista alunos. Se professorId + role=professor forem enviados, retorna SÓ os alunos vinculados a ele.
-// Admin (ou nenhum filtro enviado) continua vendo todos.
-app.get('/students', (req, res) => {
-  const { professorId, role } = req.query;
-  const isProfessor = (role || '').toLowerCase().includes('prof');
+// GET /students - Lista alunos. Protegido por JWT.
+// Admin vê todos; Professor vê somente os seus alunos vinculados.
+app.get('/students', authenticateMiddleware, (req, res) => {
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
 
   let query = 'SELECT s.* FROM students s';
   const params = [];
 
-  if (isProfessor && professorId) {
+  if (!isAdmin) {
+    // Professor vê apenas vinculados
     query += ' INNER JOIN professor_aluno pa ON pa.student_id = s.id AND pa.professor_id = ?';
-    params.push(professorId);
+    params.push(req.user.id);
+  } else if (req.query.professorId) {
+    // Admin pode filtrar por um professor específico
+    query += ' INNER JOIN professor_aluno pa ON pa.student_id = s.id AND pa.professor_id = ?';
+    params.push(req.query.professorId);
   }
 
   query += ' ORDER BY s.name ASC';
@@ -753,7 +888,91 @@ app.get('/students', (req, res) => {
   });
 });
 
-// Busca UM aluno específico — protegida pelo vínculo (NOVO)
+// GET /students/dashboard - Dados do dashboard. Protegido por JWT.
+app.get('/students/dashboard', authenticateMiddleware, (req, res) => {
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  let countQuery = 'SELECT COUNT(*) as total FROM students';
+  let recentQuery = 'SELECT * FROM students ORDER BY created_at DESC LIMIT 5';
+  let reportsQuery = 'SELECT COUNT(*) as total FROM reports';
+  const params = [];
+
+  if (!isAdmin) {
+    countQuery = `
+      SELECT COUNT(DISTINCT s.id) as total 
+      FROM students s
+      INNER JOIN professor_aluno pa ON s.id = pa.student_id 
+      WHERE pa.professor_id = ?
+    `;
+    recentQuery = `
+      SELECT s.* 
+      FROM students s
+      INNER JOIN professor_aluno pa ON s.id = pa.student_id 
+      WHERE pa.professor_id = ?
+      ORDER BY s.created_at DESC LIMIT 5
+    `;
+    reportsQuery = `
+      SELECT COUNT(DISTINCT r.id) as total 
+      FROM reports r
+      INNER JOIN professor_aluno pa ON r.student_id = pa.student_id 
+      WHERE pa.professor_id = ? OR r.user_id = ?
+    `;
+    params.push(req.user.id);
+  }
+
+  db.get(countQuery, params, (err, countResult) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        status: 'error',
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const totalStudents = countResult ? countResult.total : 0;
+
+    db.all(recentQuery, params, (err, recentStudents) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          status: 'error',
+          error: err.message,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      const reportParams = !isAdmin ? [req.user.id, req.user.id] : [];
+      db.get(reportsQuery, reportParams, (err, reportsResult) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            status: 'error',
+            error: err.message,
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        const totalReports = reportsResult ? reportsResult.total : 0;
+
+        res.json({
+          success: true,
+          status: 'success',
+          data: {
+            total: totalStudents,
+            recent: recentStudents || [],
+            reports: totalReports
+          },
+          timestamp: new Date().toISOString()
+        });
+      });
+    });
+  });
+});
+
+// Busca UM aluno específico — protegida pelo vínculo
 app.get('/students/:id', verificarAcessoAluno, (req, res) => {
   db.get('SELECT * FROM students WHERE id = ?', [req.params.id], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -771,7 +990,7 @@ app.get('/students/:id', verificarAcessoAluno, (req, res) => {
   });
 });
 
-// ATUALIZAR PDI / ESTRATÉGIAS DO ALUNO — agora protegida pelo vínculo
+// ATUALIZAR PDI / ESTRATÉGIAS DO ALUNO — protegida pelo vínculo
 app.put('/students/:id/pdi', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
   const { objetivos, estrategias } = req.body;
@@ -784,7 +1003,7 @@ app.put('/students/:id/pdi', verificarAcessoAluno, (req, res) => {
   });
 });
 
-// REGISTRAR EVOLUÇÃO / ATENDIMENTO NO DIÁRIO — agora protegida pelo vínculo
+// REGISTRAR EVOLUÇÃO / ATENDIMENTO NO DIÁRIO — protegida pelo vínculo
 app.post('/students/:id/evolucao', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
   const { data, relato } = req.body;
@@ -801,7 +1020,7 @@ app.post('/students/:id/evolucao', verificarAcessoAluno, (req, res) => {
   });
 });
 
-// BUSCAR HISTÓRICO DE EVOLUÇÕES DO ALUNO — agora protegida pelo vínculo
+// BUSCAR HISTÓRICO DE EVOLUÇÕES DO ALUNO — protegida pelo vínculo
 app.get('/students/:id/evolucoes', verificarAcessoAluno, (req, res) => {
   const { id } = req.params;
 
@@ -833,9 +1052,23 @@ app.delete('/students/:id', verificarAcessoAluno, (req, res) => {
 // ROTAS PARA PROFESSORES (ALUNOS VINCULADOS)
 // ==========================================
 
-// Buscar alunos vinculados a um professor específico
-app.get('/users/:userId/students', (req, res) => {
+// GET /users/:userId/students - Buscar alunos vinculados a um professor específico. Protegido por JWT.
+app.get('/users/:userId/students', authenticateMiddleware, (req, res) => {
   const { userId } = req.params;
+
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  // Se for professor, só pode consultar seus próprios alunos
+  if (!isAdmin && Number(req.user.id) !== Number(userId)) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Você só pode visualizar seus próprios alunos.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   const query = `
     SELECT s.*
@@ -859,9 +1092,22 @@ app.get('/users/:userId/students', (req, res) => {
   });
 });
 
-// Buscar relatórios de um professor específico
-app.get('/users/:userId/reports', (req, res) => {
+// GET /users/:userId/reports - Buscar relatórios de um professor específico. Protegido por JWT.
+app.get('/users/:userId/reports', authenticateMiddleware, (req, res) => {
   const { userId } = req.params;
+
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  if (!isAdmin && Number(req.user.id) !== Number(userId)) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Você só pode visualizar seus próprios relatórios.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   const query = `
     SELECT 
@@ -888,7 +1134,6 @@ app.get('/users/:userId/reports', (req, res) => {
       });
     }
 
-    // Formatar resposta com status
     const formattedRows = rows.map(row => ({
       ...row,
       status: 'Finalizado',
@@ -900,66 +1145,13 @@ app.get('/users/:userId/reports', (req, res) => {
 });
 
 // ==========================================
-// ROTA DO DASHBOARD
-// ==========================================
-app.get('/students/dashboard', (req, res) => {
-  // Contar total de alunos
-  db.get('SELECT COUNT(*) as total FROM students', (err, countResult) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        status: 'error',
-        error: err.message,
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    const totalStudents = countResult.total;
-
-    // Buscar alunos recentes (últimos 5)
-    db.all('SELECT * FROM students ORDER BY created_at DESC LIMIT 5', (err, recentStudents) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          status: 'error',
-          error: err.message,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      // Contar total de relatórios
-      db.get('SELECT COUNT(*) as total FROM reports', (err, reportsResult) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            status: 'error',
-            error: err.message,
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        const totalReports = reportsResult.total;
-
-        res.json({
-          success: true,
-          status: 'success',
-          data: {
-            total: totalStudents,
-            recent: recentStudents,
-            reports: totalReports
-          },
-          timestamp: new Date().toISOString()
-        });
-      });
-    });
-  });
-});
-
-// ==========================================
 // ROTAS DE RELATÓRIOS
 // ==========================================
-app.post('/reports', (req, res) => {
-  const { studentId, userId, pdfContent, fileName } = req.body;
+
+// POST /reports - Criar relatório. Protegido por JWT.
+app.post('/reports', authenticateMiddleware, (req, res) => {
+  const { studentId, pdfContent, fileName } = req.body;
+  const userId = req.user.id;
 
   if (!studentId || !pdfContent) {
     return res.status(400).json({ 
@@ -970,27 +1162,48 @@ app.post('/reports', (req, res) => {
     });
   }
 
-  const query = 'INSERT INTO reports (student_id, user_id, pdf_content, file_name) VALUES (?, ?, ?, ?)';
-  db.run(query, [studentId, userId || null, pdfContent, fileName || 'relatorio.pdf'], function (err) {
-    if (err) return res.status(500).json({ 
-      success: false,
-      status: 'error',
-      error: err.message,
-      timestamp: new Date().toISOString()
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  const saveReport = () => {
+    const query = 'INSERT INTO reports (student_id, user_id, pdf_content, file_name) VALUES (?, ?, ?, ?)';
+    db.run(query, [studentId, userId, pdfContent, fileName || 'relatorio.pdf'], function (err) {
+      if (err) return res.status(500).json({ 
+        success: false,
+        status: 'error',
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.status(201).json({ 
+        success: true,
+        status: 'success',
+        message: 'Relatório salvo com sucesso!', 
+        reportId: this.lastID,
+        timestamp: new Date().toISOString()
+      });
     });
-    
-    res.status(201).json({ 
-      success: true,
-      status: 'success',
-      message: 'Relatório salvo com sucesso!', 
-      reportId: this.lastID,
-      timestamp: new Date().toISOString()
+  };
+
+  if (!isAdmin) {
+    professorTemAcesso(userId, studentId, (err, temAcesso) => {
+      if (err) return res.status(500).json({ success: false, error: 'Erro ao verificar acesso: ' + err.message });
+      if (!temAcesso) return res.status(403).json({ success: false, error: 'Você não tem permissão para criar relatório para este aluno.' });
+      saveReport();
     });
-  });
+  } else {
+    saveReport();
+  }
 });
 
-app.get('/reports', (req, res) => {
-  const query = `
+// GET /reports - Listar relatórios. Protegido por JWT.
+app.get('/reports', authenticateMiddleware, (req, res) => {
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
+
+  let query = `
     SELECT 
       r.id, 
       r.student_id,
@@ -1005,10 +1218,17 @@ app.get('/reports', (req, res) => {
     FROM reports r
     LEFT JOIN students s ON r.student_id = s.id
     LEFT JOIN user u ON r.user_id = u.id
-    ORDER BY r.created_at DESC
   `;
   
-  db.all(query, [], (err, rows) => {
+  const params = [];
+  if (!isAdmin) {
+    query += ` WHERE r.user_id = ? OR r.student_id IN (SELECT student_id FROM professor_aluno WHERE professor_id = ?)`;
+    params.push(req.user.id, req.user.id);
+  }
+
+  query += ` ORDER BY r.created_at DESC`;
+  
+  db.all(query, params, (err, rows) => {
     if (err) return res.status(500).json({ 
       success: false,
       status: 'error',
@@ -1016,7 +1236,6 @@ app.get('/reports', (req, res) => {
       timestamp: new Date().toISOString()
     });
     
-    // Formatar resposta com status
     const formattedRows = rows.map(row => ({
       ...row,
       status: 'Finalizado',
@@ -1027,19 +1246,46 @@ app.get('/reports', (req, res) => {
   });
 });
 
-app.delete('/reports/:id', (req, res) => {
+// DELETE /reports/:id - Deletar relatório. Protegido por JWT.
+app.delete('/reports/:id', authenticateMiddleware, (req, res) => {
   const { id } = req.params;
+  const userRole = (req.user.role || '').toLowerCase();
+  const userMatricula = (req.user.matricula || '').toUpperCase();
+  const isAdmin = userRole.includes('admin') || userMatricula === 'ADM2026';
 
-  db.run('DELETE FROM reports WHERE id = ?', [id], function (err) {
-    if (err) return res.status(500).json({ error: 'Erro ao deletar relatório: ' + err.message });
-    
-    res.json({
-      success: true,
-      status: 'success',
-      message: 'Relatório deletado com sucesso!',
-      timestamp: new Date().toISOString()
+  if (isAdmin) {
+    db.run('DELETE FROM reports WHERE id = ?', [id], function (err) {
+      if (err) return res.status(500).json({ error: 'Erro ao deletar relatório: ' + err.message });
+      res.json({
+        success: true,
+        status: 'success',
+        message: 'Relatório deletado com sucesso!',
+        timestamp: new Date().toISOString()
+      });
     });
-  });
+  } else {
+    // Professor só pode deletar se criou o relatório ou está vinculado ao aluno do relatório
+    db.get(
+      `SELECT r.* FROM reports r
+       LEFT JOIN professor_aluno pa ON r.student_id = pa.student_id AND pa.professor_id = ?
+       WHERE r.id = ? AND (r.user_id = ? OR pa.id IS NOT NOT NULL)`,
+      [req.user.id, id, req.user.id],
+      (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(403).json({ error: 'Sem permissão para deletar este relatório.' });
+
+        db.run('DELETE FROM reports WHERE id = ?', [id], function (delErr) {
+          if (delErr) return res.status(500).json({ error: 'Erro ao deletar relatório: ' + delErr.message });
+          res.json({
+            success: true,
+            status: 'success',
+            message: 'Relatório deletado com sucesso!',
+            timestamp: new Date().toISOString()
+          });
+        });
+      }
+    );
+  }
 });
 
 // ==========================================

@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkAuth()) return;

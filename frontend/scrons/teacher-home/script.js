@@ -2,8 +2,8 @@
  * SISTEMA SAPE - TELA DE INÍCIO DO PROFESSOR AEE
  */
 
-const SAPE_CONFIG = {
-  API_URL: 'http://localhost:3000',
+const SAPE_CONFIG = window.SAPE_CONFIG || {
+  API_URL: (window.API_URL || 'http://localhost:3000'),
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };
