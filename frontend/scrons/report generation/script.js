@@ -1,10 +1,8 @@
 const API_URL = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Verificar autenticação
   if (!checkAuth()) return;
 
-  // Carregar perfil do usuário
   loadUserProfile();
 
   const studentSelect = document.getElementById('studentSelect');
@@ -14,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportForm = document.getElementById('reportForm');
   const btnSubmit = document.getElementById('btnSubmit');
 
-  // Atualizar Data e Hora no Topo do Formulário
   updateDateTime();
   setInterval(updateDateTime, 1000);
 
@@ -27,10 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timeEl) timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  // Carregar Alunos
   loadStudents();
 
-  // Buscar alunos (FILTRADO POR PROFESSOR SE FOR PROFESSOR, TODOS SE FOR ADMIN)
   async function loadStudents() {
     try {
       const userJSON = localStorage.getItem("sape_user");
@@ -41,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const role = (user.role || "").toLowerCase();
         const matricula = (user.matricula || "").toUpperCase();
         
-        // Se não for admin, busca apenas alunos vinculados
         if (!role.includes("admin") && matricula !== "ADM2026" && user.id) {
           endpoint = `${API_URL}/users/${user.id}/students`;
         }
@@ -69,11 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       studentSelect.innerHTML = '<option value="">-- Selecione o Aluno --</option>' + 
-        students.map(s => `
-          <option value="${s.id}" data-name="${s.name || s.nome}" data-disability="${s.disability_type || ''}">
-            ${s.name || s.nome} ${s.disability_type ? `(${s.disability_type})` : ''}
-          </option>
-        `).join('');
+        students.map(s => {
+          const safeName = (s.name || s.nome || 'Aluno sem nome').replace(/"/g, '&quot;');
+          return `
+            <option value="${s.id}" data-name="${safeName}" data-disability="${s.disability_type || ''}">
+              ${s.name || s.nome || 'Aluno sem nome'} ${s.disability_type ? `(${s.disability_type})` : ''}
+            </option>
+          `;
+        }).join('');
     } catch (error) {
       console.error(error);
       studentSelect.innerHTML = '<option value="">Erro ao conectar com o banco de dados</option>';
@@ -81,14 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Submeter Formulário: Salva os dados e Redireciona para a pasta report
   if (reportForm) {
     reportForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const studentId = studentSelect.value;
       const selectedOption = studentSelect.options[studentSelect.selectedIndex];
-      const studentName = selectedOption.getAttribute('data-name');
+
+      const studentName = (selectedOption && selectedOption.getAttribute('data-name')) || 'Aluno';
       
       const type = reportType.value;
       const content = reportContent.value.trim();
@@ -97,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentTime = document.getElementById('currentTime')?.textContent || new Date().toLocaleTimeString('pt-BR');
       const nowFormatted = `${currentDate} às ${currentTime}`;
 
-      // Validação
       if (!studentId) {
         showToast('Selecione um aluno cadastrado.', 'error');
         return;
@@ -108,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Recuperar nome do professor logado
       let professorName = 'Professor Responsável';
       let professorId = null;
       const userJSON = localStorage.getItem("sape_user");
@@ -122,12 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSubmit.disabled = true;
       btnSubmit.innerHTML = '<i class="ph ph-spinner"></i> Enviando Relatório...';
 
-      // 1. Montar Texto Consolidado
       const fullReportText = `[${type}]\nData/Hora: ${nowFormatted}\n\nDESENVOLVIMENTO:\n${content}${recommendations ? `\n\nENCAMINHAMENTOS:\n${recommendations}` : ''}`;
 
-      // 2. Salvar no LocalStorage para a tela na pasta report conseguir ler
+      const localId = 'REF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
       const novoRelatorio = {
-        id: 'REF-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
+        id: localId,
         titulo: type || 'Relatório de Acompanhamento',
         aluno: studentName,
         professor: professorName,
@@ -143,9 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
       relatoriosLocais.unshift(novoRelatorio);
       localStorage.setItem('relatoriosSAPE', JSON.stringify(relatoriosLocais));
 
-      // 3. Salvar no Backend SQLite
       try {
-        await fetch(`${API_URL}/reports`, {
+        const response = await fetch(`${API_URL}/reports`, {
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify({
@@ -156,9 +149,25 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
 
+        if (response.ok) {
+          try {
+            const saved = await response.json();
+            const backendId = saved?.id ?? saved?.data?.id;
+            if (backendId) {
+              const atualizados = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+              const idx = atualizados.findIndex(r => r.id === localId);
+              if (idx !== -1) {
+                atualizados[idx].id = backendId;
+                localStorage.setItem('relatoriosSAPE', JSON.stringify(atualizados));
+              }
+            }
+          } catch (parseErr) {
+            console.warn('Não foi possível ler o retorno do backend:', parseErr);
+          }
+        }
+
         showToast('Relatório salvo com sucesso!', 'success');
 
-        // 4. REDIRECIONAR PARA A TELA REPORT/INDEX.HTML
         setTimeout(() => {
           window.location.href = '../report/index.html';
         }, 1500);
@@ -167,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Erro ao salvar no banco backend, mas salvo localmente:', err);
         showToast('Relatório salvo localmente. Erro ao salvar no servidor.', 'warning');
         
-        // Ainda redireciona pois foi salvo localmente
         setTimeout(() => {
           window.location.href = '../report/index.html';
         }, 1500);
@@ -180,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Funções de autenticação
 function checkAuth() {
   const token = localStorage.getItem("sape_token");
   const user = localStorage.getItem("sape_user");
@@ -226,24 +233,20 @@ function loadUserProfile() {
     if (roleElem) roleElem.textContent = user.role || "Professor(a) AEE";
     if (avatarElem) avatarElem.textContent = (user.name || "P").charAt(0).toUpperCase();
     
-    // Mostrar menu admin se for admin
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
       if (role.includes("admin") || matricula === "ADM2026") {
         adminMenu.style.display = "flex";
-        // Se for admin, mostra Dashboard e Novo Aluno, esconde Início
         if (menuDashboard) menuDashboard.style.display = "flex";
         if (menuNewStudent) menuNewStudent.style.display = "flex";
         if (menuHome) menuHome.style.display = "none";
       } else {
-        // Se for professor, mostra Início, esconde Dashboard e Novo Aluno
         if (menuDashboard) menuDashboard.style.display = "none";
         if (menuNewStudent) menuNewStudent.style.display = "none";
         if (menuHome) menuHome.style.display = "flex";
       }
     } else {
-      // Se não tiver adminMenu, aplica a lógica nos outros menus
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
       const isAdmin = role.includes("admin") || matricula === "ADM2026";
@@ -271,16 +274,6 @@ function setLoading(isLoading) {
   }
 }
 
-// Menu toggle para mobile
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.querySelector('.sidebar');
-if (menuToggle && sidebar) {
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
-}
-
-// Toast notifications
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;

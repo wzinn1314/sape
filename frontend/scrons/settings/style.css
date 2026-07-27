@@ -344,6 +344,9 @@ body {
   .main-title { font-size: 28px; }
   .photo-section { flex-direction: column; align-items: flex-start; }
   .profile-photo { width: 80px; height: 80px; }
+  .settings-tabs { margin-bottom: 24px; }
+  .tab-list { padding-bottom: 10px; }
+  .tab-item { padding: 10px 14px; font-size: 14px; }
 }
 
 @media (max-width: 480px) {
@@ -355,6 +358,7 @@ body {
     height: auto;
     border-right: none;
     border-bottom: 1px solid var(--base-border);
+    padding: 20px 16px;
   }
 
   .main-content {
@@ -370,7 +374,25 @@ body {
   }
 
   .cards-grid { flex-direction: column; }
-  .settings-card { width: 100%; }
+  .settings-card { width: 100%; padding: 20px; }
   .btn-primary { width: 100%; }
   .activity-grid { flex-direction: column; }
+
+  .main-title { font-size: 24px; }
+  .subtitle { font-size: 14px; }
+  .card-title { font-size: 16px; margin-bottom: 16px; }
+  .settings-form { gap: 12px; }
+  .form-group label { font-size: 13px; }
+  .form-group input, .form-group select { padding: 10px; font-size: 14px; }
+  .btn-primary { padding: 10px 20px; font-size: 14px; }
+}
+
+@media (max-width: 360px) {
+  .main-content { padding: 12px; }
+  .settings-card { padding: 16px; }
+  .main-title { font-size: 20px; }
+  .menu { grid-template-columns: 1fr; }
+  .photo-section { gap: 12px; }
+  .profile-photo { width: 60px; height: 60px; }
+  .btn-primary { padding: 8px 16px; font-size: 13px; }
 }

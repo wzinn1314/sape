@@ -41,10 +41,8 @@ function validateAccess() {
   try {
     const user = JSON.parse(userJson);
     
-    // Lógica de Administrador - esconder itens de menu para professores
     const abaAdmin = document.getElementById('abaAdminMenu');
     const menuNovoAluno = document.querySelector('a[href="../new_students/index.html"]');
-    const menuDashboard = document.querySelector('a[href="../deshboard/index.html"]');
     
     if (abaAdmin) {
       const role = (user.role || "").toLowerCase();
@@ -53,7 +51,6 @@ function validateAccess() {
       abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
     }
     
-    // Esconder "Novo Aluno" para professores
     if (menuNovoAluno) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
@@ -61,12 +58,10 @@ function validateAccess() {
       menuNovoAluno.style.display = hasPrivileges ? 'flex' : 'none';
     }
 
-    // Identificar tipo de usuário para adaptar interface (sem redirecionamento)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
     const isAdmin = role.includes("admin") || matricula === "ADM2026";
     
-    // Apenas log para debug - não expulsa usuário
     console.log("Tipo de usuário:", isAdmin ? "Admin" : "Professor");
 
     return user;
@@ -105,7 +100,6 @@ function setupUI(user) {
   if (elements.type) elements.type.textContent = user.role || "Docente";
   if (elements.avatar) elements.avatar.textContent = getInitials(user.nome || user.name || "US");
 
-  // Data por extenso
   if (elements.date) {
       const agora = new Date();
       elements.date.innerHTML = `<i class="fas fa-calendar-day mr-2"></i> ${agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
@@ -117,7 +111,6 @@ function setupUI(user) {
 // --- CARREGAMENTO DE DADOS (DASHBOARD REAL) ---
 async function renderDashboardData() {
   try {
-    // Carregar dados reais do banco de dados
     const [studentsResponse, reportsResponse, usersResponse] = await Promise.all([
       fetch(`${SAPE_CONFIG.API_URL}/students`, { headers: getAuthHeaders() }),
       fetch(`${SAPE_CONFIG.API_URL}/reports`, { headers: getAuthHeaders() }),
@@ -140,7 +133,6 @@ async function renderDashboardData() {
     const reportsArray = Array.isArray(reports) ? reports : (reports.data || []);
     const usersArray = Array.isArray(users) ? users : (users.data || []);
 
-    // Filtrar apenas professores de AEE
     const teachers = usersArray.filter(u => {
       const role = (u.role || '').toLowerCase();
       return role.includes('prof') || role.includes('teacher') || role.includes('aee');
@@ -203,7 +195,6 @@ function updateDiagnosisStats(students) {
     return;
   }
 
-  // Contar diagnósticos
   const diagnosisCount = {};
   students.forEach(student => {
     const diagnosis = (student.diagnostico || 'Não informado').toLowerCase();
@@ -213,7 +204,7 @@ function updateDiagnosisStats(students) {
   const total = students.length;
   const sortedDiagnoses = Object.entries(diagnosisCount)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5); // Top 5 diagnósticos
+    .slice(0, 5);
 
   if (sortedDiagnoses.length === 0) {
     container.innerHTML = '<div class="loading-state">Nenhum diagnóstico registrado</div>';
@@ -291,24 +282,13 @@ function animateEntry() {
 }
 
 function setupEventListeners() {
-  // Listener de atalhos de teclado
   document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.key === 'm') console.log("Atalho acionado");
   });
 
-  // Listener do botão de logout
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', logout);
-  }
-  
-  // Listener do botão de menu toggle (mobile)
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.querySelector('.sidebar');
-  if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-    });
   }
 }
 

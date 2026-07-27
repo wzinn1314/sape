@@ -349,6 +349,52 @@ button:disabled {
   }
 }
 
+@media (max-width: 400px) {
+  .background {
+    padding: 12px;
+  }
+
+  .login-card {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+
+  .logo {
+    width: 110px;
+    height: 110px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  label {
+    font-size: 0.95rem;
+  }
+
+  .input-box {
+    height: 50px;
+    padding: 0 12px;
+  }
+
+  .input-box input {
+    font-size: 0.95rem;
+  }
+
+  button {
+    height: 52px;
+    font-size: 1rem;
+  }
+
+  .footer {
+    font-size: 0.85rem;
+  }
+}
+
 
 @media (max-width: 360px) {
   .logo {
@@ -357,10 +403,24 @@ button:disabled {
   }
 
   h1 {
-    font-size: 2.3rem;
+    font-size: 2.2rem;
   }
 
   .login-card {
-    padding: 24px 18px;
+    padding: 20px 16px;
+  }
+
+  .input-box {
+    height: 48px;
+    padding: 0 10px;
+  }
+
+  button {
+    height: 50px;
+    font-size: 0.95rem;
+  }
+
+  .heart {
+    font-size: 1.3rem;
   }
 }

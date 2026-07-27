@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <!-- SIDEBAR (Estrutura original preservada conforme pedido) -->
+    <!-- SIDEBAR (Estrutura original preservada, sempre visível) -->
     <aside class="sidebar">
         <div class="logo">
             <img src="../../assets/foto.png" alt="Logo SAPE">
@@ -22,22 +22,13 @@
         </div>
 
         <nav class="menu">
-            <a class="active" href="../deshboard/index.html">
-                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
-            </a>
-            <a href="../students/index.html">
-                <i class="fas fa-graduation-cap"></i> <span>Alunos</span>
-            </a>
-            <a href="../new_students/index.html">
-                <i class="fas fa-user-plus"></i> <span>Novo Aluno</span>
-            </a>
-            <a href="../report/index.html">
-                <i class="fas fa-file-invoice"></i> <span>Relatórios</span>
-            </a>
-            <a href="../report generation/index.html">
-                <i class="fas fa-plus-circle"></i> <span>Novo Relatório</span>
-            </a>
-            <!-- Aba Admin: Gerenciada via script.js -->
+            <a href="../teacher-home/index.html" id="menuHome" style="display: none;"><i class="fas fa-home"></i> <span>Início</span></a>
+            <a class="active" href="../deshboard/index.html" id="menuDashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
+            <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
+            <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+            <a href="../report generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
+            <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
             <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
                 <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
             </a>
@@ -58,9 +49,6 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="main">
         <header class="top-header">
-            <button class="menu-toggle" id="menuToggle" style="display: none;">
-                <i class="fas fa-bars"></i>
-            </button>
             <div class="header-greeting">
                 <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
                 <p id="headerSubtitle">Painel de gerenciamento acadêmico e acolhimento.</p>
@@ -108,7 +96,6 @@
                         <a href="../students/index.html" class="card-link">Ver histórico</a>
                     </div>
                     <div id="recentStudentsList">
-                        <!-- Gerado via JavaScript para ser dinâmico -->
                         <div class="loading-state">Aguardando dados...</div>
                     </div>
                 </div>
