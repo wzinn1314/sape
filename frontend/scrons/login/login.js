@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('password');
   const submitButton = document.getElementById('btnEntrar');
 
-  const API_BASE_URL = 'http://localhost:3000';
+  const API_BASE_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
 
   // Verificar se já está logado - DESATIVADO para permitir acesso à tela de login
   // checkExistingSession();

@@ -1,3 +1,14 @@
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
+
+function getAuthHeaders() {
+    const token = localStorage.getItem("sape_token");
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
 const nome = document.getElementById('nome');
 const email = document.getElementById('email');
 const cpf = document.getElementById('cpf');
@@ -74,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // busca domínios permitidos do backend (se configurado)
-    fetch('http://localhost:3000/config')
+    fetch(`${API_URL}/config`)
         .then(r => r.json())
         .then(cfg => {
             if (cfg && Array.isArray(cfg.allowedDomains) && cfg.allowedDomains.length > 0) {
@@ -104,11 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Enviar para o backend
-            const response = await fetch('http://localhost:3000/register', {
+            const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(userData)
             });
 

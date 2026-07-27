@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || "http://localhost:3000";
 const searchInput = document.getElementById("searchInput");
 const gradeFilter = document.getElementById("gradeFilter");
 const typeFilter = document.getElementById("typeFilter");
