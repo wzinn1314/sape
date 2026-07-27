@@ -1,6 +1,5 @@
 const API_URL = 'http://localhost:3000';
 
-// Estado da aplicação
 let allReports = [];
 let filteredReports = [];
 let allStudents = [];
@@ -10,21 +9,16 @@ const itemsPerPage = 10;
 let searchTimeout = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Verificar autenticação
   if (!checkAuth()) return;
 
-  // Carregar perfil do usuário
   loadUserProfile();
 
-  // Definir data atual
   const today = new Date().toLocaleDateString('pt-BR');
   const todayDateElement = document.getElementById('todayDate');
   if (todayDateElement) todayDateElement.textContent = today;
 
-  // Configurar eventos
   setupEventListeners();
 
-  // Carregar dados
   setLoading(true);
   await loadInitialData();
   setLoading(false);
@@ -70,21 +64,11 @@ function setupEventListeners() {
 
 async function loadInitialData() {
   try {
-    // Carregar relatórios
     await loadReports();
-    
-    // Carregar alunos para filtros
     await loadStudents();
-    
-    // Carregar professores para filtros
     await loadTeachers();
-    
-    // Aplicar filtros iniciais
     applyFilters();
-    
-    // Atualizar estatísticas
     updateStats();
-    
   } catch (error) {
     console.error('Erro ao carregar dados iniciais:', error);
     showToast('Erro ao carregar dados. Verifique sua conexão.', 'error');
@@ -102,7 +86,6 @@ async function loadReports() {
       const matricula = (user.matricula || "").toUpperCase();
       const isAdmin = role.includes("admin") || matricula === "ADM2026";
       
-      // Se não for admin, busca apenas relatórios do professor
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/reports`;
       }
@@ -123,21 +106,18 @@ async function loadReports() {
     if (!response.ok) throw new Error('Erro ao buscar relatórios');
 
     const data = await response.json();
-    allReports = Array.isArray(data) ? data : (data.data || []);
-    
-    // Também carregar relatórios do localStorage e combinar
+    const backendReports = Array.isArray(data) ? data : (data.data || []);
+
     const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
-    
-    // Combinar relatórios do backend com locais, evitando duplicatas pelo ID
-    const existingIds = new Set(allReports.map(r => r.id));
-    const newLocalReports = localReports.filter(r => !existingIds.has(r.id));
-    
-    allReports = [...newLocalReports, ...allReports];
+
+    const existingIds = new Set(backendReports.map(r => String(r.id)));
+    const newLocalReports = localReports.filter(r => !existingIds.has(String(r.id)));
+
+    allReports = [...newLocalReports, ...backendReports];
     filteredReports = [...allReports];
     
   } catch (error) {
     console.error('Erro ao carregar relatórios:', error);
-    // Fallback para localStorage
     allReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
     filteredReports = [...allReports];
   }
@@ -154,7 +134,6 @@ async function loadStudents() {
       const matricula = (user.matricula || "").toUpperCase();
       const isAdmin = role.includes("admin") || matricula === "ADM2026";
       
-      // Se não for admin, busca apenas alunos vinculados
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/students`;
       }
@@ -176,7 +155,6 @@ async function loadStudents() {
 
     allStudents = await response.json();
     
-    // Preencher select de alunos
     const filterAluno = document.getElementById('filterAluno');
     if (filterAluno) {
       filterAluno.innerHTML = '<option value="">Todos os Alunos</option>';
@@ -215,7 +193,6 @@ async function loadTeachers() {
       return role.includes('prof') || role.includes('teacher') || role.includes('aee');
     });
     
-    // Preencher select de professores
     const filterProfessor = document.getElementById('filterProfessor');
     if (filterProfessor) {
       filterProfessor.innerHTML = '<option value="">Todos os Professores</option>';
@@ -236,7 +213,7 @@ function handleSearchInput() {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
     applyFilters();
-  }, 300); // Debounce de 300ms
+  }, 300);
 }
 
 function applyFilters() {
@@ -245,17 +222,13 @@ function applyFilters() {
   const alunoId = document.getElementById('filterAluno')?.value || '';
 
   filteredReports = allReports.filter(report => {
-    // Filtro de busca
     const matchSearch = !search || 
       (report.titulo || '').toLowerCase().includes(search) ||
       (report.aluno || '').toLowerCase().includes(search) ||
       (report.professor || '').toLowerCase().includes(search);
 
-    // Filtro de professor
-    const matchProfessor = !professorId || report.professorId == professorId;
-
-    // Filtro de aluno
-    const matchAluno = !alunoId || report.studentId == alunoId;
+    const matchProfessor = !professorId || String(report.professorId) === String(professorId);
+    const matchAluno = !alunoId || String(report.studentId) === String(alunoId);
 
     return matchSearch && matchProfessor && matchAluno;
   });
@@ -292,7 +265,6 @@ function renderReports() {
   
   if (!tbody) return;
 
-  // Limpar tabela
   tbody.innerHTML = '';
 
   if (filteredReports.length === 0) {
@@ -302,12 +274,10 @@ function renderReports() {
 
   if (emptyMessage) emptyMessage.style.display = 'none';
 
-  // Calcular paginação
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const pageReports = filteredReports.slice(startIndex, endIndex);
 
-  // Renderizar linhas
   pageReports.forEach(report => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -344,8 +314,6 @@ function renderReports() {
 
 function updatePagination() {
   const totalPages = Math.ceil(filteredReports.length / itemsPerPage) || 1;
-  const startItem = filteredReports.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, filteredReports.length);
 
   const totalRows = document.getElementById('totalRows');
   const currentPageElement = document.getElementById('currentPage');
@@ -381,10 +349,12 @@ function updateStats() {
   if (totalStudents) totalStudents.textContent = allStudents.length;
   if (totalTeachers) totalTeachers.textContent = allTeachers.length;
 
-  // Calcular relatórios de hoje
   const today = new Date().toISOString().split('T')[0];
   const todayCount = allReports.filter(r => {
-    const reportDate = new Date(r.created_at).toISOString().split('T')[0];
+    if (!r.created_at) return false;
+    const parsedDate = new Date(r.created_at);
+    if (isNaN(parsedDate.getTime())) return false;
+    const reportDate = parsedDate.toISOString().split('T')[0];
     return reportDate === today;
   }).length;
 
@@ -394,14 +364,13 @@ function updateStats() {
 function formatDate(dateString) {
   if (!dateString) return 'Não informado';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Não informado';
   return date.toLocaleDateString('pt-BR');
 }
 
-// Funções de ação
 function visualizarRelatorio(id) {
-  const report = allReports.find(r => r.id == id);
+  const report = allReports.find(r => String(r.id) === String(id));
   if (report) {
-    // Criar modal simples para visualizar o conteúdo
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.cssText = `
@@ -438,15 +407,15 @@ function visualizarRelatorio(id) {
 }
 
 function baixarRelatorio(id) {
-  const report = allReports.find(r => r.id == id);
+  const report = allReports.find(r => String(r.id) === String(id));
   if (report) {
-    // Criar arquivo texto para download
-    const content = report.conteudo || `${report.titulo}\n\nAluno: ${report.aluno || report.studentName}\nProfessor: ${report.professor || report.professorName}\nData: ${formatDate(report.created_at || report.data)}`;
+    const alunoNome = report.aluno || report.studentName || 'aluno';
+    const content = report.conteudo || `${report.titulo}\n\nAluno: ${alunoNome}\nProfessor: ${report.professor || report.professorName}\nData: ${formatDate(report.created_at || report.data)}`;
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Relatorio_${report.aluno || report.studentName || 'aluno'}_${formatDate(report.created_at || report.data)}.txt`;
+    a.download = `Relatorio_${alunoNome.replace(/\s+/g, '_')}_${formatDate(report.created_at || report.data)}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -462,7 +431,6 @@ async function deletarRelatorio(id) {
   if (!confirm('Deseja realmente excluir este relatório?')) return;
 
   try {
-    // Tentar deletar do backend
     const response = await fetch(`${API_URL}/reports/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders()
@@ -476,9 +444,8 @@ async function deletarRelatorio(id) {
       return;
     }
 
-    // Deletar do localStorage independente da resposta do backend
     const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
-    const updatedLocalReports = localReports.filter(r => r.id !== id);
+    const updatedLocalReports = localReports.filter(r => String(r.id) !== String(id));
     localStorage.setItem('relatoriosSAPE', JSON.stringify(updatedLocalReports));
 
     if (response.ok) {
@@ -493,9 +460,8 @@ async function deletarRelatorio(id) {
   } catch (error) {
     console.error('Erro ao excluir relatório:', error);
     
-    // Ainda tentar deletar do localStorage mesmo com erro
     const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
-    const updatedLocalReports = localReports.filter(r => r.id !== id);
+    const updatedLocalReports = localReports.filter(r => String(r.id) !== String(id));
     localStorage.setItem('relatoriosSAPE', JSON.stringify(updatedLocalReports));
     
     await loadReports();
@@ -506,7 +472,6 @@ async function deletarRelatorio(id) {
   }
 }
 
-// Funções de autenticação
 function checkAuth() {
   const token = localStorage.getItem("sape_token");
   const user = localStorage.getItem("sape_user");
@@ -552,24 +517,20 @@ function loadUserProfile() {
     if (roleElem) roleElem.textContent = user.role || "Professor(a) AEE";
     if (avatarElem) avatarElem.textContent = (user.name || "P").charAt(0).toUpperCase();
     
-    // Mostrar menu admin se for admin
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
       if (role.includes("admin") || matricula === "ADM2026") {
         adminMenu.style.display = "flex";
-        // Se for admin, mostra Dashboard e Novo Aluno, esconde Início
         if (menuDashboard) menuDashboard.style.display = "flex";
         if (menuNewStudent) menuNewStudent.style.display = "flex";
         if (menuHome) menuHome.style.display = "none";
       } else {
-        // Se for professor, mostra Início, esconde Dashboard e Novo Aluno
         if (menuDashboard) menuDashboard.style.display = "none";
         if (menuNewStudent) menuNewStudent.style.display = "none";
         if (menuHome) menuHome.style.display = "flex";
       }
     } else {
-      // Se não tiver adminMenu, aplica a lógica nos outros menus
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
       const isAdmin = role.includes("admin") || matricula === "ADM2026";
@@ -602,7 +563,6 @@ function setLoading(isLoading) {
   }
 }
 
-// Toast notifications
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
@@ -653,13 +613,4 @@ function getToastIcon(type) {
     info: 'fas fa-info-circle'
   };
   return icons[type] || icons.info;
-}
-
-// Menu toggle para mobile
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.querySelector('.sidebar');
-if (menuToggle && sidebar) {
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
 }
