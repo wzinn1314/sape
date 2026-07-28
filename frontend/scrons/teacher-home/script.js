@@ -44,7 +44,7 @@ function validateAccess() {
     // Identificar tipo de usuário para adaptar interface (sem redirecionamento)
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
-    const isAdmin = role.includes("admin") || matricula === "ADM2026";
+    const isAdmin = role.includes("admin");
     
     // Apenas log para debug - não expulsa usuário
     console.log("Tipo de usuário:", isAdmin ? "Admin" : "Professor");

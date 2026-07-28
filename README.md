@@ -35,6 +35,11 @@ O SAPE é um sistema web projetado para educadores especializados (AEE - Atendim
 - **JWT (JSON Web Tokens)** - Autenticação segura
 - **Middleware de autenticação** - Controle de acesso
 
+## 🗄️ Banco em Produção
+
+- O SAPE usa SQLite por padrão (arquivo em disco).
+- Para produção, o caminho do banco deve ficar em armazenamento persistente (volume/disk) do provedor, configurando `DB_PATH`.
+
 ### Segurança
 - Autenticação JWT
 - Validação de tokens expirados
@@ -45,87 +50,39 @@ O SAPE é um sistema web projetado para educadores especializados (AEE - Atendim
 
 ```
 SAPE/
-├── backend/                    # Backend Node.js/Express
+├── backend/                      # Backend Node.js/Express
 │   ├── config/
-│   │   ├── database.js       # Configuração SQLite
-│   │   └── jwt.js            # Configuração JWT
-│   ├── controllers/
-│   │   └── authController.js  # Controle de autenticação
+│   │   ├── database.js           # Conexão + init do SQLite
+│   │   └── jwt.js                # Helpers JWT
 │   ├── middleware/
-│   │   └── auth.js            # Middleware JWT
-│   ├── models/
-│   │   └── User.js            # Modelo de usuário
-│   ├── routes/
-│   │   └── auth.js            # Rotas de autenticação
+│   │   ├── admin.js              # Verificação de role admin
+│   │   ├── auth.js               # Autenticação JWT (Bearer)
+│   │   └── studentAccess.js      # Checagem de vínculo professor↔aluno
 │   ├── utils/
-│   │   ├── apiResponse.js     # Utilitários de resposta
-│   │   └── asyncHandler.js    # Tratamento de erros
-│   ├── .env                   # Variáveis de ambiente
-│   ├── .env.example           # Exemplo de configuração
-│   ├── package.json           # Dependências Node.js
-│   └── server.js              # Servidor principal
+│   │   └── access.js             # Helper de vínculo (professorTemAcesso)
+│   ├── .env.example              # Exemplo de configuração (NUNCA commitar .env)
+│   ├── package.json              # Dependências do backend
+│   └── server.js                 # Servidor principal (API + estáticos)
 │
-├── frontend/                   # Frontend (opções alternativas)
-│   ├── css/
-│   │   ├── components.css
-│   │   ├── pages.css
-│   │   └── theme.css
-│   ├── js/
-│   │   ├── components/
-│   │   │   └── toast.js
-│   │   ├── pages/
-│   │   │   └── login.js
-│   │   └── utils/
-│   │       └── api.js
-│   ├── index.html
-│   └── login.html
+├── frontend/                     # Frontend HTML/CSS/JS
+│   ├── assets/
+│   ├── config.js                 # Config global do frontend
+│   └── scrons/                   # Telas
+│       ├── admin/
+│       ├── deshboard/
+│       ├── login/
+│       ├── new_students/
+│       ├── register/
+│       ├── report/
+│       ├── report generation/
+│       ├── settings/
+│       ├── students/
+│       └── teacher-home/
 │
-├── login/                      # Tela de Login (refatorada)
-│   ├── index.html
-│   ├── login.js
-│   └── styles.css
-│
-├── deshboard/                  # Dashboard (Admins e Diretores)
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── students/                   # Gestão de Alunos
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── new_students/              # Cadastro de Novo Aluno
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── admin/                      # Painel Administrativo
-│   ├── admin.html
-│   ├── admin.js
-│   └── style.css
-│
-├── report/                     # Listagem de Relatórios
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── report generation/          # Geração de Relatórios
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── teacher-home/               # Tela Início Professores (NOVA)
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-│
-├── assets/                     # Arquivos estáticos
-│   └── foto.png
-│
+├── index.html                    # Landing page
+├── styles.css                    # CSS da landing page
 ├── .gitignore
-├── REFACTORING_PLAN.md
-└── README.md                   # Este arquivo
+└── README.md
 ```
 
 ## ⚙️ Configuração e Instalação
@@ -143,40 +100,39 @@ git clone <url-do-repositorio>
 cd SAPE
 ```
 
-2. **Configure o backend:**
+2. **Instale as dependências:**
 ```bash
-cd backend
 npm install
 ```
 
 3. **Configure as variáveis de ambiente:**
 ```bash
-# Copie o arquivo de exemplo
-cp .env.example .env
-
-# Edite o .env com suas configurações
-# JWT_SECRET deve ser uma string aleatória segura
+cp backend/.env.example backend/.env
 ```
 
 ### Exemplo de arquivo `.env`:
 ```env
+NODE_ENV=development
 PORT=3000
 JWT_SECRET=sua_chave_secreta_aqui_mais_longa_e_segura
-DB_PATH=./database.sqlite
-NODE_ENV=development
+JWT_EXPIRES_IN=7d
+DB_PATH=./sapedb.sqlite
+ADMIN_EMAIL=admin@escola.edu.br
+ADMIN_MATRICULA=ADM2026
+ADMIN_PASSWORD=troque_esta_senha
+ALLOWED_EMAIL_DOMAINS=escola.edu.br
+CORS_ORIGINS=
 ```
 
 ### Rodar o Servidor
 
 **Desenvolvimento:**
 ```bash
-cd backend
 npm start
 ```
 
 **Produção:**
 ```bash
-cd backend
 npm start
 ```
 
@@ -191,7 +147,7 @@ O servidor estará disponível em `http://localhost:3000`
    - Pode criar novos alunos
    - Pode acessar Dashboard completo
    - Pode acessar Painel Admin
-   - Matrícula: `ADM2026`
+   - É identificado por role contendo `admin` (ex.: `Admin`)
 
 2. **Professor (Professor AEE)**
    - Acesso apenas a alunos vinculados
@@ -208,8 +164,9 @@ O servidor estará disponível em `http://localhost:3000`
 ## 🌐 API Endpoints
 
 ### Autenticação
-- `POST /auth/login` - Login do usuário
-- `POST /auth/register` - Registro de usuário
+- `POST /login` ou `POST /auth/login` - Login do usuário
+- `GET /me` ou `GET /auth/me` - Dados do usuário autenticado
+- `POST /register` ou `POST /auth/register` - Criar usuário (requer Admin)
 
 ### Alunos
 - `GET /students` - Listar todos os alunos (Admin) ou vinculados (Professor)
@@ -325,7 +282,7 @@ O servidor estará disponível em `http://localhost:3000`
 - ✅ Cadastro de professores
 - ✅ Vínculo professor-aluno
 - ✅ Gestão de vínculos
-- ✅ Validação dupla (JWT + matrícula ADM2026)
+- ✅ Autorização por JWT + role admin
 
 ### 7. Relatórios
 - ✅ Listagem completa
@@ -348,8 +305,8 @@ O servidor estará disponível em `http://localhost:3000`
 
 **Como Admin:**
 1. Acesse `login/index.html`
-2. Matrícula: `ADM2026`
-3. Senha: `AdminSAPE2026`
+2. Use `ADMIN_EMAIL` ou `ADMIN_MATRICULA` configurados no `.env`
+3. Use `ADMIN_PASSWORD` configurada no `.env`
 4. Deve redirecionar para `deshboard/index.html`
 
 **Como Professor:**

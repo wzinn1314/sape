@@ -10,7 +10,6 @@ let listaVinculos = [];
 // INICIALIZAÇÃO AO CARREGAR A PÁGINA
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
-  // VALIDAÇÃO DUPLA: JWT + Matrícula ADM2026
   if (!checkAdminAccess()) return;
 
   // Carregar perfil do usuário
@@ -37,9 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ==========================================
-// VALIDAÇÃO DUPLA: JWT + Matrícula ADM2026
-// ==========================================
 function checkAdminAccess() {
   const token = localStorage.getItem("sape_token");
   const userString = localStorage.getItem("sape_user");
@@ -55,10 +51,8 @@ function checkAdminAccess() {
   try {
     const user = JSON.parse(userString);
     const role = (user.role || "").toLowerCase();
-    const matricula = (user.matricula || "").toUpperCase();
 
-    // Validação dupla: JWT (role admin) + Matrícula ADM2026
-    if (!role.includes("admin") && matricula !== "ADM2026") {
+    if (!role.includes("admin")) {
       showToast("Acesso negado. Apenas administradores podem acessar esta página.", "error");
       setTimeout(() => {
         window.location.href = "../login/index.html";

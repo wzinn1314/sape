@@ -84,7 +84,7 @@ async function loadReports() {
       const user = JSON.parse(userJSON);
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/reports`;
@@ -132,7 +132,7 @@ async function loadStudents() {
       const user = JSON.parse(userJSON);
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/students`;
@@ -520,7 +520,7 @@ function loadUserProfile() {
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      if (role.includes("admin") || matricula === "ADM2026") {
+      if (role.includes("admin")) {
         adminMenu.style.display = "flex";
         if (menuDashboard) menuDashboard.style.display = "flex";
         if (menuNewStudent) menuNewStudent.style.display = "flex";
@@ -533,7 +533,7 @@ function loadUserProfile() {
     } else {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
       if (menuNewStudent) menuNewStudent.style.display = isAdmin ? "flex" : "none";

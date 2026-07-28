@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const userObj = JSON.parse(user);
       const role = (userObj.role || "").toLowerCase();
       const matricula = (userObj.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (!isAdmin) {
         showToast("Apenas administradores podem criar novos alunos.", "error");
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (adminMenu) {
         const role = (user.role || "").toLowerCase();
         const matricula = (user.matricula || "").toUpperCase();
-        if (role.includes("admin") || matricula === "ADM2026") {
+        if (role.includes("admin")) {
           adminMenu.style.display = "flex";
         }
       }
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (menuDashboard || menuNovoAluno) {
         const role = (user.role || "").toLowerCase();
         const matricula = (user.matricula || "").toUpperCase();
-        const isAdmin = role.includes("admin") || matricula === "ADM2026";
+        const isAdmin = role.includes("admin");
         
         if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
         if (menuNovoAluno) menuNovoAluno.style.display = isAdmin ? "flex" : "none";

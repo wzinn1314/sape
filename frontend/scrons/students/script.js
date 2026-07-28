@@ -72,7 +72,7 @@ function loadUserProfile() {
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      if (role.includes("admin") || matricula === "ADM2026") {
+      if (role.includes("admin")) {
         adminMenu.style.display = "flex";
         // Se for admin, mostra Dashboard e Novo Aluno, esconde Início
         if (menuDashboard) menuDashboard.style.display = "flex";
@@ -88,7 +88,7 @@ function loadUserProfile() {
       // Se não tiver adminMenu, aplica a lógica nos outros menus
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
       if (menuNewStudent) menuNewStudent.style.display = isAdmin ? "flex" : "none";
