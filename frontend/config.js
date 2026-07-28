@@ -11,7 +11,7 @@
 
     const origin = window.location.origin;
 
-    // Se a página for aberta direto do sistema de arquivos (file://) ou sem origin
+    // Se a página for aberta direto do sistema de arquivos (file://) ou sem origi
     if (!origin || origin === 'null' || origin.startsWith('file://')) {
       return 'http://localhost:3000';
     }
