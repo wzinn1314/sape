@@ -425,6 +425,146 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
+// ==========================================
+// DADOS DO CHECKLIST - AVALIAÇÃO DIAGNÓSTICA (INICIAL)
+// Extraído a partir do modelo de Relatório Pedagógico (SAPE)
+// ==========================================
+
+const DIAGNOSTICO_OPCOES = [
+  { valor: 'A', label: 'Alcançado (A)' },
+  { valor: 'P', label: 'Em Processo (P)' },
+  { valor: 'N', label: 'Não (N)' }
+];
+
+const DIAGNOSTICO_INICIAL = [
+  {
+    area: 'Linguagem - Comunicação',
+    perguntas: [
+      'Expressa-se com clareza?',
+      'Expressa-se espontaneamente?',
+      'Possui vocábulo amplo?',
+      'Transmite recados?',
+      'Faz perguntas oportunas?',
+      'Usa linguagem oral para expressar desejos, necessidades e sentimentos?',
+      'Participa de interações orais em sala, respeitando turnos de fala?',
+      'Narra pequenas experiências pessoais?'
+    ]
+  },
+  {
+    area: 'Estruturação Espaço/Temporal',
+    perguntas: [
+      'Demonstra ter noção de espaço (sala de aula, casa, escola, etc.)?',
+      'Demonstra noção de tempo (manhã, tarde e noite)?',
+      'Demonstra noção de tempo (hoje, ontem, amanhã)?',
+      'Demonstra noção de tempo (semana, meses e anos)?',
+      'Demonstra capacidade de organização de história em sequência, através de gravuras?',
+      'Observa mudanças de organização da sala?'
+    ]
+  },
+  {
+    area: 'Linguagem Escrita',
+    perguntas: [
+      'Escreve seu nome?',
+      'Escreve de forma espontânea as palavras conhecidas com sílabas diretas?',
+      'Escreve respeitando a direção espacial?',
+      'Copia de forma automática sem atribuição de significado?',
+      'Confunde letras parecidas?',
+      'Troca ou omite letras?',
+      'Escreve letras espelhadas?'
+    ]
+  },
+  {
+    area: 'Leitura',
+    perguntas: [
+      'Associa rótulos de embalagens?',
+      'Soletração oral de palavras?',
+      'Conhece gibi e livros infantis?',
+      'Segue o dedo na leitura da palavra, da esquerda para direita?',
+      'Interpreta a partir da sequência de imagens e ilustrações?',
+      'Lê palavras simples?',
+      'Lê palavras complexas?',
+      'Realiza produção de texto a partir do que foi lido?',
+      'Compreende que os sinais impressos (?, ., !) correspondem à entonação da fala?'
+    ]
+  },
+  {
+    area: 'Atenção e Concentração',
+    perguntas: [
+      'Detém muito tempo na execução das tarefas?',
+      'É disperso e muda o foco da atenção de uma atividade para outra?',
+      'É apático, necessitando de muito estímulo para o término das atividades?',
+      'É agitado, não concluindo as atividades propostas?',
+      'Escuta com atenção textos de diferentes gêneros lidos pelo professor?',
+      'Sua atenção é dirigida para detalhes sem importância?',
+      'Sua atenção é constante e permanente?'
+    ]
+  },
+  {
+    area: 'Psicomotricidade',
+    perguntas: [
+      'Faz desenhos do corpo humano com riqueza de detalhes?',
+      'Identifica direita e esquerda?',
+      'Tem noção de espaço (em baixo, em cima, lado, direita, esquerda, frente, trás, longe, perto)?',
+      'Tem noção de quantidade (cheio e vazio)?',
+      'Tem noção de fino, grosso, largo?',
+      'Define a lateralidade em si e no outro?'
+    ]
+  },
+  {
+    area: 'Coordenação Visomotora',
+    perguntas: [
+      'Atira, pega, solta, faz preensão palmar, pinça, rasga, dobra e modela?',
+      'Recorta linha reta?',
+      'Recorta linha curva?',
+      'Abre zíper?',
+      'Pega corretamente a caneta, tesoura, lápis, borracha?',
+      'Amarra nó?',
+      'Abotoa?'
+    ]
+  },
+  {
+    area: 'Memória Visual',
+    perguntas: [
+      'Interpreta gravuras?',
+      'Interpreta jogos de memória, monta quebra-cabeças e jogos de encaixe?',
+      'Identifica figuras iguais?'
+    ]
+  },
+  {
+    area: 'Memória Auditiva',
+    perguntas: [
+      'Identifica os vários tipos de sons (vozes de animais, gotejamento, chuva, ventania, etc.)?',
+      'Percebe estímulos sonoros?',
+      'Reproduz sons?',
+      'Tem dificuldades de lembrar informações adquiridas oralmente?'
+    ]
+  },
+  {
+    area: 'Matemática – Raciocínio Lógico',
+    perguntas: [
+      'Apresenta noção de seriação (maior para o menor, do menor para o maior)?',
+      'Relaciona a quantidade com o numeral?',
+      'Conta oralmente?',
+      'Tem noção de quantidade?',
+      'Realiza adição?',
+      'Realiza subtração?',
+      'Realiza multiplicação?',
+      'Realiza divisão?',
+      'Identifica figuras geométricas?',
+      'Relaciona objetos iguais?',
+      'Resolve situações problema, utilizando diferentes formas de resolução?',
+      'Identifica cores?'
+    ]
+  },
+  {
+    area: 'Movimento e Artes',
+    perguntas: [
+      'Desloca-se com destreza progressiva no espaço ao andar, correr, pular, rolar, dançar, etc.?',
+      'Produz trabalhos de artes, utilizando diversas formas de expressão como desenho, pintura, colagem, etc.?',
+      'Possui gosto, cuidado e respeito pelo processo de produção e criação?'
+    ]
+  }
+];
 
 
 function getToastIcon(type) {
