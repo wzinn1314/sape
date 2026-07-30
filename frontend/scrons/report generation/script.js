@@ -1,5 +1,8 @@
 const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
 
+// Tipo de relatório que ativa o checklist (precisa bater com o value do <option> no HTML)
+const TIPO_DIAGNOSTICO_INICIAL = "Avaliação Diagnóstica (Inicial)";
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkAuth()) return;
 
@@ -11,9 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportRecommendations = document.getElementById('reportRecommendations');
   const reportForm = document.getElementById('reportForm');
   const btnSubmit = document.getElementById('btnSubmit');
+  const reportContentWrapper = document.getElementById('reportContentWrapper');
+  const diagnosticoWrapper = document.getElementById('diagnosticoChecklistWrapper');
+  const diagnosticoChecklist = document.getElementById('diagnosticoChecklist');
 
   updateDateTime();
   setInterval(updateDateTime, 1000);
+
+
+  
 
   function updateDateTime() {
     const now = new Date();
@@ -26,6 +35,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadStudents();
 
+  // ==========================================
+  // CHECKLIST DE AVALIAÇÃO DIAGNÓSTICA
+  // ==========================================
+
+  function montarChecklistDiagnostico() {
+    if (!diagnosticoChecklist) return;
+
+    diagnosticoChecklist.innerHTML = DIAGNOSTICO_INICIAL.map((bloco, areaIndex) => `
+      <div class="diagnostico-area">
+        <h3 class="diagnostico-area-titulo">${bloco.area}</h3>
+        ${bloco.perguntas.map((pergunta, perguntaIndex) => {
+          const nomeCampo = `diag_${areaIndex}_${perguntaIndex}`;
+          return `
+            <div class="diagnostico-item">
+              <p class="diagnostico-pergunta">${pergunta}</p>
+              <div class="diagnostico-opcoes">
+                ${DIAGNOSTICO_OPCOES.map(op => `
+                  <label class="diagnostico-opcao">
+                    <input type="checkbox" name="${nomeCampo}" value="${op.valor}" data-area="${bloco.area}" data-pergunta="${pergunta}">
+                    ${op.label}
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `).join('');
+
+    // Garante que só uma opção por pergunta fique marcada (checkbox se comportando como rádio)
+    diagnosticoChecklist.addEventListener('change', (e) => {
+      if (e.target.type !== 'checkbox') return;
+      const nome = e.target.name;
+      if (e.target.checked) {
+        diagnosticoChecklist
+          .querySelectorAll(`input[name="${nome}"]`)
+          .forEach(input => {
+            if (input !== e.target) input.checked = false;
+          });
+      }
+    });
+  }
+
+  function alternarModoRelatorio() {
+    const isDiagnosticoInicial = reportType.value === TIPO_DIAGNOSTICO_INICIAL;
+
+    if (isDiagnosticoInicial) {
+      diagnosticoWrapper.style.display = 'flex';
+      reportContentWrapper.style.display = 'none';
+      reportContent.removeAttribute('required');
+      if (!diagnosticoChecklist.innerHTML) montarChecklistDiagnostico();
+    } else {
+      diagnosticoWrapper.style.display = 'none';
+      reportContentWrapper.style.display = 'flex';
+      reportContent.setAttribute('required', 'required');
+    }
+  }
+
+  reportType.addEventListener('change', alternarModoRelatorio);
+  alternarModoRelatorio(); // aplica o estado correto já na carga da página
+
+  function coletarRespostasDiagnostico() {
+    const respostasPorArea = {};
+
+    diagnosticoChecklist.querySelectorAll('input[type="checkbox"]:checked').forEach(input => {
+      const area = input.dataset.area;
+      const pergunta = input.dataset.pergunta;
+      const opcao = DIAGNOSTICO_OPCOES.find(o => o.valor === input.value);
+
+      if (!respostasPorArea[area]) respostasPorArea[area] = [];
+      respostasPorArea[area].push(`- ${pergunta} → ${opcao ? opcao.label : input.value}`);
+    });
+
+    let texto = '';
+    Object.keys(respostasPorArea).forEach(area => {
+      texto += `\n${area.toUpperCase()}\n${respostasPorArea[area].join('\n')}\n`;
+    });
+
+    return texto.trim();
+  }
+
+  function contarPerguntasRespondidas() {
+    return diagnosticoChecklist.querySelectorAll('input[type="checkbox"]:checked').length;
+  }
+
+  // ==========================================
+  // CARREGAR ALUNOS
+  // ==========================================
+
   async function loadStudents() {
     try {
       const userJSON = localStorage.getItem("sape_user");
@@ -34,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (userJSON) {
         const user = JSON.parse(userJSON);
         const role = (user.role || "").toLowerCase();
-        const matricula = (user.matricula || "").toUpperCase();
         
         if (!role.includes("admin") && user.id) {
           endpoint = `${API_URL}/users/${user.id}/students`;
@@ -78,18 +175,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ==========================================
+  // SUBMISSÃO DO FORMULÁRIO
+  // ==========================================
+
   if (reportForm) {
     reportForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const studentId = studentSelect.value;
       const selectedOption = studentSelect.options[studentSelect.selectedIndex];
-
       const studentName = (selectedOption && selectedOption.getAttribute('data-name')) || 'Aluno';
-      
+
       const type = reportType.value;
-      const content = reportContent.value.trim();
+      const isDiagnosticoInicial = type === TIPO_DIAGNOSTICO_INICIAL;
       const recommendations = reportRecommendations.value.trim();
+
       const currentDate = document.getElementById('currentDate')?.textContent || new Date().toLocaleDateString('pt-BR');
       const currentTime = document.getElementById('currentTime')?.textContent || new Date().toLocaleTimeString('pt-BR');
       const nowFormatted = `${currentDate} às ${currentTime}`;
@@ -99,9 +200,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (!content || content.length < 10) {
-        showToast('O relatório deve ter pelo menos 10 caracteres.', 'error');
-        return;
+      let content;
+
+      if (isDiagnosticoInicial) {
+        if (contarPerguntasRespondidas() === 0) {
+          showToast('Marque pelo menos uma resposta no checklist.', 'error');
+          return;
+        }
+        content = coletarRespostasDiagnostico();
+      } else {
+        content = reportContent.value.trim();
+        if (!content || content.length < 10) {
+          showToast('O relatório deve ter pelo menos 10 caracteres.', 'error');
+          return;
+        }
       }
 
       let professorName = 'Professor Responsável';
@@ -235,7 +347,6 @@ function loadUserProfile() {
     
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
       if (role.includes("admin")) {
         adminMenu.style.display = "flex";
         if (menuDashboard) menuDashboard.style.display = "flex";
@@ -248,7 +359,6 @@ function loadUserProfile() {
       }
     } else {
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
       const isAdmin = role.includes("admin");
       
       if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
@@ -315,6 +425,7 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
+
 
 function getToastIcon(type) {
   const icons = {

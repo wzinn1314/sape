@@ -118,6 +118,78 @@
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(27, 102, 210, 0.25);
 }
+/* ============ CHECKLIST DIAGNÓSTICO INICIAL ============ */
+.diagnostico-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.diagnostico-area-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e0e7ff;
+}
+
+.diagnostico-item {
+  margin-bottom: 0.9rem;
+}
+
+.diagnostico-pergunta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-color);
+}
+
+.diagnostico-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.diagnostico-opcao {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: #fff;
+  transition: all 0.15s;
+}
+
+.diagnostico-opcao:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.diagnostico-opcao input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.diagnostico-opcao input[type="checkbox"]:checked + label,
+.diagnostico-opcao:has(input:checked) {
+  border-color: var(--primary-color);
+  background: #eef2ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
 
 .profile {
   margin-top: auto;

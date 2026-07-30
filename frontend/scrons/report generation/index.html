@@ -37,8 +37,8 @@
     <div class="profile">
       <div class="avatar" id="avatarProfile">A</div>
       <div>
-        <strong id="professorName">Prof. Amanda</strong>
-        <span id="userType">Professora</span>
+        <strong id="professorName"></strong>
+        <span id="userType"></span>
       </div>
     </div>
   </aside>
@@ -92,22 +92,27 @@
           <div class="input-wrapper">
             <i class="ph ph-tag"></i>
             <select id="reportType" required>
-              <option value="Acompanhamento AEE">Acompanhamento AEE</option>
-              <option value="Plano de Desenvolvimento Individual (PDI)">Plano de Desenvolvimento Individual (PDI)</option>
-              <option value="Avaliação Diagnóstica Inclusiva">Avaliação Diagnóstica Inclusiva</option>
-              <option value="Parecer Pedagógico Semestral">Parecer Pedagógico Semestral</option>
+              <option value="Avaliação Diagnóstica (Inicial)">Avaliação Diagnóstica (Inicial)</option>
+              <option value="Plano de Desenvolvimento Individual (PDI)">Estudo de Caso</option>
+              <option value="Avaliação Diagnóstica Inclusiva">Cronograma de Atendimento</option>
+              <option value="Parecer Pedagógico Semestral">Atividade avaliativa do Aluno</option>
             </select>
           </div>
         </div>
 
-        <!-- Corpo do Relatório / Observações -->
-        <div class="input-group">
+        <!-- ====== CHECKLIST DA AVALIAÇÃO DIAGNÓSTICA (aparece só quando esse tipo é selecionado) ====== -->
+        <div class="input-group" id="diagnosticoChecklistWrapper" style="display:none;">
+          <label>Avaliação Diagnóstica (Inicial) — marque uma opção por item</label>
+          <div id="diagnosticoChecklist" class="diagnostico-checklist"></div>
+        </div>
+
+        <!-- Corpo do Relatório / Observações (usado para os outros tipos de relatório) -->
+        <div class="input-group" id="reportContentWrapper">
           <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
           <textarea 
             id="reportContent" 
             rows="6" 
             placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
-            required
           ></textarea>
         </div>
 
