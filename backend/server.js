@@ -11,6 +11,11 @@ const { requireAdmin } = require('./middleware/admin');
 const { createStudentAccessMiddleware } = require('./middleware/studentAccess');
 const { professorTemAcesso } = require('./utils/access');
 
+function isProfessorRole(role) {
+  const normalized = (role || '').toLowerCase();
+  return normalized.includes('prof') || normalized.includes('teacher') || normalized.includes('aee');
+}
+
 const app = express();
 
 const corsOrigins = process.env.CORS_ORIGINS
@@ -56,7 +61,7 @@ app.use('/login', express.static(path.join(projectRoot, 'frontend', 'scrons', 'l
 app.use('/new_students', express.static(path.join(projectRoot, 'frontend', 'scrons', 'new_students')));
 app.use('/register', express.static(path.join(projectRoot, 'frontend', 'scrons', 'register')));
 app.use('/report', express.static(path.join(projectRoot, 'frontend', 'scrons', 'report')));
-app.use('/report generation', express.static(path.join(projectRoot, 'frontend', 'scrons', 'report generation')));
+app.use('/report-generation', express.static(path.join(projectRoot, 'frontend', 'scrons', 'report-generation')));
 app.use('/settings', express.static(path.join(projectRoot, 'frontend', 'scrons', 'settings')));
 app.use('/students', express.static(path.join(projectRoot, 'frontend', 'scrons', 'students'), { index: false }));
 app.use('/teacher-home', express.static(path.join(projectRoot, 'frontend', 'scrons', 'teacher-home')));
@@ -430,6 +435,16 @@ app.post('/vinculos', authenticateMiddleware, requireAdmin, (req, res) => {
 app.get('/vinculos', authenticateMiddleware, (req, res) => {
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem visualizar vínculos.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   let query = `
     SELECT 
@@ -479,7 +494,7 @@ app.post('/students', authenticateMiddleware, (req, res) => {
   const {
     nome, nascimento, matricula, cpf, turma, curso, anoLetivo,
     diagnostico, pei, suporte, hiperfocos, gatilhos, estrategias, adaptacoes,
-    responsavel, parentesco, telefone, email, gradeValue, registeredBy
+    responsavel, parentesco, telefone, email, gradeValue
   } = req.body;
 
   if (!nome || nome.trim() === '') {
@@ -493,6 +508,16 @@ app.post('/students', authenticateMiddleware, (req, res) => {
 
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem cadastrar alunos.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   const query = `
     INSERT INTO students (
@@ -502,7 +527,7 @@ app.post('/students', authenticateMiddleware, (req, res) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const creatorId = req.user.id || registeredBy || null;
+  const creatorId = req.user.id;
 
   const params = [
     nome.trim(), nascimento || null, matricula ? matricula.trim() : null,
@@ -595,6 +620,16 @@ app.get('/students', authenticateMiddleware, (req, res) => {
 app.get('/students/dashboard', authenticateMiddleware, (req, res) => {
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem acessar o dashboard.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   let countQuery = 'SELECT COUNT(*) as total FROM students';
   let recentQuery = 'SELECT * FROM students ORDER BY created_at DESC LIMIT 5';
@@ -760,6 +795,16 @@ app.get('/users/:userId/students', authenticateMiddleware, (req, res) => {
 
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem visualizar alunos vinculados.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   // Se for professor, só pode consultar seus próprios alunos
   if (!isAdmin && Number(req.user.id) !== Number(userId)) {
@@ -799,6 +844,16 @@ app.get('/users/:userId/reports', authenticateMiddleware, (req, res) => {
 
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem visualizar relatórios.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   if (!isAdmin && Number(req.user.id) !== Number(userId)) {
     return res.status(403).json({
@@ -814,12 +869,15 @@ app.get('/users/:userId/reports', authenticateMiddleware, (req, res) => {
       r.id, 
       r.student_id,
       s.name AS student_name, 
-      s.name as aluno,
+      s.name AS aluno,
+      u.name AS professor,
+      r.user_id,
       r.pdf_content, 
       r.file_name, 
       r.created_at
     FROM reports r
     LEFT JOIN students s ON r.student_id = s.id
+    LEFT JOIN user u ON r.user_id = u.id
     WHERE r.user_id = ?
     ORDER BY r.created_at DESC
   `;
@@ -853,6 +911,19 @@ app.post('/reports', authenticateMiddleware, (req, res) => {
   const { studentId, pdfContent, fileName } = req.body;
   const userId = req.user.id;
 
+  const userRole = (req.user.role || '').toLowerCase();
+  const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      error: 'Acesso negado. Apenas administradores ou professores podem criar relatórios.',
+      timestamp: new Date().toISOString()
+    });
+  }
+
   if (!studentId || !pdfContent) {
     return res.status(400).json({ 
       success: false,
@@ -861,9 +932,6 @@ app.post('/reports', authenticateMiddleware, (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-
-  const userRole = (req.user.role || '').toLowerCase();
-  const isAdmin = userRole.includes('admin');
 
   const saveReport = () => {
     const query = 'INSERT INTO reports (student_id, user_id, pdf_content, file_name) VALUES (?, ?, ?, ?)';
@@ -879,7 +947,16 @@ app.post('/reports', authenticateMiddleware, (req, res) => {
         success: true,
         status: 'success',
         message: 'Relatório salvo com sucesso!', 
+        id: this.lastID,
         reportId: this.lastID,
+        report: {
+          id: this.lastID,
+          student_id: studentId,
+          user_id: userId,
+          pdf_content: pdfContent,
+          file_name: fileName || 'relatorio.pdf',
+          created_at: new Date().toISOString()
+        },
         timestamp: new Date().toISOString()
       });
     });
@@ -900,6 +977,16 @@ app.post('/reports', authenticateMiddleware, (req, res) => {
 app.get('/reports', authenticateMiddleware, (req, res) => {
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      message: 'Acesso negado. Apenas administradores ou professores podem listar relatórios.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   let query = `
     SELECT 
@@ -949,6 +1036,16 @@ app.delete('/reports/:id', authenticateMiddleware, (req, res) => {
   const { id } = req.params;
   const userRole = (req.user.role || '').toLowerCase();
   const isAdmin = userRole.includes('admin');
+  const isProfessor = isProfessorRole(userRole);
+
+  if (!isAdmin && !isProfessor) {
+    return res.status(403).json({
+      success: false,
+      status: 'error',
+      error: 'Acesso negado. Apenas administradores ou professores podem deletar relatórios.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   if (isAdmin) {
     db.run('DELETE FROM reports WHERE id = ?', [id], function (err) {
