@@ -3,7 +3,7 @@
  */
 
 const SAPE_CONFIG = window.SAPE_CONFIG || {
-  API_URL: (window.API_URL || 'http://localhost:3000'),
+  API_URL: window.location.origin,
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };
@@ -179,7 +179,7 @@ function renderLinkedStudents(students) {
               <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
               <div class="record-meta">${aluno.turma || 'Sem turma'} • ${aluno.curso || 'Sem curso'}</div>
           </div>
-          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn">
+          <a href="../report-generation/index.html?studentId=${aluno.id}" class="action-btn">
               <i class="fas fa-file-medical"></i>
           </a>
       </div>
@@ -205,7 +205,7 @@ function renderAttentionStudents(students, reports) {
               <div class="record-name">${aluno.name || aluno.nome || 'Sem nome'}</div>
               <div class="record-meta">Sem relatório recente</div>
           </div>
-          <a href="../report generation/index.html?studentId=${aluno.id}" class="action-btn urgent">
+          <a href="../report-generation/index.html?studentId=${aluno.id}" class="action-btn urgent">
               <i class="fas fa-exclamation-circle"></i>
           </a>
       </div>

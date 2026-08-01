@@ -1,7 +1,10 @@
-const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin;
 
 // Tipo de relatório que ativa o checklist (precisa bater com o value do <option> no HTML)
 const TIPO_DIAGNOSTICO_INICIAL = "Avaliação Diagnóstica (Inicial)";
+const TIPO_ESTUDO_DE_CASO = "Estudo de Caso";
+const TIPO_CRONOGRAMA = "Cronograma de Atendimento";
+const TIPO_ATIVIDADES_REALIZADAS = "Registro de Atividades Realizadas no Atendimento";
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkAuth()) return;
@@ -16,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSubmit = document.getElementById('btnSubmit');
   const reportContentWrapper = document.getElementById('reportContentWrapper');
   const diagnosticoWrapper = document.getElementById('diagnosticoChecklistWrapper');
+  const estudoCasoWrapper = document.getElementById('estudoCasoWrapper');
+  const cronogramaWrapper = document.getElementById('cronogramaWrapper');
+  const registroAtividadesWrapper = document.getElementById('registroAtividadesWrapper');
   const diagnosticoChecklist = document.getElementById('diagnosticoChecklist');
 
   updateDateTime();
@@ -79,18 +85,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function alternarModoRelatorio() {
-    const isDiagnosticoInicial = reportType.value === TIPO_DIAGNOSTICO_INICIAL;
+    const type = reportType.value;
+    const isDiagnosticoInicial = type === TIPO_DIAGNOSTICO_INICIAL;
+    const isEstudoCaso = type === TIPO_ESTUDO_DE_CASO;
+    const isCronograma = type === TIPO_CRONOGRAMA;
+    const isAtividades = type === TIPO_ATIVIDADES_REALIZADAS;
 
-    if (isDiagnosticoInicial) {
-      diagnosticoWrapper.style.display = 'flex';
-      reportContentWrapper.style.display = 'none';
-      reportContent.removeAttribute('required');
-      if (!diagnosticoChecklist.innerHTML) montarChecklistDiagnostico();
-    } else {
-      diagnosticoWrapper.style.display = 'none';
-      reportContentWrapper.style.display = 'flex';
-      reportContent.setAttribute('required', 'required');
-    }
+    diagnosticoWrapper.style.display = isDiagnosticoInicial ? 'flex' : 'none';
+    reportContentWrapper.style.display = 'none';
+    estudoCasoWrapper.style.display = isEstudoCaso ? 'flex' : 'none';
+    cronogramaWrapper.style.display = isCronograma ? 'flex' : 'none';
+    registroAtividadesWrapper.style.display = isAtividades ? 'flex' : 'none';
+
+    reportContent.removeAttribute('required');
+    if (isDiagnosticoInicial && !diagnosticoChecklist.innerHTML) montarChecklistDiagnostico();
   }
 
   reportType.addEventListener('change', alternarModoRelatorio);
@@ -105,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const opcao = DIAGNOSTICO_OPCOES.find(o => o.valor === input.value);
 
       if (!respostasPorArea[area]) respostasPorArea[area] = [];
-      respostasPorArea[area].push(`- ${pergunta} → ${opcao ? opcao.label : input.value}`);
+      respostasPorArea[area].push(`- ${pergunta} | ${opcao ? opcao.label : input.value}`);
     });
 
     let texto = '';
@@ -114,6 +122,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     return texto.trim();
+  }
+
+  function coletarEstudoDeCaso() {
+    const alunoIdade = document.getElementById('estudoAlunoIdade')?.value.trim();
+    const serieTurma = document.getElementById('estudoSerieTurma')?.value.trim();
+    const dataCaso = document.getElementById('estudoData')?.value;
+    const demandas = document.getElementById('estudoDemandas')?.value.trim();
+    const contexto = document.getElementById('estudoContexto')?.value.trim();
+    const potencialidades = document.getElementById('estudoPotencialidades')?.value.trim();
+    const estrategias = document.getElementById('estudoEstrategias')?.value.trim();
+    const consideracoes = document.getElementById('estudoConsideracoes')?.value.trim();
+
+    if (!alunoIdade) { showToast('Preencha Nome do(a) aluno(a) e Idade.', 'error'); return null; }
+    if (!serieTurma) { showToast('Preencha Ano/Série/Turma.', 'error'); return null; }
+    if (!dataCaso) { showToast('Preencha a Data do estudo de caso.', 'error'); return null; }
+    if (!demandas) { showToast('Preencha a Identificação das demandas individuais e das barreiras enfrentadas.', 'error'); return null; }
+    if (!contexto) { showToast('Preencha a Análise do contexto escolar e das barreiras.', 'error'); return null; }
+    if (!potencialidades) { showToast('Preencha a Identificação das potencialidades e das demandas de apoio.', 'error'); return null; }
+    if (!estrategias) { showToast('Preencha a Definição de estratégias e recursos de acessibilidade.', 'error'); return null; }
+    if (!consideracoes) { showToast('Preencha as Considerações Finais e Indicação para PEI.', 'error'); return null; }
+
+    return `ESTUDO DE CASO\n- Nome do(a) aluno(a) e Idade: ${alunoIdade}\n- Ano/Série/Turma: ${serieTurma}\n- Data do estudo de caso: ${dataCaso}\n- Identificação das demandas individuais e das barreiras enfrentadas: ${demandas}\n- Análise do contexto escolar e das barreiras: ${contexto}\n- Identificação das potencialidades e das demandas de apoio: ${potencialidades}\n- Definição de estratégias e recursos de acessibilidade: ${estrategias}\n- Considerações Finais e Indicação para PEI: ${consideracoes}`;
+  }
+
+  function coletarCronograma() {
+    const horarioDia = document.getElementById('cronogramaHorarioDia')?.value.trim();
+    const duracao = document.getElementById('cronogramaDuracao')?.value.trim();
+    const frequencia = document.getElementById('cronogramaFrequencia')?.value;
+    const tipo = document.getElementById('cronogramaTipo')?.value;
+    const composicaoNodes = Array.from(document.querySelectorAll('input[name="cronogramaComposicao"]:checked'));
+    const composicao = composicaoNodes.map(input => input.value.trim());
+
+    if (!horarioDia) { showToast('Preencha Hora / Dia da Semana.', 'error'); return null; }
+    if (!duracao) { showToast('Preencha a Duração do Atendimento.', 'error'); return null; }
+    if (!frequencia) { showToast('Selecione a Frequência do Atendimento Semanal.', 'error'); return null; }
+    if (!tipo) { showToast('Selecione o Tipo de Atendimento.', 'error'); return null; }
+    if (composicao.length === 0) { showToast('Selecione ao menos uma opção de Composição do Atendimento.', 'error'); return null; }
+
+    return `CRONOGRAMA DE ATENDIMENTO\n- Hora / Dia da Semana: ${horarioDia}\n- Duração do Atendimento (minutos/horas): ${duracao}\n- Frequência do Atendimento Semanal: ${frequencia}\n- Tipo de Atendimento: ${tipo}\n- Composição do Atendimento: ${composicao.join(', ')}`;
+  }
+
+  function coletarAtividadesRealizadas() {
+    const dataAtividade = document.getElementById('registroDataAtividade')?.value.trim();
+    const avancos = document.getElementById('registroAvancos')?.value.trim();
+    const dificuldades = document.getElementById('registroDificuldades')?.value.trim();
+    const avaliacaoArea = document.getElementById('avaliacaoArea')?.value.trim();
+    const avaliacaoEstrategia = document.getElementById('avaliacaoEstrategia')?.value.trim();
+
+    if (!dataAtividade) { showToast('Preencha Data / Atividade.', 'error'); return null; }
+    if (!avancos) { showToast('Preencha os Avanços.', 'error'); return null; }
+    if (!dificuldades) { showToast('Preencha as Dificuldades na realização.', 'error'); return null; }
+    if (!avaliacaoArea) { showToast('Preencha a Área de avaliação.', 'error'); return null; }
+    if (!avaliacaoEstrategia) { showToast('Preencha a Estratégia utilizada.', 'error'); return null; }
+
+    return `REGISTRO DE ATIVIDADES REALIZADAS NO ATENDIMENTOS\n- Data / Atividade: ${dataAtividade}\n- Avanços: ${avancos}\n- Dificuldades na realização: ${dificuldades}\n\nESTRATÉGIAS DE AVALIAÇÃO\n- Área: ${avaliacaoArea}\n- Estratégia utilizada: ${avaliacaoEstrategia}`;
   }
 
   function contarPerguntasRespondidas() {
@@ -202,18 +265,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let content;
 
-      if (isDiagnosticoInicial) {
-        if (contarPerguntasRespondidas() === 0) {
-          showToast('Marque pelo menos uma resposta no checklist.', 'error');
+      switch (type) {
+        case TIPO_DIAGNOSTICO_INICIAL:
+          if (contarPerguntasRespondidas() === 0) {
+            showToast('Marque pelo menos uma resposta no checklist.', 'error');
+            return;
+          }
+          content = coletarRespostasDiagnostico();
+          break;
+        case TIPO_ESTUDO_DE_CASO:
+          content = coletarEstudoDeCaso();
+          if (!content) return;
+          break;
+        case TIPO_CRONOGRAMA:
+          content = coletarCronograma();
+          if (!content) return;
+          break;
+        case TIPO_ATIVIDADES_REALIZADAS:
+          content = coletarAtividadesRealizadas();
+          if (!content) return;
+          break;
+        default:
+          showToast('Tipo de relatório inválido.', 'error');
           return;
-        }
-        content = coletarRespostasDiagnostico();
-      } else {
-        content = reportContent.value.trim();
-        if (!content || content.length < 10) {
-          showToast('O relatório deve ter pelo menos 10 caracteres.', 'error');
-          return;
-        }
       }
 
       let professorName = 'Professor Responsável';
@@ -261,24 +335,27 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
 
-        if (response.ok) {
-          try {
-            const saved = await response.json();
-            const backendId = saved?.id ?? saved?.data?.id;
-            if (backendId) {
-              const atualizados = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
-              const idx = atualizados.findIndex(r => r.id === localId);
-              if (idx !== -1) {
-                atualizados[idx].id = backendId;
-                localStorage.setItem('relatoriosSAPE', JSON.stringify(atualizados));
-              }
-            }
-          } catch (parseErr) {
-            console.warn('Não foi possível ler o retorno do backend:', parseErr);
-          }
-        }
+        const saved = await response.json().catch((parseErr) => {
+          console.warn('Não foi possível ler o retorno do backend:', parseErr);
+          return null;
+        });
 
-        showToast('Relatório salvo com sucesso!', 'success');
+        if (response.ok) {
+          const backendId = saved?.reportId ?? saved?.id ?? saved?.data?.id ?? saved?.report?.id;
+          if (backendId) {
+            const atualizados = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
+            const idx = atualizados.findIndex(r => r.id === localId);
+            if (idx !== -1) {
+              atualizados[idx].id = backendId;
+              localStorage.setItem('relatoriosSAPE', JSON.stringify(atualizados));
+            }
+          }
+
+          showToast('Relatório salvo com sucesso!', 'success');
+        } else {
+          const errorMessage = saved?.message || saved?.error || 'Erro ao salvar relatório no servidor.';
+          showToast(errorMessage, 'warning');
+        }
 
         setTimeout(() => {
           window.location.href = '../report/index.html';
@@ -297,8 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmit.innerHTML = '<i class="ph ph-file-pdf"></i> Salvar Relatório';
       }
     });
-  }
-});
+
 
 function checkAuth() {
   const token = localStorage.getItem("sape_token");
@@ -576,3 +652,5 @@ function getToastIcon(type) {
   };
   return icons[type] || icons.info;
 }
+  }
+});

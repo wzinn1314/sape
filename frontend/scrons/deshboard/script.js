@@ -3,7 +3,7 @@
  */
 
 const SAPE_CONFIG = window.SAPE_CONFIG || {
-  API_URL: (window.API_URL || 'http://localhost:3000'),
+  API_URL: (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin,
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };

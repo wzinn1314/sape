@@ -1,5 +1,5 @@
 // Endereço da sua API Node.js/SQLite vindo do config.js dinâmico
-const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin;
 
 // Armazena em memória os dados vindos do backend
 let listaProfessores = [];
@@ -258,8 +258,7 @@ async function cadastrarProfessor(event) {
     matricula,
     password,
     specialization,
-    role: 'Professor',
-    requesterRole: 'admin'
+    role: 'Professor'
   };
 
   setLoading(true);

@@ -1,4 +1,4 @@
-const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || "http://localhost:3000";
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin;
 const searchInput = document.getElementById("searchInput");
 const gradeFilter = document.getElementById("gradeFilter");
 const typeFilter = document.getElementById("typeFilter");
@@ -498,7 +498,7 @@ function openStudentModal(studentId) {
         <footer class="modal-pro-footer">
           <div class="left-actions">
             <button class="btn-pro secondary" onclick="window.print()"><i class="fas fa-print"></i> Imprimir PEI / PDI</button>
-            <a href="../report generation/index.html?alunoId=${student.id}" class="btn-pro primary"><i class="fas fa-plus"></i> Novo Relatório</a>
+            <a href="../report-generation/index.html?alunoId=${student.id}" class="btn-pro primary"><i class="fas fa-plus"></i> Novo Relatório</a>
           </div>
         </footer>
       </div>

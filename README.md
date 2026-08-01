@@ -74,7 +74,7 @@ SAPE/
 │       ├── new_students/
 │       ├── register/
 │       ├── report/
-│       ├── report generation/
+│       ├── report-generation/
 │       ├── settings/
 │       ├── students/
 │       └── teacher-home/
