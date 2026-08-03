@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/build/pdf.min.js"></script>
 </head>
 <body>
 
   <!-- SIDEBAR DE NAVEGAÇÃO (MANTIDA ORIGINAL) -->
   <aside class="sidebar">
     <div class="logo">
-      <img src="/assets/foto.png" alt="Logo SAPE">
+      <img src="frontend/assets/foto.png" alt="Logo SAPE">
       <div>
         <span>SAPE</span>
         <p>Suporte e Acolhimento</p>
@@ -100,8 +101,15 @@
           </div>
         </div>
 
+        <div class="upload-card">
+          <label for="pdfFileInput"><i class="ph ph-file-pdf"></i> Anexar PDF com informações do aluno</label>
+          <input id="pdfFileInput" type="file" accept="application/pdf" />
+          <span class="upload-hint">O sistema tentará preencher automaticamente os campos a partir do PDF enviado.</span>
+          <span id="pdfStatus" class="helper-pill" style="display:none;"></span>
+        </div>
+
         <!-- ====== CHECKLIST DA AVALIAÇÃO DIAGNÓSTICA (aparece só quando esse tipo é selecionado) ====== -->
-        <div class="input-group" id="diagnosticoChecklistWrapper" style="display:none;">
+        <div class="input-group" id="diagnosticoChecklistWrapper">
           <label>Avaliação Diagnóstica (Inicial) — marque uma opção por item</label>
           <div id="diagnosticoChecklist" class="diagnostico-checklist"></div>
         </div>
@@ -194,31 +202,40 @@
               <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="hospitalar" /> hospitalar</label>
               <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="outros" /> outros</label>
             </div>
+            <input id="cronogramaOutros" class="cronograma-outros-input" type="text" placeholder="Especifique outras composições" />
           </div>
         </div>
 
         <div class="form-section" id="registroAtividadesWrapper" style="display:none;">
           <h2 class="section-heading">REGISTRO DE ATIVIDADES REALIZADAS NO ATENDIMENTOS</h2>
-          <div class="input-group">
-            <label for="registroDataAtividade">Data / Atividade *</label>
-            <input id="registroDataAtividade" type="text" placeholder="Ex: 28/07/2026 - Sessão de leitura" />
+          <div id="registroAtividadesList" class="registro-atividade-list">
+            <div class="registro-atividade-bloco">
+              <div class="input-group">
+                <label>Data / Atividade *</label>
+                <input data-role="registro-data" type="text" placeholder="Ex: 28/07/2026 - Sessão de leitura" />
+              </div>
+              <div class="input-group field-multiline">
+                <label>Avanços *</label>
+                <textarea data-role="registro-avancos" rows="4" placeholder="Descreva os avanços observados"></textarea>
+              </div>
+              <div class="input-group field-multiline">
+                <label>Dificuldades na realização *</label>
+                <textarea data-role="registro-dificuldades" rows="4" placeholder="Descreva as dificuldades encontradas"></textarea>
+              </div>
+            </div>
           </div>
-          <div class="input-group field-multiline">
-            <label for="registroAvancos">Avanços *</label>
-            <textarea id="registroAvancos" rows="4" placeholder="Descreva os avanços observados"></textarea>
-          </div>
-          <div class="input-group field-multiline">
-            <label for="registroDificuldades">Dificuldades na realização *</label>
-            <textarea id="registroDificuldades" rows="4" placeholder="Descreva as dificuldades encontradas"></textarea>
-          </div>
+          <button type="button" id="btnAdicionarRegistroAtividade" class="btn-submit btn-inline">
+            <i class="ph ph-plus"></i>
+            Adicionar outro registro de atividade
+          </button>
           <div class="section-heading">ESTRATÉGIAS DE AVALIAÇÃO</div>
           <div class="input-group">
-            <label for="avaliacaoArea">Área *</label>
-            <input id="avaliacaoArea" type="text" placeholder="Área de avaliação" />
+            <label>Área *</label>
+            <input data-role="avaliacao-area" type="text" placeholder="Área de avaliação" />
           </div>
           <div class="input-group field-multiline">
-            <label for="avaliacaoEstrategia">Estratégia utilizada *</label>
-            <textarea id="avaliacaoEstrategia" rows="4" placeholder="Descreva a estratégia de avaliação utilizada"></textarea>
+            <label>Estratégia utilizada *</label>
+            <textarea data-role="avaliacao-estrategia" rows="4" placeholder="Descreva a estratégia de avaliação utilizada"></textarea>
           </div>
         </div>
 
@@ -244,6 +261,7 @@
     <div id="toastContainer"></div>
 
     <script src="../../config.js"></script>
+    <script src="reportParser.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
