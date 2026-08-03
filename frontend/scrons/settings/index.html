@@ -30,7 +30,7 @@
                 <a href="#"><i class="fas fa-file-alt"></i> Adaptações de Provas</a>
                 <a href="#"><i class="fas fa-chart-bar"></i> Histórico Escolar</a>
                 <a href="#"><i class="fas fa-book"></i> Plano de Apoio</a>
-                <a href="#"><i class="fas fa-comments"></i> Observações</a>
+                <a href="../admin/admin.html"><i class="fas fa-comments"></i> Professores</a>
                 <a href="#"><i class="fas fa-users"></i> Responsáveis</a>
                 <a class="active" href="index.html"><i class="fas fa-cog"></i> Configurações</a>
             </nav>
@@ -40,85 +40,34 @@
         <main class="main-content">
             
             <header class="settings-header">
-                <h1 class="main-title">Configurações</h1>
-                <p class="subtitle">Gerencie as configurações do sistema</p>
+                <h1 class="main-title">Professores Cadastrados</h1>
+                
             </header>
 
             <div class="settings-container">
-                
-                
                 <div class="cards-grid">
-                    
-                    
-                    <section class="settings-card profile-info">
-                        <h2 class="card-title">Informações do Perfil</h2>
+                    <section class="settings-card professors-card">
+                        <h2 class="card-title">Lista de Professores</h2>
                         <div class="card-content">
-                            
-                            <div class="photo-section">
-                                <img src="https://via.placeholder.com/100" alt="Foto de Perfil" class="profile-photo">
-                                <button class="btn-text">Alterar Foto</button>
+                            <div class="filters-section">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="searchInput" placeholder="Buscar por nome, matrícula ou e-mail...">
+                                </div>
                             </div>
-
-                            <form class="settings-form">
-                                <div class="form-group">
-                                    <label for="nome">Nome Completo</label>
-                                    <input type="text" id="nome" placeholder="Ana Silva">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">E-mail</label>
-                                    <input type="email" id="email" placeholder="ana.silva@sape.edu.br">
-                                </div>
-                                <div class="form-group">
-                                    <label for="telefone">Telefone</label>
-                                    <input type="tel" id="telefone" placeholder="(11) 98765-4321">
-                                </div>
-                                <button type="submit" class="btn-primary">Salvar Alterações</button>
-                            </form>
-
+                            <div id="loadingState" class="loading-state" style="display: none;">
+                                <div class="spinner"></div>
+                                <span>Carregando professores...</span>
+                            </div>
+                            <div class="professores-grid" id="professoresGrid"></div>
+                            <div class="empty-state" id="emptyState" style="display: none;">
+                                <i class="fas fa-user-slash" style="font-size: 2.5rem; margin-bottom: 12px; color: #94a3b8;"></i>
+                                <p>Nenhum professor encontrado com esses filtros.</p>
+                            </div>
                         </div>
                     </section>
-
-                    <!-- CARD DIREITO: PREFERÊNCIAS -->
-                    <section class="settings-card preferences">
-                        <h2 class="card-title">Preferências</h2>
-                        <div class="card-content">
-                            <form class="settings-form">
-                                <div class="form-group">
-                                    <label for="idioma">Idioma</label>
-                                    <select id="idioma">
-                                        <option value="pt-BR">Português (Brasil)</option>
-                                        <option value="en-US">English (US)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="fuso">Fuso Horário</label>
-                                    <select id="fuso">
-                                        <option value="utc3">(UTC-03:00) Brasília</option>
-                                        <option value="utc">UTC</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="formato-data">Formato de Data</label>
-                                    <select id="formato-data">
-                                        <option value="dd-mm-yyyy">DD/MM/AAAA</option>
-                                        <option value="mm-dd-yyyy">MM/DD/AAAA</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="itens-pagina">Itens por Página</label>
-                                    <select id="itens-pagina">
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                    </section>
-
-                </div> <!-- FIM DA GRADE -->
-
-            </div> <!-- FIM DO CONTAINER DE CONFIGURAÇÕES -->
+                </div>
+            </div>
 
         </main> <!-- FIM DO CONTEÚDO PRINCIPAL -->
 

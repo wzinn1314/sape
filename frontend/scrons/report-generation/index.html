@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/build/pdf.min.js"></script>
 </head>
 <body>
 
@@ -29,7 +28,7 @@
       <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
       <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
       <a class="active" href="../report-generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
-      <a href="#"><i class="fas fa-comments"></i> <span>Observações</span></a>
+      <a href="../admin/admin.html"><i class="fas fa-comments"></i> <span>Professores</span></a>
       <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
         <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
       </a>
@@ -85,6 +84,9 @@
               <option value="">Carregando alunos do banco...</option>
             </select>
           </div>
+          <div id="studentInfoBox" class="student-info-box" style="display:none;">
+            Aluno vinculado selecionado. Nome e dados pessoais são carregados automaticamente do cadastro do aluno.
+          </div>
         </div>
 
         <!-- Tipo de Relatório -->
@@ -99,13 +101,6 @@
               <option value="Registro de Atividades Realizadas no Atendimento">Registro de Atividades Realizadas no Atendimento</option>
             </select>
           </div>
-        </div>
-
-        <div class="upload-card">
-          <label for="pdfFileInput"><i class="ph ph-file-pdf"></i> Anexar PDF com informações do aluno</label>
-          <input id="pdfFileInput" type="file" accept="application/pdf" />
-          <span class="upload-hint">O sistema tentará preencher automaticamente os campos a partir do PDF enviado.</span>
-          <span id="pdfStatus" class="helper-pill" style="display:none;"></span>
         </div>
 
         <!-- ====== CHECKLIST DA AVALIAÇÃO DIAGNÓSTICA (aparece só quando esse tipo é selecionado) ====== -->
@@ -127,16 +122,15 @@
         <div class="form-section" id="estudoCasoWrapper" style="display:none;">
           <h2 class="section-heading">ESTUDO DE CASO (com base no Decreto nº 12.686/2025 e Avaliação Diagnóstica realizada junto à sala regular)</h2>
           <div class="input-group">
-            <label for="estudoAlunoIdade">Nome do(a) aluno(a) e Idade *</label>
-            <input id="estudoAlunoIdade" type="text" placeholder="Nome do aluno e idade" />
+            <label>Aluno Selecionado *</label>
+            <div id="estudoAlunoInfo" class="student-info-box">
+              Selecione um aluno acima para carregar os dados vinculados automaticamente.
+            </div>
           </div>
           <div class="input-group">
-            <label for="estudoSerieTurma">Ano/Série/Turma *</label>
-            <input id="estudoSerieTurma" type="text" placeholder="Ano/Série/Turma" />
-          </div>
-          <div class="input-group">
-            <label for="estudoData">Data do estudo de caso *</label>
-            <input id="estudoData" type="date" />
+            <div id="studentAcademicInfo" class="student-info-box">
+              Turma, Curso e Ano Letivo serão preenchidos automaticamente.
+            </div>
           </div>
           <div class="input-group field-multiline">
             <label for="estudoDemandas">Identificação das demandas individuais e das barreiras enfrentadas *</label>
@@ -261,7 +255,6 @@
     <div id="toastContainer"></div>
 
     <script src="../../config.js"></script>
-    <script src="reportParser.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

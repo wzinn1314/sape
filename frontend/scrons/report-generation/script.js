@@ -289,8 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportRecommendations = document.getElementById('reportRecommendations');
   const reportForm = document.getElementById('reportForm');
   const btnSubmit = document.getElementById('btnSubmit');
-  const pdfFileInput = document.getElementById('pdfFileInput');
-  const pdfStatus = document.getElementById('pdfStatus');
   const reportContentWrapper = document.getElementById('reportContentWrapper');
   const diagnosticoWrapper = document.getElementById('diagnosticoChecklistWrapper');
   const estudoCasoWrapper = document.getElementById('estudoCasoWrapper');
@@ -300,15 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const registroAtividadesList = document.getElementById('registroAtividadesList');
   const btnAdicionarRegistroAtividade = document.getElementById('btnAdicionarRegistroAtividade');
   const cronogramaOutrosInput = document.getElementById('cronogramaOutros');
-  let parsedPdfContent = null;
-
-  if (!window.pdfjsLib) {
-    window.pdfjsLib = {};
-  }
-  if (!window.pdfjsLib.GlobalWorkerOptions) {
-    window.pdfjsLib.GlobalWorkerOptions = {};
-  }
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/build/pdf.worker.min.js';
+  const studentInfoBox = document.getElementById('studentInfoBox');
+  const estudoAlunoInfo = document.getElementById('estudoAlunoInfo');
+  const studentAcademicInfo = document.getElementById('studentAcademicInfo');
 
   updateDateTime();
   setInterval(updateDateTime, 1000);
@@ -325,37 +317,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timeEl) timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
+  function atualizarInformacoesAlunoSelecionado() {
+    const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+    if (!selectedOption || !selectedOption.value) {
+      if (studentInfoBox) studentInfoBox.style.display = 'none';
+      if (estudoAlunoInfo) estudoAlunoInfo.textContent = 'Selecione um aluno acima para carregar os dados vinculados automaticamente.';
+      return;
+    }
+
+    const nome = selectedOption.dataset.name || selectedOption.textContent || 'Aluno selecionado';
+    const turma = selectedOption.dataset.turma || '';
+    const curso = selectedOption.dataset.curso || '';
+    const anoLetivo = selectedOption.dataset.anoLetivo || selectedOption.dataset['ano-letivo'] || '';
+    const deficiencia = selectedOption.dataset.disability || '';
+
+    if (studentInfoBox) {
+      studentInfoBox.style.display = 'block';
+      studentInfoBox.textContent = `Aluno vinculado: ${nome}`;
+    }
+    if (estudoAlunoInfo) {
+      estudoAlunoInfo.textContent = `Aluno selecionado: ${nome}`;
+    }
+    if (studentAcademicInfo) {
+      studentAcademicInfo.textContent = `Turma: ${turma || 'Não informado'} • Curso: ${curso || 'Não informado'} • Ano Letivo: ${anoLetivo || 'Não informado'}`;
+    }
+  }
+
   loadStudents();
   montarChecklistDiagnostico();
+  reportType.addEventListener('change', alternarModoRelatorio);
+  studentSelect.addEventListener('change', atualizarInformacoesAlunoSelecionado);
 
-  if (pdfFileInput) {
-    pdfFileInput.addEventListener('change', async (event) => {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-
-      if (pdfStatus) {
-        pdfStatus.style.display = 'inline-flex';
-        pdfStatus.textContent = 'Lendo PDF...';
-      }
-
-      try {
-        const text = await extractPdfText(file);
-        const parsed = window.reportParser?.extractStructuredData?.(text, reportType.value) || {};
-        parsedPdfContent = parsed;
-        applyParsedContent(parsed, reportType.value);
-
-        if (pdfStatus) {
-          pdfStatus.textContent = 'PDF lido com sucesso. Campos preenchidos automaticamente.';
-        }
-      } catch (error) {
-        console.error('Erro ao ler PDF:', error);
-        if (pdfStatus) {
-          pdfStatus.textContent = 'Não foi possível ler o PDF. Preencha os campos manualmente.';
-        }
-        showToast('Não foi possível extrair o conteúdo do PDF.', 'warning');
-      }
-    });
-  }
 
   // ==========================================
   // CHECKLIST DE AVALIAÇÃO DIAGNÓSTICA
@@ -411,52 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .trim();
   }
 
-  function aplicarChecklistDiagnosticoPorPdf(texto) {
-    if (!diagnosticoChecklist) return;
-    if (!texto) return;
-
-    if (!diagnosticoChecklist.innerHTML) {
-      montarChecklistDiagnostico();
-    }
-
-    const linhas = String(texto)
-      .split(/\n+/)
-      .map((linha) => linha.trim())
-      .filter(Boolean);
-    const textoNormalizado = normalizarTextoChecklist(texto);
-
-    DIAGNOSTICO_INICIAL.forEach((bloco) => {
-      bloco.perguntas.forEach((pergunta, perguntaIndex) => {
-        const nomeCampo = `diag_${DIAGNOSTICO_INICIAL.indexOf(bloco)}_${perguntaIndex}`;
-        const inputGroup = diagnosticoChecklist.querySelectorAll(`input[name="${nomeCampo}"]`);
-        if (!inputGroup.length) return;
-
-        const perguntaNormalizada = normalizarTextoChecklist(pergunta);
-        const linhasCorrespondentes = linhas.filter((linha) => {
-          const linhaNormalizada = normalizarTextoChecklist(linha);
-          return linhaNormalizada.includes(perguntaNormalizada) || perguntaNormalizada.split(' ').filter(Boolean).slice(0, 6).every((palavra) => linhaNormalizada.includes(palavra));
-        });
-
-        const linhaEncontrada = linhasCorrespondentes[0] || '';
-        const linhaNormalizada = normalizarTextoChecklist(linhaEncontrada);
-        const statusMatch = linhaNormalizada.match(/\b([apn])\b/);
-        const statusTexto = statusMatch ? statusMatch[1].toUpperCase() : '';
-        const valor = statusTexto && DIAGNOSTICO_OPCOES.some((op) => op.valor === statusTexto) ? statusTexto : '';
-
-        if (valor) {
-          inputGroup.forEach((input) => {
-            input.checked = input.value === valor;
-          });
-        } else if (textoNormalizado.includes(perguntaNormalizada)) {
-          inputGroup.forEach((input) => {
-            input.checked = false;
-          });
-        }
-      });
-    });
-
-    atualizarEstadoChecklistDiagnostico();
-  }
 
   function alternarModoRelatorio() {
     const type = reportType.value;
@@ -484,75 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarEstadoChecklistDiagnostico();
   }
 
-  function applyParsedContent(parsedContent, type) {
-    if (!parsedContent) return;
-
-    if (type === TIPO_ESTUDO_DE_CASO) {
-      const fields = [
-        ['estudoAlunoIdade', parsedContent.alunoIdade],
-        ['estudoSerieTurma', parsedContent.serieTurma],
-        ['estudoData', parsedContent.data],
-        ['estudoDemandas', parsedContent.demandas],
-        ['estudoContexto', parsedContent.contexto],
-        ['estudoPotencialidades', parsedContent.potencialidades],
-        ['estudoEstrategias', parsedContent.estrategias],
-        ['estudoConsideracoes', parsedContent.consideracoes]
-      ];
-
-      fields.forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element && value) element.value = value;
-      });
-      return;
-    }
-
-    if (type === TIPO_CRONOGRAMA) {
-      const fields = [
-        ['cronogramaHorarioDia', parsedContent.horarioDia],
-        ['cronogramaDuracao', parsedContent.duracao],
-        ['cronogramaFrequencia', parsedContent.frequencia],
-        ['cronogramaTipo', parsedContent.tipo]
-      ];
-
-      fields.forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element && value) element.value = value;
-      });
-
-      if (parsedContent.composicao) {
-        document.querySelectorAll('input[name="cronogramaComposicao"]').forEach((checkbox) => {
-          checkbox.checked = checkbox.value.toLowerCase().includes(parsedContent.composicao.toLowerCase());
-        });
-      }
-      return;
-    }
-
-    if (type === TIPO_ATIVIDADES_REALIZADAS) {
-      const fields = [
-        ['registroDataAtividade', parsedContent.dataAtividade],
-        ['registroAvancos', parsedContent.avancos],
-        ['registroDificuldades', parsedContent.dificuldades],
-        ['avaliacaoArea', parsedContent.avaliacaoArea],
-        ['avaliacaoEstrategia', parsedContent.avaliacaoEstrategia]
-      ];
-
-      fields.forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element && value) element.value = value;
-      });
-      return;
-    }
-
-    if (type === TIPO_DIAGNOSTICO_INICIAL) {
-      const textoChecklist = parsedContent?.checklistSummary || parsedContent?.rawText || '';
-      if (textoChecklist) {
-        aplicarChecklistDiagnosticoPorPdf(textoChecklist);
-      }
-      if (parsedContent?.checklistSummary) {
-        reportContent.value = parsedContent.checklistSummary;
-      }
-    }
-  }
 
   function sincronizarCampoOutrosCronograma() {
     if (!cronogramaOutrosInput) return;
@@ -596,31 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
     checkbox.addEventListener('change', sincronizarCampoOutrosCronograma);
   });
 
-  async function extractPdfText(file) {
-    if (!window.pdfjsLib) {
-      throw new Error('pdfjsLib não disponível');
-    }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
-
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-      const page = await pdf.getPage(pageNumber);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item) => item.str).join(' ');
-      fullText += `\n${pageText}`;
-    }
-
-    return fullText;
-  }
-
-  reportType.addEventListener('change', () => {
-    alternarModoRelatorio();
-    if (parsedPdfContent) {
-      applyParsedContent(parsedPdfContent, reportType.value);
-    }
-  });
+  reportType.addEventListener('change', alternarModoRelatorio);
   alternarModoRelatorio(); // aplica o estado correto já na carga da página
 
   function coletarRespostasDiagnostico() {
@@ -644,25 +498,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function coletarEstudoDeCaso() {
-    const alunoIdade = document.getElementById('estudoAlunoIdade')?.value.trim();
-    const serieTurma = document.getElementById('estudoSerieTurma')?.value.trim();
-    const dataCaso = document.getElementById('estudoData')?.value;
     const demandas = document.getElementById('estudoDemandas')?.value.trim();
     const contexto = document.getElementById('estudoContexto')?.value.trim();
     const potencialidades = document.getElementById('estudoPotencialidades')?.value.trim();
     const estrategias = document.getElementById('estudoEstrategias')?.value.trim();
     const consideracoes = document.getElementById('estudoConsideracoes')?.value.trim();
 
-    if (!alunoIdade) { showToast('Preencha Nome do(a) aluno(a) e Idade.', 'error'); return null; }
-    if (!serieTurma) { showToast('Preencha Ano/Série/Turma.', 'error'); return null; }
-    if (!dataCaso) { showToast('Preencha a Data do estudo de caso.', 'error'); return null; }
     if (!demandas) { showToast('Preencha a Identificação das demandas individuais e das barreiras enfrentadas.', 'error'); return null; }
     if (!contexto) { showToast('Preencha a Análise do contexto escolar e das barreiras.', 'error'); return null; }
     if (!potencialidades) { showToast('Preencha a Identificação das potencialidades e das demandas de apoio.', 'error'); return null; }
     if (!estrategias) { showToast('Preencha a Definição de estratégias e recursos de acessibilidade.', 'error'); return null; }
     if (!consideracoes) { showToast('Preencha as Considerações Finais e Indicação para PEI.', 'error'); return null; }
 
-    return `ESTUDO DE CASO\n- Nome do(a) aluno(a) e Idade: ${alunoIdade}\n- Ano/Série/Turma: ${serieTurma}\n- Data do estudo de caso: ${dataCaso}\n- Identificação das demandas individuais e das barreiras enfrentadas: ${demandas}\n- Análise do contexto escolar e das barreiras: ${contexto}\n- Identificação das potencialidades e das demandas de apoio: ${potencialidades}\n- Definição de estratégias e recursos de acessibilidade: ${estrategias}\n- Considerações Finais e Indicação para PEI: ${consideracoes}`;
+    const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+    const alunoNome = selectedOption?.dataset.name || selectedOption?.textContent || 'Aluno selecionado';
+    const turma = selectedOption?.dataset.turma || 'Não informado';
+    const curso = selectedOption?.dataset.curso || 'Não informado';
+    const anoLetivo = selectedOption?.dataset.anoLetivo || selectedOption?.dataset['ano-letivo'] || 'Não informado';
+    const currentDate = document.getElementById('currentDate')?.textContent || new Date().toLocaleDateString('pt-BR');
+    const currentTime = document.getElementById('currentTime')?.textContent || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `ESTUDO DE CASO\n- Aluno: ${alunoNome}\n- Turma: ${turma}\n- Curso: ${curso}\n- Ano Letivo: ${anoLetivo}\n- Data/Hora do estudo de caso: ${currentDate} às ${currentTime}\n- Identificação das demandas individuais e das barreiras enfrentadas: ${demandas}\n- Análise do contexto escolar e das barreiras: ${contexto}\n- Identificação das potencialidades e das demandas de apoio: ${potencialidades}\n- Definição de estratégias e recursos de acessibilidade: ${estrategias}\n- Considerações Finais e Indicação para PEI: ${consideracoes}`;
   }
 
   function coletarCronograma() {
@@ -789,15 +644,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      studentSelect.innerHTML = '<option value="">-- Selecione o Aluno --</option>' + 
+      studentSelect.innerHTML = '<option value="">-- Selecione o aluno vinculado --</option>' + 
         students.map(s => {
-          const safeName = (s.name || s.nome || 'Aluno sem nome').replace(/"/g, '&quot;');
+          const safeName = (s.nome || s.name || 'Aluno sem nome').replace(/"/g, '&quot;');
+          const disability = s.deficiencia || s.disability_type || '';
+          const turma = s.turma || '';
+          const curso = s.curso || '';
+          const anoLetivo = s.anoLetivo || s.ano_letivo || '';
           return `
-            <option value="${s.id}" data-name="${safeName}" data-disability="${s.disability_type || ''}">
-              ${s.name || s.nome || 'Aluno sem nome'} ${s.disability_type ? `(${s.disability_type})` : ''}
+            <option 
+              value="${s.id}" 
+              data-name="${safeName}" 
+              data-disability="${disability}"
+              data-turma="${turma.replace(/"/g, '&quot;')}"
+              data-curso="${curso.replace(/"/g, '&quot;')}"
+              data-ano-letivo="${anoLetivo.replace(/"/g, '&quot;')}"
+            >
+              ${safeName}
             </option>
           `;
         }).join('');
+
+      if (students.length === 1) {
+        studentSelect.selectedIndex = 1;
+      }
+
+      atualizarInformacoesAlunoSelecionado();
     } catch (error) {
       console.error(error);
       studentSelect.innerHTML = '<option value="">Erro ao conectar com o banco de dados</option>';

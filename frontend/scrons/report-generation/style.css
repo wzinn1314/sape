@@ -501,33 +501,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Upload de PDF e helpers */
-.upload-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: 1rem;
-  border: 1px dashed rgba(27, 102, 210, 0.35);
-  border-radius: 14px;
-  background: rgba(235, 245, 255, 0.96);
-}
 
-.upload-card label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-}
-
-.upload-card input[type="file"] {
-  width: 100%;
-  font-size: 0.95rem;
-}
-
-.upload-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
 
 .helper-pill {
   display: inline-flex;
@@ -540,6 +514,17 @@ input:focus, select:focus, textarea:focus {
   color: var(--primary-color);
   font-size: 0.78rem;
   font-weight: 700;
+}
+
+.student-info-box {
+  padding: 0.9rem 1rem;
+  background: rgba(235, 245, 255, 0.95);
+  border: 1px solid rgba(27, 102, 210, 0.18);
+  border-radius: 12px;
+  color: #0f172a;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  white-space: pre-line;
 }
 
 /* Lista de relatórios (mantida para compatibilidade) */
