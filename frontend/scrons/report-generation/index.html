@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Relatórios - AEE / SAPE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR DE NAVEGAÇÃO (MANTIDA ORIGINAL) -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="frontend/assets/foto.png" alt="Logo SAPE">
+      <div>
+        <span>SAPE</span>
+        <p>Suporte e Acolhimento</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="../teacher-home/index.html" id="menuHome" style="display: none;"><i class="fas fa-home"></i> <span>Início</span></a>
+      <a href="../deshboard/index.html" id="menuDashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
+      <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
+      <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
+      <a class="active" href="../report-generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
+      <a href="../admin/admin.html"><i class="fas fa-comments"></i> <span>Professores</span></a>
+      <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
+        <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
+      </a>
+    </nav>
+
+    <div class="profile">
+      <div class="avatar" id="avatarProfile">A</div>
+      <div>
+        <strong id="professorName"></strong>
+        <span id="userType"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="main">
+    <header class="top-header">
+      <button class="menu-toggle" id="menuToggle" style="display: none;">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="header-left">
+        <div class="header-icon">
+          <i class="ph ph-note-pencil"></i>
+        </div>
+        <div class="header-titles">
+          <h1>Gerador de Relatórios Pedagógicos</h1>
+          <p>Preencha as observações do aluno com deficiência para gerar o PDF e registrar no sistema.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state" style="display: none;">
+        <div class="spinner"></div>
+        <span>Processando relatório...</span>
+      </div>
+
+      <form id="reportForm" class="form-card">
+        
+        <!-- Cabeçalho Automático com Data e Hora -->
+        <div class="meta-info-bar">
+          <span><i class="ph ph-calendar"></i> Data: <strong id="currentDate">--/--/----</strong></span>
+          <span><i class="ph ph-clock"></i> Hora: <strong id="currentTime">--:--</strong></span>
+        </div>
+
+        <!-- Seleção do Aluno -->
+        <div class="input-group">
+          <label for="studentSelect">Aluno *</label>
+          <div class="input-wrapper">
+            <i class="ph ph-user-focus"></i>
+            <select id="studentSelect" required>
+              <option value="">Carregando alunos do banco...</option>
+            </select>
+          </div>
+          <div id="studentInfoBox" class="student-info-box" style="display:none;">
+            Aluno vinculado selecionado. Nome e dados pessoais são carregados automaticamente do cadastro do aluno.
+          </div>
+        </div>
+
+        <!-- Tipo de Relatório -->
+        <div class="input-group">
+          <label for="reportType">Tipo de Relatório *</label>
+          <div class="input-wrapper">
+            <i class="ph ph-tag"></i>
+            <select id="reportType" required>
+              <option value="Avaliação Diagnóstica (Inicial)">Avaliação Diagnóstica (Inicial)</option>
+              <option value="Estudo de Caso">Estudo de Caso</option>
+              <option value="Cronograma de Atendimento">Cronograma de Atendimento</option>
+              <option value="Registro de Atividades Realizadas no Atendimento">Registro de Atividades Realizadas no Atendimento</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ====== CHECKLIST DA AVALIAÇÃO DIAGNÓSTICA (aparece só quando esse tipo é selecionado) ====== -->
+        <div class="input-group" id="diagnosticoChecklistWrapper">
+          <label>Avaliação Diagnóstica (Inicial) — marque uma opção por item</label>
+          <div id="diagnosticoChecklist" class="diagnostico-checklist"></div>
+        </div>
+
+        <!-- Corpo do Relatório / Observações (usado para o tipo livre, mas não para os formulários estruturados) -->
+        <div class="input-group" id="reportContentWrapper">
+          <label for="reportContent">Desenvolvimento e Observações Pedagógicas *</label>
+          <textarea 
+            id="reportContent" 
+            rows="6" 
+            placeholder="Escreva aqui o relatório detalhado sobre a evolução, aspectos cognitivos, motor, social e pedagógico do aluno..." 
+          ></textarea>
+        </div>
+
+        <div class="form-section" id="estudoCasoWrapper" style="display:none;">
+          <h2 class="section-heading">ESTUDO DE CASO (com base no Decreto nº 12.686/2025 e Avaliação Diagnóstica realizada junto à sala regular)</h2>
+          <div class="input-group">
+            <label>Aluno Selecionado *</label>
+            <div id="estudoAlunoInfo" class="student-info-box">
+              Selecione um aluno acima para carregar os dados vinculados automaticamente.
+            </div>
+          </div>
+          <div class="input-group">
+            <div id="studentAcademicInfo" class="student-info-box">
+              Turma, Curso e Ano Letivo serão preenchidos automaticamente.
+            </div>
+          </div>
+          <div class="input-group field-multiline">
+            <label for="estudoDemandas">Identificação das demandas individuais e das barreiras enfrentadas *</label>
+            <textarea id="estudoDemandas" rows="4" placeholder="Descreva as demandas individuais e as barreiras enfrentadas"></textarea>
+          </div>
+          <div class="input-group field-multiline">
+            <label for="estudoContexto">Análise do contexto escolar e das barreiras *</label>
+            <textarea id="estudoContexto" rows="4" placeholder="Descreva o contexto escolar e as barreiras"></textarea>
+          </div>
+          <div class="input-group field-multiline">
+            <label for="estudoPotencialidades">Identificação das potencialidades e das demandas de apoio *</label>
+            <textarea id="estudoPotencialidades" rows="4" placeholder="Identifique potencialidades e demandas de apoio"></textarea>
+          </div>
+          <div class="input-group field-multiline">
+            <label for="estudoEstrategias">Definição de estratégias e recursos de acessibilidade *</label>
+            <textarea id="estudoEstrategias" rows="4" placeholder="Defina estratégias e recursos de acessibilidade"></textarea>
+          </div>
+          <div class="input-group field-multiline">
+            <label for="estudoConsideracoes">Considerações Finais e Indicação para PEI *</label>
+            <textarea id="estudoConsideracoes" rows="4" placeholder="Informe considerações finais e indicação para PEI"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section" id="cronogramaWrapper" style="display:none;">
+          <h2 class="section-heading">CRONOGRAMA DE ATENDIMENTO</h2>
+          <div class="input-group">
+            <label for="cronogramaHorarioDia">Hora / Dia da Semana *</label>
+            <input id="cronogramaHorarioDia" type="text" placeholder="Ex: 09:00 - Segunda-feira" />
+          </div>
+          <div class="input-group">
+            <label for="cronogramaDuracao">Duração do Atendimento (minutos/horas) *</label>
+            <input id="cronogramaDuracao" type="text" placeholder="Ex: 45 minutos" />
+          </div>
+          <div class="input-group">
+            <label for="cronogramaFrequencia">Frequência do Atendimento Semanal *</label>
+            <select id="cronogramaFrequencia">
+              <option value="">Selecione a frequência</option>
+              <option value="1 vez">1 vez</option>
+              <option value="2 vezes">2 vezes</option>
+              <option value="3 vezes">3 vezes</option>
+              <option value="4 vezes">4 vezes</option>
+              <option value="5 vezes">5 vezes</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="cronogramaTipo">Tipo de Atendimento *</label>
+            <select id="cronogramaTipo">
+              <option value="">Selecione o tipo</option>
+              <option value="individual">individual</option>
+              <option value="coletivo">coletivo</option>
+              <option value="individual e coletivo">individual e coletivo</option>
+              <option value="em sala de aula junto aos outros">em sala de aula junto aos outros</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Composição do Atendimento *</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="sala de recursos" /> sala de recursos</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="prof. de libras" /> prof. de libras</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="prof. de braile" /> prof. de braile</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="intérprete sala regular" /> intérprete sala regular</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="mediador sala regular" /> mediador sala regular</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="hospitalar" /> hospitalar</label>
+              <label class="checkbox-item"><input type="checkbox" name="cronogramaComposicao" value="outros" /> outros</label>
+            </div>
+            <input id="cronogramaOutros" class="cronograma-outros-input" type="text" placeholder="Especifique outras composições" />
+          </div>
+        </div>
+
+        <div class="form-section" id="registroAtividadesWrapper" style="display:none;">
+          <h2 class="section-heading">REGISTRO DE ATIVIDADES REALIZADAS NO ATENDIMENTOS</h2>
+          <div id="registroAtividadesList" class="registro-atividade-list">
+            <div class="registro-atividade-bloco">
+              <div class="input-group">
+                <label>Data / Atividade *</label>
+                <input data-role="registro-data" type="text" placeholder="Ex: 28/07/2026 - Sessão de leitura" />
+              </div>
+              <div class="input-group field-multiline">
+                <label>Avanços *</label>
+                <textarea data-role="registro-avancos" rows="4" placeholder="Descreva os avanços observados"></textarea>
+              </div>
+              <div class="input-group field-multiline">
+                <label>Dificuldades na realização *</label>
+                <textarea data-role="registro-dificuldades" rows="4" placeholder="Descreva as dificuldades encontradas"></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="btnAdicionarRegistroAtividade" class="btn-submit btn-inline">
+            <i class="ph ph-plus"></i>
+            Adicionar outro registro de atividade
+          </button>
+          <div class="section-heading">ESTRATÉGIAS DE AVALIAÇÃO</div>
+          <div class="input-group">
+            <label>Área *</label>
+            <input data-role="avaliacao-area" type="text" placeholder="Área de avaliação" />
+          </div>
+          <div class="input-group field-multiline">
+            <label>Estratégia utilizada *</label>
+            <textarea data-role="avaliacao-estrategia" rows="4" placeholder="Descreva a estratégia de avaliação utilizada"></textarea>
+          </div>
+        </div>
+
+        <!-- Encaminhamentos / Recomendações -->
+        <div class="input-group">
+          <label for="reportRecommendations">Encaminhamentos e Recomendações (Opcional)</label>
+          <textarea 
+            id="reportRecommendations" 
+            rows="3" 
+            placeholder="Ex: Adaptação de material, encaminhamento para fonoaudiologia, adequação curricular..."
+          ></textarea>
+        </div>
+
+        <!-- Botão para Gerar PDF e Salvar -->
+        <button type="submit" id="btnSubmit" class="btn-submit">
+          <i class="ph ph-file-pdf"></i>
+          Salvar Relatório
+        </button>
+      </form>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+
+    <script src="../../config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

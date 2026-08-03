@@ -1,4 +1,4 @@
-const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
+const API_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin;
 
 let allReports = [];
 let filteredReports = [];
@@ -33,33 +33,13 @@ function setupEventListeners() {
   const prevPageBtn = document.getElementById('prevPage');
   const nextPageBtn = document.getElementById('nextPage');
 
-  if (searchInput) {
-    searchInput.addEventListener('input', handleSearchInput);
-  }
-
-  if (filterProfessor) {
-    filterProfessor.addEventListener('change', applyFilters);
-  }
-
-  if (filterAluno) {
-    filterAluno.addEventListener('change', applyFilters);
-  }
-
-  if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener('click', clearFilters);
-  }
-
-  if (clearSearchBtn) {
-    clearSearchBtn.addEventListener('click', clearSearch);
-  }
-
-  if (prevPageBtn) {
-    prevPageBtn.addEventListener('click', () => changePage(-1));
-  }
-
-  if (nextPageBtn) {
-    nextPageBtn.addEventListener('click', () => changePage(1));
-  }
+  if (searchInput) searchInput.addEventListener('input', handleSearchInput);
+  if (filterProfessor) filterProfessor.addEventListener('change', applyFilters);
+  if (filterAluno) filterAluno.addEventListener('change', applyFilters);
+  if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', clearFilters);
+  if (clearSearchBtn) clearSearchBtn.addEventListener('click', clearSearch);
+  if (prevPageBtn) prevPageBtn.addEventListener('click', () => changePage(-1));
+  if (nextPageBtn) nextPageBtn.addEventListener('click', () => changePage(1));
 }
 
 async function loadInitialData() {
@@ -75,6 +55,22 @@ async function loadInitialData() {
   }
 }
 
+// Normaliza um relatório vindo do backend (snake_case) para o formato que a tela usa
+function normalizeReport(r) {
+  return {
+    id: r.id,
+    titulo: r.titulo || r.file_name || 'Relatório AEE',
+    aluno: r.aluno || r.student_name || r.studentName || 'Não informado',
+    professor: r.professor || r.professorName || 'Não informado',
+    professorId: r.professorId ?? r.user_id ?? r.userId ?? null,
+    studentId: r.studentId ?? r.student_id ?? null,
+    data: r.data,
+    created_at: r.created_at,
+    status: r.status || 'Finalizado',
+    conteudo: r.conteudo || r.pdf_content || r.pdfContent || 'Sem conteúdo'
+  };
+}
+
 async function loadReports() {
   try {
     const userJSON = localStorage.getItem("sape_user");
@@ -83,8 +79,7 @@ async function loadReports() {
     if (userJSON) {
       const user = JSON.parse(userJSON);
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/reports`;
@@ -106,7 +101,8 @@ async function loadReports() {
     if (!response.ok) throw new Error('Erro ao buscar relatórios');
 
     const data = await response.json();
-    const backendReports = Array.isArray(data) ? data : (data.data || []);
+    const rawBackendReports = Array.isArray(data) ? data : (data.data || []);
+    const backendReports = rawBackendReports.map(normalizeReport);
 
     const localReports = JSON.parse(localStorage.getItem('relatoriosSAPE')) || [];
 
@@ -131,8 +127,7 @@ async function loadStudents() {
     if (userJSON) {
       const user = JSON.parse(userJSON);
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (!isAdmin && user.id) {
         endpoint = `${API_URL}/users/${user.id}/students`;
@@ -290,8 +285,8 @@ function renderReports() {
           </div>
         </div>
       </td>
-      <td>${report.aluno || report.studentName || 'Não informado'}</td>
-      <td>${report.professor || report.professorName || 'Não informado'}</td>
+      <td>${report.aluno || 'Não informado'}</td>
+      <td>${report.professor || 'Não informado'}</td>
       <td>${formatDate(report.created_at || report.data)}</td>
       <td><span class="status-badge status-finalizado">${report.status || 'Finalizado'}</span></td>
       <td>
@@ -387,8 +382,8 @@ function visualizarRelatorio(id) {
     
     modalContent.innerHTML = `
       <h2 style="margin-bottom: 15px;">${report.titulo || 'Relatório'}</h2>
-      <p><strong>Aluno:</strong> ${report.aluno || report.studentName || 'Não informado'}</p>
-      <p><strong>Professor:</strong> ${report.professor || report.professorName || 'Não informado'}</p>
+      <p><strong>Aluno:</strong> ${report.aluno || 'Não informado'}</p>
+      <p><strong>Professor:</strong> ${report.professor || 'Não informado'}</p>
       <p><strong>Data:</strong> ${formatDate(report.created_at || report.data)}</p>
       <hr style="margin: 15px 0;">
       <pre style="white-space: pre-wrap; font-family: inherit;">${report.conteudo || 'Sem conteúdo'}</pre>
@@ -408,25 +403,146 @@ function visualizarRelatorio(id) {
 
 function baixarRelatorio(id) {
   const report = allReports.find(r => String(r.id) === String(id));
-  if (report) {
-    const alunoNome = report.aluno || report.studentName || 'aluno';
-    const content = report.conteudo || `${report.titulo}\n\nAluno: ${alunoNome}\nProfessor: ${report.professor || report.professorName}\nData: ${formatDate(report.created_at || report.data)}`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Relatorio_${alunoNome.replace(/\s+/g, '_')}_${formatDate(report.created_at || report.data)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showToast(`Baixando relatório: ${report.titulo}`, 'success');
-  } else {
+  if (!report) {
     showToast('Relatório não encontrado', 'error');
+    return;
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+    const marginLeft = 45;
+    const marginRight = 45;
+    const marginBottom = 45;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const usableWidth = pageWidth - marginLeft - marginRight;
+    let y = 55;
+
+    const alunoNome = report.aluno || 'Não informado';
+    const professorNome = report.professor || 'Não informado';
+    const dataFormatada = formatDate(report.created_at || report.data);
+    const titulo = report.titulo || 'Relatório AEE';
+    const conteudo = report.conteudo || 'Sem conteúdo';
+
+    function novaLinhaSeNecessario(alturaLinha) {
+      if (y + alturaLinha > pageHeight - marginBottom) {
+        doc.addPage();
+        y = 55;
+      }
+    }
+
+    function escreverTexto(texto, x, larguraDisponivel, alturaLinha) {
+      const linhasQuebradas = doc.splitTextToSize(String(texto), larguraDisponivel);
+      linhasQuebradas.forEach(l => {
+        novaLinhaSeNecessario(alturaLinha);
+        doc.text(l, x, y);
+        y += alturaLinha;
+      });
+    }
+
+    // Cabeçalho
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Sistema SAPE - Relatório Pedagógico', marginLeft, y);
+    y += 20;
+
+    doc.setDrawColor(200);
+    doc.line(marginLeft, y, pageWidth - marginRight, y);
+    y += 16;
+
+    // Metadados
+    const lhMeta = 13;
+    doc.setFontSize(9);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Título:', marginLeft, y);
+    doc.setFont('helvetica', 'normal');
+    escreverTexto(titulo, marginLeft + 55, usableWidth - 55, lhMeta);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Aluno:', marginLeft, y);
+    doc.setFont('helvetica', 'normal');
+    escreverTexto(alunoNome, marginLeft + 55, usableWidth - 55, lhMeta);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Professor:', marginLeft, y);
+    doc.setFont('helvetica', 'normal');
+    escreverTexto(professorNome, marginLeft + 55, usableWidth - 55, lhMeta);
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Data:', marginLeft, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dataFormatada, marginLeft + 55, y);
+    y += lhMeta + 4;
+
+    doc.line(marginLeft, y, pageWidth - marginRight, y);
+    y += 16;
+
+    // Conteúdo organizado por tópicos
+    const lineHeight = 10;
+    const paragrafoEspaco = 5;
+    doc.setFontSize(7.5);
+
+    const blocos = conteudo.split(/\n\s*\n/).filter(b => b.trim() !== '');
+
+    blocos.forEach(bloco => {
+      const linhasDoBloco = bloco.split('\n').filter(l => l.trim() !== '');
+
+      linhasDoBloco.forEach(linhaOriginal => {
+        const linha = linhaOriginal.trim();
+        if (!linha) return;
+
+        const ehTopico = linha === linha.toUpperCase() &&
+                          /[A-ZÀ-Ú]/.test(linha) &&
+                          !linha.includes('|') &&
+                          !linha.startsWith('-') &&
+                          !linha.startsWith('[') &&
+                          linha.length < 80;
+
+        const ehCabecalhoSecao = linha.startsWith('[') && linha.endsWith(']');
+        const ehRotulo = /^[A-ZÀ-Ú/]+:$/.test(linha) || linha.startsWith('Data/Hora:');
+
+        if (ehCabecalhoSecao) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10.5);
+          escreverTexto(linha.replace(/^\[|\]$/g, ''), marginLeft, usableWidth, lineHeight + 2);
+          y += 2;
+          doc.setFontSize(7.5);
+          doc.setFont('helvetica', 'normal');
+        } else if (ehTopico) {
+          y += 3;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.5);
+          doc.setTextColor(37, 99, 235);
+          escreverTexto(linha, marginLeft, usableWidth, lineHeight + 1);
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(7.5);
+          doc.setFont('helvetica', 'normal');
+        } else if (ehRotulo) {
+          doc.setFont('helvetica', 'bold');
+          escreverTexto(linha, marginLeft, usableWidth, lineHeight);
+          doc.setFont('helvetica', 'normal');
+        } else if (linha.startsWith('-')) {
+          escreverTexto(linha, marginLeft + 10, usableWidth - 10, lineHeight);
+        } else {
+          escreverTexto(linha, marginLeft, usableWidth, lineHeight);
+        }
+      });
+
+      y += paragrafoEspaco;
+    });
+
+    const nomeArquivo = `Relatorio_${alunoNome.replace(/\s+/g, '_')}_${dataFormatada.replace(/\//g, '-')}.pdf`;
+    doc.save(nomeArquivo);
+
+    showToast(`Baixando relatório: ${titulo}`, 'success');
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    showToast('Erro ao gerar o PDF do relatório.', 'error');
   }
 }
-
 async function deletarRelatorio(id) {
   if (!confirm('Deseja realmente excluir este relatório?')) return;
 
@@ -519,8 +635,7 @@ function loadUserProfile() {
     
     if (adminMenu) {
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      if (role.includes("admin") || matricula === "ADM2026") {
+      if (role.includes("admin")) {
         adminMenu.style.display = "flex";
         if (menuDashboard) menuDashboard.style.display = "flex";
         if (menuNewStudent) menuNewStudent.style.display = "flex";
@@ -532,8 +647,7 @@ function loadUserProfile() {
       }
     } else {
       const role = (user.role || "").toLowerCase();
-      const matricula = (user.matricula || "").toUpperCase();
-      const isAdmin = role.includes("admin") || matricula === "ADM2026";
+      const isAdmin = role.includes("admin");
       
       if (menuDashboard) menuDashboard.style.display = isAdmin ? "flex" : "none";
       if (menuNewStudent) menuNewStudent.style.display = isAdmin ? "flex" : "none";

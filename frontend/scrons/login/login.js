@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const passwordInput = document.getElementById('password');
   const submitButton = document.getElementById('btnEntrar');
 
-  const API_BASE_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.API_URL || 'http://localhost:3000';
+  const API_BASE_URL = (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin;
 
   // Verificar se já está logado - DESATIVADO para permitir acesso à tela de login
   // checkExistingSession();
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Redirecionamento após sucesso
           setTimeout(() => {
-            if (role.includes('admin') || matricula === 'ADM2026') {
+            if (role.includes('admin')) {
               window.location.href = '../deshboard/index.html';
             } else {
               window.location.href = '../teacher-home/index.html';
@@ -119,12 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (token && user) {
       const userData = JSON.parse(user);
       const role = (userData.role || '').toLowerCase();
-      const matricula = (userData.matricula || '').toUpperCase();
 
-      if (role.includes('admin') || matricula === 'ADM2026') {
+      if (role.includes('admin')) {
         window.location.href = '../deshboard/index.html';
       } else {
-        window.location.href = '../deshboard/index.html';
+        window.location.href = '../teacher-home/index.html';
       }
     }
   }

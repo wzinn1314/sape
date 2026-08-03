@@ -4,26 +4,21 @@
  */
 (function () {
   function getApiUrl() {
-    // Se houver uma URL explicitamente injetada globalmente
     if (window.SAPE_API_URL) {
       return window.SAPE_API_URL;
     }
 
     const origin = window.location.origin;
-
-    // Se a página for aberta direto do sistema de arquivos (file://) ou sem origin
     if (!origin || origin === 'null' || origin.startsWith('file://')) {
       return 'http://localhost:3000';
     }
 
     try {
       const url = new URL(origin);
-      // Se o servidor frontend estiver rodando em ambiente de dev local (ex: porta 5500 ou 8080)
       if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
         return `${url.protocol}//${url.hostname}:3000`;
       }
-      // Em produção (mesmo domínio/porta ou com proxy reverso)
-      return origin;
+      return `${url.protocol}//${url.hostname}${url.port ? `:${url.port}` : ''}`;
     } catch (e) {
       return 'http://localhost:3000';
     }

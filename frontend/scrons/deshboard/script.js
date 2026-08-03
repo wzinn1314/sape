@@ -3,7 +3,7 @@
  */
 
 const SAPE_CONFIG = window.SAPE_CONFIG || {
-  API_URL: (window.API_URL || 'http://localhost:3000'),
+  API_URL: (window.SAPE_CONFIG && window.SAPE_CONFIG.API_URL) || window.location.origin,
   STORAGE_KEY: 'sape_user',
   TOKEN_KEY: 'sape_token'
 };
@@ -47,20 +47,20 @@ function validateAccess() {
     if (abaAdmin) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
+      const hasPrivileges = role.includes("admin");
       abaAdmin.style.display = hasPrivileges ? 'flex' : 'none';
     }
     
     if (menuNovoAluno) {
       const role = (user.role || "").toLowerCase();
       const matricula = (user.matricula || "").toUpperCase();
-      const hasPrivileges = role.includes("admin") || matricula === "ADM2026";
+      const hasPrivileges = role.includes("admin");
       menuNovoAluno.style.display = hasPrivileges ? 'flex' : 'none';
     }
 
     const role = (user.role || "").toLowerCase();
     const matricula = (user.matricula || "").toUpperCase();
-    const isAdmin = role.includes("admin") || matricula === "ADM2026";
+    const isAdmin = role.includes("admin");
     
     console.log("Tipo de usuário:", isAdmin ? "Admin" : "Professor");
 
