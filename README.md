@@ -97,7 +97,7 @@ SAPE/
 1. **Clone o repositório:**
 ```bash
 git clone https://github.com/wzinn1314/sape.git
-cd SAPE
+cd sape
 ```
 
 2. **Instale as dependências:**
