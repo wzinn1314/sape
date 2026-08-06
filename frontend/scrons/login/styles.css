@@ -46,6 +46,9 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 h1 {

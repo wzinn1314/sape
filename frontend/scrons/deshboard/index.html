@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAPE - Dashboard Profissional</title>
-    <!-- CSS e Icones -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" href="/assets/foto.png" type="image/png">
+    <link rel="icon" href="../../assets/foto.png" type="image/png">
+    <link rel="shortcut icon" href="../../assets/foto.png" type="image/png">
 </head>
 <body>
 
-    <!-- SIDEBAR (Estrutura original preservada, sempre visível) -->
     <aside class="sidebar">
         <div class="logo">
-            <img src="/assets/foto.png" alt="Logo SAPE">
+            <img src="../../assets/foto.png" alt="Logo SAPE">
             <div class="logo-text">
                 <span>SAPE</span>
                 <p>Suporte e Acolhimento</p>
@@ -22,13 +21,27 @@
         </div>
 
         <nav class="menu">
-            <a href="../teacher-home/index.html" id="menuHome" style="display: none;"><i class="fas fa-home"></i> <span>Início</span></a>
-            <a class="active" href="../deshboard/index.html" id="menuDashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-            <a href="../students/index.html"><i class="fas fa-graduation-cap"></i> <span>Alunos</span></a>
-            <a href="../new_students/index.html" id="menuNewStudent"><i class="fas fa-user-plus"></i> <span>Novo Aluno</span></a>
-            <a href="../report/index.html"><i class="fas fa-file-pdf"></i> <span>Relatórios</span></a>
-            <a href="../report-generation/index.html"><i class="fas fa-clipboard-list"></i> <span>Novo Relatório</span></a>
-            <a href="../settings/index.html"><i class="fas fa-comments"></i> <span>Professores</span></a>
+            <a href="../teacher-home/index.html" id="menuHome" style="display: none;">
+                <i class="fas fa-home"></i> <span>Início</span>
+            </a>
+            <a class="active" href="../deshboard/index.html" id="menuDashboard">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="../students/index.html">
+                <i class="fas fa-graduation-cap"></i> <span>Meus Alunos</span>
+            </a>
+            <a href="../report-generation/index.html">
+                <i class="fas fa-file-medical"></i> <span>Criar Relatório</span>
+            </a>
+            <a href="../report/index.html">
+                <i class="fas fa-file-invoice"></i> <span>Meus Relatórios</span>
+            </a>
+            <a href="../settings/index.html">
+                <i class="fas fa-comments"></i> <span>Professores</span>
+            </a>
+            <a href="../new_students/index.html" id="menuNewStudent" style="display: none;">
+                <i class="fas fa-user-plus"></i> <span>Novo Aluno</span>
+            </a>
             <a href="../admin/admin.html" id="abaAdminMenu" style="display: none;">
                 <i class="fas fa-user-shield"></i> <span>Painel Admin</span>
             </a>
@@ -46,9 +59,11 @@
         </div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main">
         <header class="top-header">
+            <button class="menu-toggle" id="menuToggle" style="display: none;">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="header-greeting">
                 <h1>Bem-vindo(a), <span id="professorGreeting">Usuário</span>!</h1>
                 <p id="headerSubtitle">Painel de gerenciamento acadêmico e acolhimento.</p>
@@ -58,13 +73,11 @@
             </div>
         </header>
 
-        <!-- Loading State -->
         <div id="loadingState" class="loading-state" style="display: none;">
             <div class="spinner"></div>
             <span>Carregando dados...</span>
         </div>
 
-        <!-- CARDS DE ESTATÍSTICAS (KPIs) -->
         <section class="stats-cards">
             <div class="card">
                 <p class="card-label">Total de Alunos</p>
@@ -78,18 +91,15 @@
                 <small class="text-muted">Relatórios registrados</small>
             </div>
 
-            <div class="card card-yellow">
+            <div class="card card-green">
                 <p class="card-label">Professores Ativos</p>
                 <h3 class="card-number" id="totalTeachers">--</h3>
                 <small class="text-muted">Professores de AEE</small>
             </div>
         </section>
 
-        <!-- GRID DE CONTEÚDO -->
         <section class="dashboard-grid">
-            
             <div class="left-column">
-                <!-- ÚLTIMOS REGISTROS -->
                 <div class="box">
                     <div class="box-header">
                         <h3>Alunos Registrados Recentemente</h3>
@@ -100,7 +110,6 @@
                     </div>
                 </div>
 
-                <!-- QUADRO DE AVISOS -->
                 <div class="box">
                     <div class="box-header">
                         <h3>Status do Sistema</h3>
@@ -117,41 +126,61 @@
             </div>
 
             <div class="right-column">
-                <!-- DISTRIBUIÇÃO POR DIAGNÓSTICO -->
                 <div class="box">
                     <div class="box-header">
                         <h3>Distribuição por Diagnóstico</h3>
                         <span class="status-pill">Dados reais</span>
                     </div>
-
                     <div class="analytics" id="diagnosisStats">
                         <div class="loading-state">Carregando estatísticas...</div>
                     </div>
                 </div>
 
-                <!-- ATALHOS RÁPIDOS -->
                 <div class="box">
                     <div class="box-header">
-                        <h3>Acesso Rápido</h3>
+                        <h3>Ações Rápidas</h3>
                     </div>
-                    <div class="quick-links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <a href="../report-generation/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
-                            <i class="fas fa-file-medical"></i><br>Novo Relatório
+                    <div class="quick-actions">
+                        <a href="../report-generation/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Criar Relatório</strong>
+                                <p>Novo relatório pedagógico</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
                         </a>
-                        <a href="../report/index.html" class="card-link" style="padding: 15px; border: 1px solid var(--border); border-radius: var(--radius-md); text-align: center;">
-                            <i class="fas fa-print"></i><br>Ver Relatórios
+
+                        <a href="../students/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Meus Alunos</strong>
+                                <p>Gerenciar alunos vinculados</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+
+                        <a href="../report/index.html" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Histórico</strong>
+                                <p>Ver relatórios anteriores</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
                         </a>
                     </div>
                 </div>
             </div>
-
         </section>
     </main>
 
-    <!-- Toast Notification Container -->
     <div id="toastContainer"></div>
 
-    <!-- Scripts -->
     <script src="../../config.js"></script>
     <script src="script.js"></script>
 </body>

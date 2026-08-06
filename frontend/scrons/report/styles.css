@@ -64,7 +64,9 @@ body {
   border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(27, 102, 210, 0.15);
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .logo span {
